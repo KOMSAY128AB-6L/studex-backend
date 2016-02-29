@@ -1,0 +1,52 @@
+{
+  "name": "studex-backend",
+  "version": "0.0.1",
+  "description": "Student volunteer selection",
+  "main": "server.js",
+  "dependencies": {
+    "anytv-node-cors": "0.0.7",
+    "anytv-node-error-handler": "0.0.10",
+    "anytv-node-importer": "0.0.0",
+    "anytv-node-mysql": "0.0.47",
+    "body-parser": "^1.14.2",
+    "compression": "^1.6.0",
+    "cuddle": "0.0.52",
+    "express": "^4.13.3",
+    "file-stream-rotator": "0.0.6",
+    "grunt-contrib-watch": "^0.6.1",
+    "lodash": "^4.2.1",
+    "method-override": "^2.3.5",
+    "moment": "^2.11.2",
+    "morgan": "^1.6.1",
+    "multer": "^1.1.0",
+    "winston": "^2.1.0"
+  },
+  "scripts": {
+    "start": "grunt",
+    "test": "grunt test",
+    "coverage": "unset NODE_ENV && istanbul cover _mocha -- --recursive -R spec -t 5000 -s 100",
+    "test-dev": "grunt test-watch",
+    "docs": "apidoc -i controllers -o apidoc/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KOMSAY128AB-6L/studex-backend"
+  },
+  "homepage": "https://github.com/KOMSAY128AB-6L/studex-backend",
+  "devDependencies": {
+    "apidoc": "^0.15.0",
+    "chai": "^3.4.1",
+    "coveralls": "^2.11.4",
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-express-server": "^0.5.1",
+    "grunt-mocha-test": "^0.12.7",
+    "istanbul": "^0.4.0",
+    "mocha": "^2.3.3",
+    "mocha-lcov-reporter": "^1.0.0",
+    "node-mocks-http": "^1.5.1",
+    "supertest": "^1.1.0"
+  },
+  "license": "MIT"
+}
