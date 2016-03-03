@@ -34,13 +34,11 @@ CREATE TABLE IF NOT EXISTS teacher (
 
 CREATE TABLE IF NOT EXISTS student (
 	student_id INT AUTO_INCREMENT PRIMARY KEY,
-	teacher_id INT,
 	email VARCHAR(64) UNIQUE,
 	first_name VARCHAR(64),
 	middle_initial VARCHAR(4),
 	last_name VARCHAR(64),
-	picture VARCHAR(64),
-	FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id)
+	picture VARCHAR(64)
 );
 
 CREATE TABLE IF NOT EXISTS class (
