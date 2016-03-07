@@ -34,13 +34,11 @@ CREATE TABLE IF NOT EXISTS teacher (
 
 CREATE TABLE IF NOT EXISTS student (
 	student_id INT AUTO_INCREMENT PRIMARY KEY,
-	teacher_id INT,
 	email VARCHAR(64) UNIQUE,
 	first_name VARCHAR(64),
 	middle_initial VARCHAR(4),
 	last_name VARCHAR(64),
-	picture VARCHAR(64),
-	FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id)
+	picture VARCHAR(64)
 );
 
 CREATE TABLE IF NOT EXISTS class (
@@ -57,3 +55,16 @@ CREATE TABLE IF NOT EXISTS student_class (
 	PRIMARY KEY(class_id, student_id)
 );
 
+CREATE TABLE IF NOT EXISTS volunteer (
+	volunteer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	teacher_id INT,
+	volunteer_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
+);
+
+CREATE TABLE IF NOT EXISTS volunteer_student (
+	student_id INT,
+	volunteer_id BIGINT,
+	PRIMARY KEY(student_id, volunteer_id),
+	FOREIGN KEY(student_id) REFERENCES student(student_id)
+);
