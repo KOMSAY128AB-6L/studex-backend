@@ -38,7 +38,7 @@ exports.create_user = (req, res, next) => {
         }
 
         return res.status(200)
-                .error({message: 'User successfully created'})
+                .item({message: 'User successfully created'})
                 .send();
     }
 
