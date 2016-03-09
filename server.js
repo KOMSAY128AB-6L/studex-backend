@@ -34,7 +34,7 @@ function start () {
 
     // configure mysql
     mysql.set_logger(winston)
-        .add('my_db', config.DB);
+        .add('master', config.DB);
 
 
     winston.log('info', 'Starting', config.APP_NAME, 'on', config.ENV, 'environment');
