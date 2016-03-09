@@ -19,7 +19,7 @@ exports.delete_class = (req, res, next) => {
     function start () {
         mysql.use('my_db')
             .query(
-                'DELETE * FROM users WHERE user_id = ? LIMIT 1;',
+                'DELETE * FROM class WHERE class_id = ? LIMIT 1;',
                 [req.params.id],
                 send_response
             )
