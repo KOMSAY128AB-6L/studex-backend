@@ -24,7 +24,7 @@ const config = {
         host: 'localhost',
         user: 'root',
         password: '',
-        database: 'test'
+        database: 'studex'
     },
 
     use: (env) => {
