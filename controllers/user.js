@@ -1,7 +1,9 @@
 'use strict';
 
+const util   = require(__dirname + '/../helpers/util');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
+const config  = require(__dirname + '/../config/config');
 
 /**
  * @api {post} /user Create new user
@@ -17,15 +19,47 @@ const winston = require('winston');
  * @apiSuccess 
  */
 exports.create_user = (req, res, next) => {
-    
+    const data = util.get_data(
+        {
+            email: '',
+            password: '',
+            first_name: '',
+            middle_initial: '',
+            last_name: ''
+        },
+        req.body
+    );
+
+
     function start () {
-        mysql.use('my_db')
+        let email, password, first_name, middle_initial, last_name;
+
+        if (data instanceof Error) {
+            return res.warn(400, {message: data.message});
+        }
+
+        email = data.email;
+        delete data.email;
+        
+        password = data.password;
+        delete data.password;
+        
+        first_name = data.first_name;
+        delete data.first_name;
+        
+        middle_initial = data.middle_initial;
+        delete data.middle_initial;
+        
+        last_name = data.last_name;
+        delete data.last_name;
+
+        mysql.use('master')
             .query(
-                'INSERT INTO users(email, password, first_name, middle_initial,\
+                'INSERT INTO teacher(email, password, first_name, middle_initial,\
                                     last_name) \
-                 VALUES(?,?,?,?,?);',
-                [req.body.email, req.body.password, req.body.first_name,
-                 req.body.middle_initial, req.body.last_name],
+                 VALUES(?, PASSWORD(CONCAT(?, ?)), ?, ?, ?);',
+                [email, password, config.SALT, first_name, middle_initial, 
+                 last_name],
                 send_response
             )
             .end();
