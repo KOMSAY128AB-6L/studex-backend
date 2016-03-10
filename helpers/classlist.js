@@ -14,7 +14,7 @@ const start = () => {
     console.log('use studex');
     
 	lr.on('error', (err) => {
-	    console.log(err);
+        console.log(err);
 	});
 	
 	lr.on('line', (line) => {
