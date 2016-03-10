@@ -57,7 +57,7 @@ exports.create_user = (req, res, next) => {
             .query(
                 'INSERT INTO teacher(email, password, first_name, middle_initial,\
                                     last_name) \
-                 VALUES(?, PASSWORD(CONCAT(?, ?)), ?, ?, ?);',
+                 VALUES(?, PASSWORD(CONCAT(MD5(?), ?)), ?, ?, ?);',
                 [email, password, config.SALT, first_name, middle_initial, 
                  last_name],
                 send_response
