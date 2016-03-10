@@ -63,8 +63,8 @@ const start = () => {
                 ['INSERT INTO student_class ',
                 'VALUES (',
                     '(SELECT class_id FROM class WHERE class_name=', class_name, '),',
-                    '(SELECT student_id FROM student WHERE email=', line_arr[0].split(',')[0],')'
-                 ,')'].join('')
+                    '(SELECT student_id FROM student WHERE email=', line_arr[0].split(',')[0],')',
+                ')'].join('')
             );
         }
 	});
