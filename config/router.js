@@ -14,6 +14,9 @@ module.exports = (router) => {
     router.get('/user/', __.user.get_users);
     router.post('/user/', __.user.post_user);
 
+    router.put('/teacher/:id',__.teacher.update_teacher);
+    router.delete('/teacher/:id',__.teacher.delete_teacher);
+
     router.all('*', (req, res) => {
         res.status(404)
             .send({message: 'Nothing to do here.'});
