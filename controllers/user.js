@@ -32,34 +32,17 @@ exports.create_user = (req, res, next) => {
 
 
     function start () {
-        let email, password, first_name, middle_initial, last_name;
-
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
         }
-
-        email = data.email;
-        delete data.email;
-        
-        password = data.password;
-        delete data.password;
-        
-        first_name = data.first_name;
-        delete data.first_name;
-        
-        middle_initial = data.middle_initial;
-        delete data.middle_initial;
-        
-        last_name = data.last_name;
-        delete data.last_name;
 
         mysql.use('master')
             .query(
                 'INSERT INTO teacher(email, password, first_name, middle_initial,\
                                     last_name) \
-                 VALUES(?, PASSWORD(CONCAT(?, ?)), ?, ?, ?);',
-                [email, password, config.SALT, first_name, middle_initial, 
-                 last_name],
+                 VALUES(?, PASSWORD(CONCAT(MD5(?), ?)), ?, ?, ?);',
+                [data.email, data.password, config.SALT, data.first_name, 
+                 data.middle_initial, data.last_name],
                 send_response
             )
             .end();
