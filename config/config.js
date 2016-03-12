@@ -24,8 +24,10 @@ const config = {
         host: 'localhost',
         user: 'root',
         password: '',
-        database: 'test'
+        database: 'studex'
     },
+
+    SALT: 'q5cH9VoL',
 
     use: (env) => {
         _.assign(config, require(__dirname + '/env/' + env));
