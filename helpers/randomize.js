@@ -17,8 +17,7 @@ function randomize_with_chance(studentList, numberOfVolunteers) {
 	let volunteer = [];
 	let currentWeightIndex = 0;
 
-	let size = studentList.push();
-	for(let iii = 0; iii < size;) {
+	for(let iii = 0; iii < studentList.length;) {
 		if (selectedWeights[currentWeightIndex] < accumulatedWeight + studentList[iii].weight) {
 			volunteer.push(studentList[iii].student_id);
 			currentWeightIndex++;
