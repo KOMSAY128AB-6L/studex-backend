@@ -53,7 +53,15 @@ function randomize_distinct_with_chance(studentList, numberOfVolunteers) {
 	return volunteer;
 }
 
+function set_weight_by_count(studentList, settings) {
+	studentList.forEach((student) => student.weight = (student.volunteer > settings.freshWeight)? settings.minWeight: settings.freshWeight - student.volunteer);
+}
+
 function randomize(studentList, settings) {
+	if(settings.byCount) {
+		set_weight_by_count(studentList, settings);
+		settings.withChance = true;
+	}
 	if (settings.withChance) {
 		if (settings.unique) {
 			return randomize_distinct_with_chance(studentList, settings.numberOfVolunteers);
@@ -65,5 +73,5 @@ function randomize(studentList, settings) {
 
 
 module.exports = {
-	randomize_with_chance
+	randomize
 };
