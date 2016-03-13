@@ -30,15 +30,29 @@ function randomize_with_chance(studentList, numberOfVolunteers) {
 	return volunteer;
 }
 
-
 function randomize_distinct_with_chance(studentList, numberOfVolunteers) {
 	let fullWeight = 0;
 	let volunteer = [];
 	studentList.forEach((student) => fullWeight += student.weight);
+
+	let accumulatedWeight;
+	let selectedWeight;
 	while(numberOfVolunteers-- > 0) {
+		selectedWeight = Math.floor(Math.random()*fullWeight);
+		accumulatedWeight = 0;
+		for(let iii = 0; iii < studentList.length; iii++) {
+			if (selectedWeight < accumulatedWeight + studentList[iii].weight) {
+				fullWeight -= studentList[iii].weight;
+				volunteer.push(studentList.splice(iii,1)[0].student_id);
+				break;
+			}
+			accumulatedWeight += studentList[iii].weight;
+		}
 	}
 
+	return volunteer;
 }
+
 function randomize(studentList, settings) {
 	if (settings.withChance) {
 		if (settings.unique) {
