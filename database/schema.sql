@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS class (
 CREATE TABLE IF NOT EXISTS student_class (
 	class_id BIGINT,
 	student_id INT,
+	times_called INT,
 	PRIMARY KEY(class_id, student_id)
 );
 

@@ -10,7 +10,9 @@ module.exports = (router) => {
 
     router.delete('/class/:id', __.class.delete_class);
     router.post('/user', __.user.create_user);
-    router.post('/randomize', __.randomize.randomize);
+
+    router.post('/randomize/classes', __.randomize.randomize_classes);
+    router.post('/randomize/students', __.randomize.randomize_students);
 
     
     router.all('*', (req, res) => {
