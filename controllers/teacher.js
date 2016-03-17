@@ -7,7 +7,7 @@ const winston = require('winston');
 exports.get_teachers = (req, res, next) => {
 
     function start () {
-        mysql.use('studex')
+        mysql.use('master')
             .query(
                 'SELECT * FROM get_teacher;',
                 send_response
@@ -30,7 +30,7 @@ exports.get_teachers = (req, res, next) => {
 exports.get_teacher = (req, res, next) => {
 
     function start () {
-        mysql.use('studex')
+        mysql.use('master')
             .query(
                 'SELECT * FROM teacher WHERE teacher_id = ?;',
                 [req.params.id],
@@ -60,7 +60,7 @@ exports.get_teacher = (req, res, next) => {
 exports.post_teacher = (req, res, next) => {
 
     function start () {
-        mysql.use('studex')
+        mysql.use('master')
             .query(
                 'INSERT INTO teacher(email, password, first_name, middle_initial, last_name, picture)'
                 +' VALUES(?,?,?,?,?,?);',
