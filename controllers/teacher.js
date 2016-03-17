@@ -27,7 +27,7 @@ exports.update_teacher = (req, res, next) => {
 				.send();
 		}        
 		
-			res.item(result[0])
+		res.item(result[0])
 			.send();
 	}
 		
