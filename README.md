@@ -23,7 +23,16 @@ A web application for selecting volunteers. Uses [anytv-node-boilerplate](https:
 
 ## Running the application
 
-Nope.
+1. Clone the repository
+2. Import the `database/schema.sql`
+```sh
+mysql -uroot < database/schema.sql
+```
+3. Run these commands:
+```sh
+npm install
+node server.js
+```
 
 ## Running test
 
