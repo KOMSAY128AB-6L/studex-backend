@@ -34,12 +34,14 @@ exports.randomize_students = (req, res, next) => {
                 _byCount: false,
                 _byChance: false,
                 _withChance: false,
-		_unique: false,
+        _unique: false,
                 numberOfVolunteers: 0
             }
         },
         req.body
     );
+
+    let volunteers;
 
 
     function start () {
@@ -47,8 +49,43 @@ exports.randomize_students = (req, res, next) => {
             return res.warn(400, {message: data.message});
         }
 
-        return res.item(random.randomize(data.student_list, data.settings)).send();
+        
+        mysql.use('master')
+             .query('INSERT INTO volunteer(teacher_id) VALUES(?)', 1, insert_volunteers)
+             .end();
+    }
 
+    function insert_volunteers(err, result, args, last_query) {
+        if(err) {
+            winston.error('Error in creating volunteer entity', last_query);
+            return next(err);
+        }
+
+        let query = '';
+        volunteers = random.randomize(data.student_list, data.settings);
+        let volunteerIds = [];
+        let iii;
+        for(iii = 0; iii < volunteers.length - 1; iii++) {
+            query += '(?, ' + result.insertId + '), ';
+            volunteerIds.push(volunteers[iii].student_id);
+        }
+        query += '(?, ' + result.insertId + ')';
+        volunteerIds.push(volunteers[iii].student_id);
+        mysql.use('master')
+             .query('INSERT INTO volunteer_student VALUES ' + query,
+                    volunteerIds,
+                    send_response)
+             .end();
+    }
+
+    function send_response(err, result, args, last_query) {
+        if(err) {
+            winston.error('Error in inserting volunteers', last_query);
+            return next(err);
+        }
+
+        res.items(volunteers)
+           .send();
     }
 
     start();
@@ -63,7 +100,7 @@ exports.randomize_classes = (req, res, next) => {
             settings: {
                 _byCount: false,
                 _withChance: false,
-		_unique: false,
+        _unique: false,
                 numberOfVolunteers: 0
             }
         },
@@ -75,7 +112,6 @@ exports.randomize_classes = (req, res, next) => {
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
         }
-
         if (data.class_list.length == 0) {
             return res.warn(400, {message: 'No class specified'});
         }
