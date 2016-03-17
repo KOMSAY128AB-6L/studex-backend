@@ -1,26 +1,48 @@
 'use strict';
 
+const util   = require(__dirname + '/../helpers/util');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
+const config  = require(__dirname + '/../config/config');
 
 /**
- * @api {get} /user/:id Get user information
- * @apiName GetUser
+ * @api {post} /user Create new user
+ * @apiName CreateUser
  * @apiGroup User
  *
- * @apiParam {String} id User's unique ID
+ * @apiParam {String} email User's email
+ * @apiParam {String} password User's password
+ * @apiParam {String} first_name User's first name
+ * @apiParam {String} middle_initial User's middle initial
+ * @apiParam {String} last_name User's last name
  *
- * @apiSuccess {String} user_id User's unique ID
- * @apiSuccess {String} date_created Time when the user was created
- * @apiSuccess {String} date_updated Time when last update occurred
+ * @apiSuccess 
  */
-exports.get_user = (req, res, next) => {
+exports.create_user = (req, res, next) => {
+    const data = util.get_data(
+        {
+            email: '',
+            password: '',
+            first_name: '',
+            middle_initial: '',
+            last_name: ''
+        },
+        req.body
+    );
+
 
     function start () {
-        mysql.use('my_db')
+        if (data instanceof Error) {
+            return res.warn(400, {message: data.message});
+        }
+
+        mysql.use('master')
             .query(
-                'SELECT * FROM users WHERE user_id = ? LIMIT 1;',
-                [req.params.id],
+                'INSERT INTO teacher(email, password, first_name, middle_initial,\
+                                    last_name) \
+                 VALUES(?, PASSWORD(CONCAT(MD5(?), ?)), ?, ?, ?);',
+                [data.email, data.password, config.SALT, data.first_name, 
+                 data.middle_initial, data.last_name],
                 send_response
             )
             .end();
@@ -28,18 +50,13 @@ exports.get_user = (req, res, next) => {
 
     function send_response (err, result, args, last_query) {
         if (err) {
-            winston.error('Error in selecting users', last_query);
+            winston.error('Error in creating user', last_query);
             return next(err);
         }
 
-        if (!result.length) {
-            return res.status(404)
-                .error({code: 'USER404', message: 'User not found'})
+        return res.status(200)
+                .item({message: 'User successfully created'})
                 .send();
-        }
-
-        res.item(result[0])
-            .send();
     }
 
     start();

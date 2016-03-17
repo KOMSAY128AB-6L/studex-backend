@@ -8,16 +8,16 @@ module.exports = (router) => {
 
     router.del = router.delete;
 
-    router.get('/user/:id', __.user.get_user);
-    
     router.get('/user/', __.user.get_users);
-    router.post('/user/', __.user.post_user);
+    router.post('/user', __.user.create_user);
+    
+    router.get('/user/:id', __.user.get_user);
     
     router.get('/teacher', __.teacher.get_teachers);
     router.post('/teacher', __.teacher.post_teacher);
 
     router.get('/teacher/:id',__.teacher.get_teacher);
-
+    
     router.all('*', (req, res) => {
         res.status(404)
             .send({message: 'Nothing to do here.'});
