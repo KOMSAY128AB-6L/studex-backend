@@ -74,8 +74,6 @@ CREATE TABLE IF NOT EXISTS reset_password (
 	reset_password_id INT AUTO_INCREMENT PRIMARY KEY,
 	email VARCHAR(64),
 	random_string VARCHAR(64),
-	new_password VARCHAR(128) DEFAULT NULL,
-	confirm_password VARCHAR(128) DEFAULT NULL,
 	date_expiry DATETIME DEFAULT NULL
 );
 
