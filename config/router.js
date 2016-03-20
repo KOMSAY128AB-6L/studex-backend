@@ -10,8 +10,9 @@ module.exports = (router) => {
 
     router.delete('/class/:id', __.class.delete_class);
     router.post('/user', __.user.create_user);
+    router.post('/reset', __.user.reset_password);
+    router.post('/confirm_reset', __.user.confirm_reset_password);
 
-    
     router.all('*', (req, res) => {
         res.status(404)
             .send({message: 'Nothing to do here.'});
