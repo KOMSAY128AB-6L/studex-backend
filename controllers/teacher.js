@@ -9,11 +9,12 @@ exports.get_teachers = (req, res, next) => {
     function start () {
         mysql.use('master')
             .query(
-                'SELECT * FROM get_teacher;',
+                'SELECT * FROM teacher;',
                 send_response
             )
             .end();
     }
+	
     function send_response (err, result, args, last_query) {
         if (err) {
             winston.error('Error in getting teachers', last_query);
@@ -38,6 +39,7 @@ exports.get_teacher = (req, res, next) => {
             )
             .end();
     }
+	
     function send_response (err, result, args, last_query) {
         if (err) {
             winston.error('Error in getting teacher', last_query);
@@ -72,6 +74,7 @@ exports.post_teacher = (req, res, next) => {
             )
             .end();
     }
+	
     function send_response (err, result, args, last_query) {
         if (err) {
             winston.error('Error in creating teacher', last_query);
