@@ -3,7 +3,6 @@
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
-
 exports.get_teachers = (req, res, next) => {
 
     function start () {
@@ -88,3 +87,68 @@ exports.post_teacher = (req, res, next) => {
     start();
 };
 
+exports.update_teacher = (req, res, next) => {
+	
+	console.log(req.body);
+	
+	function start () {
+		mysql.use('master')
+			.query(
+				'UPDATE teacher SET ? WHERE teacher_id=?',
+				[req.body, req.params.id],
+				send_response
+			)
+			.end();
+	}
+	
+	function send_response (err, result, args, last_query) {
+		
+		if (err) {
+			winston.error('Error in updating teacher', last_query);
+			return next(err);
+		}
+		
+		if (!result.affectedRows) {
+			return res.status(404)
+				.error({code: 'teacher404', message: 'teacher not found'})
+				.send();
+		}        
+		
+		res.item(result[0])
+			.send();
+	}
+		
+	start();
+};
+	
+exports.delete_teacher = (req, res, next) => {
+
+	function start () {
+		mysql.use('master')
+			.query(
+				'DELETE from teacher WHERE teacher_id=?;',
+				[req.params.id],
+				send_response
+			)
+			.end();
+	}
+
+	function send_response (err, result, args, last_query) {
+		
+		if (err) {
+			winston.error('Error in deleting teacher', last_query);
+			return next(err);
+		}
+	
+		if (!result.affectedRows) {
+			return res.status(404)
+				.error({code: 'teacher404', message: 'teacher not found'})
+				.send();
+		}
+	
+		res.item(result[0])
+			.send();
+	}
+	
+	start();
+};

@@ -14,9 +14,11 @@ module.exports = (router) => {
     // router.get('/user/:id', __.user.get_user);
     
     router.get('/teacher', __.teacher.get_teachers);
-    router.post('/teacher', __.teacher.post_teacher);
 
     router.get('/teacher/:id', __.teacher.get_teacher);
+    router.post('/teacher', __.teacher.post_teacher);
+    router.put('/teacher/:id',__.teacher.update_teacher);
+    router.delete('/teacher/:id',__.teacher.delete_teacher);
     
     router.delete('/class/:id', __.class.delete_class);
 
