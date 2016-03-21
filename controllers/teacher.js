@@ -89,10 +89,12 @@ exports.post_teacher = (req, res, next) => {
 
 exports.update_teacher = (req, res, next) => {
 	
+	console.log(req.body);
+	
 	function start () {
 		mysql.use('master')
 			.query(
-				'UPDATE teacher SET ? WHERE teacher_id=?;',
+				'UPDATE teacher SET ? WHERE teacher_id=?',
 				[req.body, req.params.id],
 				send_response
 			)
@@ -100,12 +102,13 @@ exports.update_teacher = (req, res, next) => {
 	}
 	
 	function send_response (err, result, args, last_query) {
+		
 		if (err) {
 			winston.error('Error in updating teacher', last_query);
 			return next(err);
 		}
 		
-		if (!result.length) {
+		if (!result.affectedRows) {
 			return res.status(404)
 				.error({code: 'teacher404', message: 'teacher not found'})
 				.send();
