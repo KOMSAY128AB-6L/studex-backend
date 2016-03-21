@@ -90,9 +90,9 @@ exports.post_teacher = (req, res, next) => {
 exports.update_teacher = (req, res, next) => {
 	
 	function start () {
-		mysql.use('my_db')
+		mysql.use('master')
 			.query(
-				'UPDATE teacher SET ? WHERE id=?;',
+				'UPDATE teacher SET ? WHERE teacher_id=?;',
 				[req.body, req.params.id],
 				send_response
 			)
@@ -121,9 +121,9 @@ exports.update_teacher = (req, res, next) => {
 exports.delete_teacher = (req, res, next) => {
 
 	function start () {
-		mysql.use('my_db')
+		mysql.use('master')
 			.query(
-				'DELETE from teacher WHERE id=?;',
+				'DELETE from teacher WHERE teacher_id=?;',
 				[req.params.id],
 				send_response
 			)
@@ -131,15 +131,16 @@ exports.delete_teacher = (req, res, next) => {
 	}
 
 	function send_response (err, result, args, last_query) {
+		
 		if (err) {
 			winston.error('Error in deleting teacher', last_query);
 			return next(err);
 		}
 	
-		if (!result.length) {
+		if (!result.affectedRows) {
 			return res.status(404)
-			.error({code: 'teacher404', message: 'teacher not found'})
-			.send();
+				.error({code: 'teacher404', message: 'teacher not found'})
+				.send();
 		}
 	
 		res.item(result[0])
