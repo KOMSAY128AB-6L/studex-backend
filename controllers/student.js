@@ -36,7 +36,7 @@ exports.create_student = (req, res, next) => {
 
     function send_response (err, result, args, last_query) {
         if (err) {
-            winston.error('Error in creating user', last_query);
+            winston.error('Error in creating student', last_query);
             return next(err);
         }
 
@@ -85,7 +85,7 @@ exports.update_student = (req, res, next) => {
             return next(err);
         }
 
-        res.send({message: 'User successfully updated'});
+        res.send({message: 'Student successfully updated'});
     }
 
     start();
@@ -163,7 +163,7 @@ exports.retrieve_all_student = (req, res, next) => {
             return next(err);
         }
 
-        res.item(JSON.stringify(result))
+        res.item(result)
             .send();
   
       

@@ -24,6 +24,9 @@ module.exports = (router) => {
 
     /*Routes for N Volunteers*/
     //router.post ('/classes/randomize/nVolunteers', __.randomize.nVolunteers);
+
+    /*Routes for Teacher Login*/
+    //router.post('/login', __.user.login_user);
     
     router.all('*', (req, res) => {
         res.status(404)
