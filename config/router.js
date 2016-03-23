@@ -20,6 +20,8 @@ module.exports = (router) => {
     router.put('/teacher/:id',__.teacher.update_teacher);
     router.delete('/teacher/:id',__.teacher.delete_teacher);
     
+    router.get('/student/:id',__.get_times_student_volunteered);
+    
     router.delete('/class/:id', __.class.delete_class);
 
     router.all('*', (req, res) => {
