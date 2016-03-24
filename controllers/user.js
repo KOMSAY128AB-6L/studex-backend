@@ -90,7 +90,7 @@ exports.reset_password = (req, res, next) => {
                 find_user
              )
             .query(
-                'INSERT INTO reset_password(email, random_string) VALUES(?, ?);',
+                'REPLACE INTO reset_password(email, random_string) VALUES(?, ?);',
                 [data.email, user.random_string],
                 send_email
             )
@@ -116,18 +116,6 @@ exports.reset_password = (req, res, next) => {
         return result[0];
 
     }
-
-    function send_response (err, result, args, last_query) {
-        if (err) {
-            winston.error('Error in reset password link request', last_query);
-            return next(err);
-        }
-
-        return res.status(200)
-                .item({ message: 'Enter given key to reset your password here: http://localhost:8000/reset',
-                        key: random_string})
-                .send();
-        }
 
     function send_email (err, result, args, last_query) {
         var smtpConfig = {
@@ -165,13 +153,12 @@ exports.reset_password = (req, res, next) => {
         // send mail with defined transport object
         transporter.sendMail(mailOptions, function(error, info){
             if(error){
-                console.log(error);
-                res.status(500)
-                    .send();
+                winston.error('Error in sending email containing password reset key', error);
+                return next(error);
             }
-            console.log('Message sent: ' + info.response);
 
             res.status(200)
+                .item({message: 'Message sent'})
                 .send();
         });
     }
