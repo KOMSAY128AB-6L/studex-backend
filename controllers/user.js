@@ -4,7 +4,7 @@ const util   = require(__dirname + '/../helpers/util');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 const config  = require(__dirname + '/../config/config');
-const randomstring = require('randomstring');
+const nodemailer = require('nodemailer');
 
 /**
  * @api {post} /user Create new user
@@ -70,26 +70,29 @@ exports.reset_password = (req, res, next) => {
         },
         req.body
     );
-
-    let random_string;
     
-    function start () {
-        random_string = randomstring.generate();
+    let user = {
+        first_name: '',
+        random_string: ''
+    };
 
+    function start () {
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
         }
 
+        user.random_string = util.random_string();
+
         mysql.use('master')
             .query(
-                'SELECT email FROM teacher WHERE email = ? LIMIT 1;',
+                'SELECT email, first_name FROM teacher WHERE email = ? LIMIT 1;',
                 [data.email],
                 find_user
-            )
+             )
             .query(
                 'INSERT INTO reset_password(email, random_string) VALUES(?, ?);',
-                [data.email, random_string],
-                send_response
+                [data.email, user.random_string],
+                send_email
             )
             .end();
         
@@ -108,7 +111,9 @@ exports.reset_password = (req, res, next) => {
                 .send();
         }
 
-        return result[0].email;
+        user.first_name = result[0].first_name;
+
+        return result[0];
 
     }
 
@@ -123,6 +128,53 @@ exports.reset_password = (req, res, next) => {
                         key: random_string})
                 .send();
         }
+
+    function send_email (err, result, args, last_query) {
+        var smtpConfig = {
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // use SSL
+            auth: {
+                user: 'studex.staff@gmail.com',
+                pass: 'cmsc128ab6l'
+            }
+        };
+
+        // create reusable transporter object using the default SMTP transport
+        var transporter = nodemailer.createTransport(smtpConfig);
+
+        // setup e-mail data with unicode symbols
+        var mailOptions = {
+            from: '"Studex Support" <studex.staff@gmail.com>', // sender address
+            to: data.email, // list of receivers
+            subject: 'Studex Account Password Reset', // Subject line
+            text: 'Dear '+user.first_name+', \n\n\
+                    You have requested to have your password reset for your account at Studex. \n\
+                    Please click on the following link or copy and paste the link on your address bar and enter '+user.random_string+' to reset your password. \
+                    http://localhost:8000/confirm_reset \n\
+                    This key is valid only for 24 hours.\n\
+                    If you received this email in error, you can safely ignore this email.', // plaintext body
+            html: '<p>Dear '+user.first_name+',</p><p></p>\
+                    <p>You have requested to have your password reset for your account at Studex.</p><p></p>\
+                    <p>Please click on the following link or copy and paste the link on your address bar and enter <strong>'+user.random_string+'</strong> to reset your password. </p><p></p>\
+                    <p><a href="http://localhost:8000/confirm_reset">http://localhost:8000/confirm_reset</a></p><p></p>\
+                    <p>This key is valid only for 24 hours.</p><p></p>\
+                    <p>If you received this email in error, you can safely ignore this email.</p>' // html body
+        };
+
+        // send mail with defined transport object
+        transporter.sendMail(mailOptions, function(error, info){
+            if(error){
+                console.log(error);
+                res.status(500)
+                    .send();
+            }
+            console.log('Message sent: ' + info.response);
+
+            res.status(200)
+                .send();
+        });
+    }
 
     start();
 };
@@ -149,41 +201,13 @@ exports.confirm_reset_password = (req, res, next) => {
             .query(
                 'SELECT email FROM reset_password WHERE email = ? AND random_string = ? LIMIT 1;',
                 [data.email, data.random_string],
-                find_user_request
-            )
-            .query(
-                'SELECT DATEDIFF( (SELECT date_expiry FROM reset_password WHERE  email = ? AND random_string = ? LIMIT 1), CURRENT_TIMESTAMP ) AS date_expiry LIMIT 1;',
-                [data.email, data.random_string],
-                validate_user_request_date
+                validate_user_request
             )
             .end();
-
-        if(data.new_password === data.confirm_password){
-            mysql.use('master')
-            .query(
-                'UPDATE teacher SET password = PASSWORD(CONCAT(MD5(?), ?))\
-                 WHERE email = ?;',
-                [data.new_password, config.SALT, data.email],
-                send_response
-            )
-            //*
-            .query(
-                'DELETE FROM reset_password WHERE email = ? AND random_string = ?;',
-                [data.email, data.random_string],
-                remove_request
-            )
-            //*/
-            .end();
-        }
-        else{
-            return res.status(400)
-                    .error({code: 'USERREQUEST400', message: 'Passwords do not match'})
-                    .send();       
-        }
 
     }
 
-    function find_user_request (err, result, args, last_query) {
+    function validate_user_request (err, result, args, last_query) {
 
         if (err) {
             winston.error('Error in reset password link request', last_query);
@@ -196,28 +220,47 @@ exports.confirm_reset_password = (req, res, next) => {
                 .send();
         }
 
-        return res.status(200)
-                ;//.item({message: 'User reset password request exists'});
+        mysql.use('master')
+            .query(
+                'SELECT DATEDIFF( (SELECT date_expiry FROM reset_password WHERE  email = ? AND random_string = ? LIMIT 1), CURRENT_TIMESTAMP ) AS date_expiry LIMIT 1;',
+                [data.email, data.random_string],
+                check_password
+            )
+            .end();
+
+        return res.status(200);
 
     }
 
-    function validate_user_request_date (err, result, args, last_query) {
+    function check_password (err, result, args, last_query) {
 
         if (err) {
             winston.error('Error in reset password', last_query);
             return next(err);
         }
 
-        console.log(result[0]);
-
         if (result[0].date_expiry <= 0) {
             return res.status(400)
                 .error({code: 'USERREQUEST404', message: 'User reset password request already expired'})
                 .send();
-        }        
+        }
 
-        return res.status(200)
-                ;//.item({message: 'User reset password request still valid'});
+        if(data.new_password !== data.confirm_password){
+            return res.status(400)
+                .error({code: 'USERREQUEST400', message: 'Passwords do not match'})
+                .send();
+        }
+
+        mysql.use('master')
+            .query(
+                'UPDATE teacher SET password = PASSWORD(CONCAT(MD5(?), ?))\
+                 WHERE email = ?;',
+                [data.new_password, config.SALT, data.email],
+                send_response
+            )
+            .end();
+
+        return res.status(200);
     }
 
     function send_response (err, result, args, last_query) {
@@ -226,8 +269,17 @@ exports.confirm_reset_password = (req, res, next) => {
             return next(err);
         }
 
+        mysql.use('master')
+            .query(
+                'DELETE FROM reset_password WHERE email = ? AND random_string = ?;',
+                [data.email, data.random_string],
+                remove_request
+            )
+            .end();
+
         return res.status(200)
-                ;//.item({message: 'Reset password success'});
+                .item({message: 'Reset password request successfully claimed'})
+                .send();
     }
 
     function remove_request (err, result, args, last_query) {
@@ -236,9 +288,7 @@ exports.confirm_reset_password = (req, res, next) => {
             return next(err);
         }
 
-        return res.status(200)
-                .item({message: 'Reset password request successfully claimed'})
-                .send();
+        return res.status(200);
     }
 
     start();
