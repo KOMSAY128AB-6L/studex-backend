@@ -71,9 +71,8 @@ CREATE TABLE IF NOT EXISTS volunteer_student (
 
 
 CREATE TABLE IF NOT EXISTS reset_password (
-	reset_password_id INT AUTO_INCREMENT PRIMARY KEY,
-	email VARCHAR(64),
-	random_string VARCHAR(64),
+	email VARCHAR(64) PRIMARY KEY,
+	random_string VARCHAR(64) NOT NULL,
 	date_expiry DATETIME DEFAULT NULL
 );
 
