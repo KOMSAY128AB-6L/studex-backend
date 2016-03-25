@@ -10,16 +10,17 @@ module.exports = (router) => {
 
     // router.get('/user', __.user.get_users);
     router.post('/user', __.user.create_user);
-    
+
     // router.get('/user/:id', __.user.get_user);
-    
+
     router.get('/teacher', __.teacher.get_teachers);
 
     router.get('/teacher/:id', __.teacher.get_teacher);
     router.post('/teacher', __.teacher.post_teacher);
     router.put('/teacher/:id',__.teacher.update_teacher);
     router.delete('/teacher/:id',__.teacher.delete_teacher);
-    
+
+    router.update('/class/', __.class.update_class);
     router.delete('/class/:id', __.class.delete_class);
 
     router.all('*', (req, res) => {
