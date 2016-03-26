@@ -27,7 +27,7 @@ module.exports = (router) => {
     router.put('/teacher/:id',__.teacher.update_teacher);
     router.delete('/teacher/:id',__.teacher.delete_teacher);
 
-    router.update('/class/', __.class.update_class);
+    router.put('/class', __.class.update_class);
     router.delete('/class/:id', __.class.delete_class);
 
     router.all('*', (req, res) => {
