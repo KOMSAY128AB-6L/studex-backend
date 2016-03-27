@@ -186,7 +186,7 @@ exports.confirm_reset_password = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT email FROM reset_password WHERE email = ? AND random_string = ? LIMIT 1;',
+                'SELECT email FROM reset_password WHERE email = ? AND random_string = ? AND date_expiry > CURDATE() LIMIT 1;',
                 [data.email, data.random_string],
                 validate_user_request
             )
@@ -203,32 +203,7 @@ exports.confirm_reset_password = (req, res, next) => {
 
        if (!result.length) {
             return res.status(404)
-                .error({code: 'USERREQUEST404', message: 'User reset password request not found'})
-                .send();
-        }
-
-        mysql.use('master')
-            .query(
-                'SELECT DATEDIFF( (SELECT date_expiry FROM reset_password WHERE  email = ? AND random_string = ? LIMIT 1), CURRENT_TIMESTAMP ) AS date_expiry LIMIT 1;',
-                [data.email, data.random_string],
-                check_password
-            )
-            .end();
-
-        return res.status(200);
-
-    }
-
-    function check_password (err, result, args, last_query) {
-
-        if (err) {
-            winston.error('Error in reset password', last_query);
-            return next(err);
-        }
-
-        if (result[0].date_expiry <= 0) {
-            return res.status(400)
-                .error({code: 'USERREQUEST404', message: 'User reset password request already expired'})
+                .error({code: 'USERREQUEST404', message: 'User reset password request not found or already expired'})
                 .send();
         }
 
@@ -248,7 +223,9 @@ exports.confirm_reset_password = (req, res, next) => {
             .end();
 
         return res.status(200);
+
     }
+
 
     function send_response (err, result, args, last_query) {
         if (err) {
