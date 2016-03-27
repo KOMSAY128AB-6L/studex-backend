@@ -13,7 +13,6 @@ module.exports = (router) => {
     router.post('/user', __.user.create_user);
 
     router.post('/randomize/classes', __.randomize.randomize_classes);
-    router.post('/randomize/students', __.randomize.randomize_students);
 
     // router.get('/user/:id', __.user.get_user);
     /*Routes for Student CRUD*/

@@ -65,8 +65,8 @@ const freshWeight = 50; //default weight
  **/
 function randomize(studentList, settings) {
     
-    if (settings.minWeight) settings.minWeight = 0;
-    if (settings.freshWeight) settings.freshWeight = freshWeight;
+    if (!settings.minWeight) settings.minWeight = 0;
+    if (!settings.freshWeight) settings.freshWeight = freshWeight;
     if(settings.byCount) {
         studentList.forEach((student) => student.weight = (student.volunteer > settings.freshWeight)? settings.minWeight: settings.freshWeight - student.volunteerCount);
         settings.withChance = true;
