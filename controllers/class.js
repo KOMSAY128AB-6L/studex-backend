@@ -14,10 +14,53 @@ const winston = require('winston');
  * @apiSuccess {String} date_created Time when the user was created
  * @apiSuccess {String} date_updated Time when last update occurred
  */
+
+exports.update_class = (req, res, next) => {
+	const data = util.get_data({
+	    id,
+			className,
+			section
+		},
+	req.body
+	);
+
+	function start () {
+		if (data instanceof Error) {
+            return res.warn(400, {message: data.message});
+        }
+
+		mysql.use('master')
+			.query(
+				'UPDATE class SET class_name = ?, section = ? WHERE class_id = ?;',
+				[data.className, data.section, data.id],
+				send_response
+			)
+			.end();
+
+	}
+		function send_response (err, result, args, last_query) {
+			if (err) {
+				winston.error('Error in updating class', last_query);
+				return next(err);
+			}
+
+			if (!result.length) {
+				return res.status(404)
+		 		   .error({code: 'CLASS404', message: 'Class not found'})
+				.send();
+			}
+
+			res.item(result[0])
+			.send();
+		}
+
+start();
+};
+
 exports.delete_class = (req, res, next) => {
 
     function start () {
-        mysql.use('my_db')
+        mysql.use('master')
             .query(
                 'DELETE * FROM class WHERE class_id = ? LIMIT 1;',
                 [req.params.id],
