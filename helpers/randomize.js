@@ -60,7 +60,7 @@ function randomize(studentList, settings) {
     if (settings.minWeight) settings.minWeight = 0;
     if (settings.freshWeight) settings.freshWeight = freshWeight;
     if(settings.byCount) {
-        studentList.forEach((student) => student.weight = (student.volunteer > settings.freshWeight)? settings.minWeight: settings.freshWeight - student.volunteer);
+        studentList.forEach((student) => student.weight = (student.volunteer > settings.freshWeight)? settings.minWeight: settings.freshWeight - student.volunteerCount);
         settings.withChance = true;
     } else if (settings.byChance) {
         studentList.forEach((student) => student.weight = Math.ceil(settings.freshWeight * student.chance));

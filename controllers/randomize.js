@@ -50,9 +50,35 @@ exports.randomize_students = (req, res, next) => {
         }
 
         
-        mysql.use('master')
-             .query('INSERT INTO volunteer(teacher_id) VALUES(?)', 1, insert_volunteers)
-             .end();
+	if (data.settings.byCount) {
+		let student_ids = '(';
+
+		let iii;
+		for (iii = 0; iii < data.student_list.length - 1; iii++) {
+			student_ids += data.student_list[iii].student_id + ',';
+		}
+		
+		student_ids += data.student_list[iii].student_id + ')';
+
+		mysql.use('master')
+		     .query(`SELECT COUNT(v.class_id) FROM 
+			volunteer v, volunteer_student vs WHERE v.volunteer_id = vs.volunteer_id 
+			AND (v.class_id = 1 OR v.class_id = 3) AND vs.student_id IN ` + student_ids + 
+			`GROUP BY v.class_id, vs.student_id`, get_count)
+		     .end();
+	} else {
+		mysql.use('master')
+		     .query('INSERT INTO volunteer(teacher_id) VALUES(?)', 1, insert_volunteers)
+		     .end();
+	}
+    }
+
+    function get_count(err, result, args, last_query) {
+        if(err) {
+            winston.error('Error in selecting number volunteers of student', last_query);
+            return next(err);
+        }
+
     }
 
     function insert_volunteers(err, result, args, last_query) {
@@ -112,7 +138,7 @@ exports.randomize_classes = (req, res, next) => {
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
         }
-        if (data.class_list.length == 0) {
+        if (data.class_list.length === 0) {
             return res.warn(400, {message: 'No class specified'});
         }
 
