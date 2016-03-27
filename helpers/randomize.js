@@ -54,7 +54,15 @@ function randomize_distinct_with_chance(studentList, numberOfVolunteers) {
 }
 
 
-const freshWeight = 50; //starting weight
+const freshWeight = 50; //default weight
+/**
+ * All in one randomize function
+ * @param1 the list of students to be randomized
+    Student's required attributes: student_id
+    	required if using randomizing by chance: chance
+    	required if randomizing by coung: volunteerCount
+ * @param2 the settings to be used for randomization
+ **/
 function randomize(studentList, settings) {
     
     if (settings.minWeight) settings.minWeight = 0;
