@@ -19,6 +19,7 @@
     "moment": "^2.11.2",
     "morgan": "^1.6.1",
     "multer": "^1.1.0",
+    "nodemailer": "^2.3.0",
     "winston": "^2.1.0"
   },
   "scripts": {
