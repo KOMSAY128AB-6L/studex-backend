@@ -104,7 +104,7 @@ exports.write_to_csv = (res, req, next) => {
 	function write_to_csv(err, result, args, last_query){
 		if(err){
 			winston.error('Selection query of students failed', lst_query);
-			return.next(err);
+			return next(err);
 		}
 		
 		csv
@@ -117,7 +117,7 @@ exports.write_to_csv = (res, req, next) => {
 	function send_response(err, result, args, last_query){
 	 	if(err){
 	 		winston.error('Could not write to CSV', last_query);
-	 		return.next(err);
+	 		return next(err);
 	 	} 
 	 	
 	 	res.item(result[0])
