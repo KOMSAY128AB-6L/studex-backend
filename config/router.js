@@ -20,6 +20,9 @@ module.exports = (router) => {
     router.put ('/student/:id', __.student.update_student);
     router.delete('/student/:id', __.student.delete_student);
 
+    //Routes for log-in
+    router.post('/login', __.user.login_user);
+
     router.get('/teacher', __.teacher.get_teachers);
     router.get('/teacher/:id', __.teacher.get_teacher);
     router.post('/teacher', __.teacher.post_teacher);

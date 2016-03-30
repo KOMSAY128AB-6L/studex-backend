@@ -21,7 +21,7 @@ exports.update_class = (req, res, next) => {
 			className,
 			section
 		},
-	req.body
+		req.body
 	);
 
 	function start () {
