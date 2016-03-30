@@ -10,6 +10,8 @@ const mysql       = require('anytv-node-mysql');
 const body_parser = require('body-parser');
 const winston     = require('winston');
 const express     = require('express');
+const session     = require('express-session');
+const RedisStore  = require('connect-redis')(session);
 
 let app;
 let handler;
@@ -19,7 +21,7 @@ let handler;
 function start () {
     if (handler) {
         handler.close();
-    }
+    };
 
     // create express app
     app = express();
@@ -50,6 +52,12 @@ function start () {
     app.use(body_parser.urlencoded({extended: false}));
     app.use(body_parser.json());
     app.use(require('compression')());
+
+    // configure redis store
+    app.use(session({
+        store: new RedisStore(),
+        secret: 'keryboard cat'
+    }));
 
 
     winston.log('verbose', 'Binding custom middlewares');

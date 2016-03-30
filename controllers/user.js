@@ -257,3 +257,45 @@ exports.confirm_reset_password = (req, res, next) => {
 
     start();
 };
+
+
+
+exports.login_user = (req, res, next) => {
+    const data = util.get_data(
+        {
+            email : '',
+            password : '' 
+        },
+        req.body
+    );
+
+    function start(){
+        if (data instanceof Error) {
+            return res.warn(400, {message: data.message});
+        }
+
+        mysql.use('master')
+            .query(
+                'SELECT teacher_id from teacher where email = ? and password = PASSWORD(CONCAT(MD5(?), ?))', [data.email, data.password, config.SALT],
+                send_response
+            )
+            .end();
+    }
+
+    function send_response(err, result) {
+        if (err) {
+            winston.error('Error in selecting teacher_id', last_query);
+            return next(err);
+        }
+
+        if(!result.length) {
+            res.item("User Email or Password is incorrect.")
+                .send();
+        } else {
+            req.session.userid = result[0].teacher_id;
+            res.send('User succesfully logged in.');
+        }
+    }
+
+    start();
+};
