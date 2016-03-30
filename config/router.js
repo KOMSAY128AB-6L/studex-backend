@@ -32,6 +32,8 @@ module.exports = (router) => {
     router.put('/class', __.class.update_class);
     router.delete('/class/:id', __.class.delete_class);
 
+    router.post('/randomize', __.randomize.getNumVolunteers);
+    
     router.all('*', (req, res) => {
         res.status(404)
             .send({message: 'Nothing to do here.'});
