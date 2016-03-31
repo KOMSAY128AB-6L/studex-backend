@@ -29,6 +29,7 @@ module.exports = (router) => {
     router.put('/teacher/:id',__.teacher.update_teacher);
     router.delete('/teacher/:id',__.teacher.delete_teacher);
 
+    router.post('/class/csv', __.class.insert_csv_classlist);
     router.put('/class', __.class.update_class);
     router.delete('/class/:id', __.class.delete_class);
 

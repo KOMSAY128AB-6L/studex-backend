@@ -1,7 +1,9 @@
 'use strict';
 
-const mysql   = require('anytv-node-mysql');
-const winston = require('winston');
+const util  	= require(__dirname + '/../helpers/util');
+const mysql   	= require('anytv-node-mysql');
+const winston 	= require('winston');
+const sh      	= require('shelljs');
 
 /**
  * @api {get} /user/:id Get user information
@@ -38,23 +40,24 @@ exports.update_class = (req, res, next) => {
 			.end();
 
 	}
-		function send_response (err, result, args, last_query) {
-			if (err) {
-				winston.error('Error in updating class', last_query);
-				return next(err);
-			}
+	
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in updating class', last_query);
+			return next(err);
+		}
 
-			if (!result.length) {
-				return res.status(404)
-		 		   .error({code: 'CLASS404', message: 'Class not found'})
-				.send();
-			}
-
-			res.item(result[0])
+		if (!result.length) {
+			return res.status(404)
+				.error({code: 'CLASS404', message: 'Class not found'})
 			.send();
 		}
 
-start();
+		res.item(result[0])
+			.send();
+	}
+
+	start();
 };
 
 exports.delete_class = (req, res, next) => {
@@ -87,3 +90,40 @@ exports.delete_class = (req, res, next) => {
 
     start();
 };
+
+exports.insert_csv_classlist = (req, res, next) => {
+
+    function start () {
+		
+		let class_query;
+		
+		sh.cd('controllers');
+		sh.config.silent = true;
+		sh.exec('sudo chmod 755 ../helpers/classlist.js');
+		sh.config.silent = false;
+		sh.exec('node ../helpers/classlist.js ../uploads/csv/classlist.csv > ../database/classlist.sql', function (err) {
+
+			if (err) {
+				winston.error('Error in inserting classlist from CSV');
+				return next(err);
+			}
+
+		});
+		class_query = sh.exec('cat ../database/classlist.sql').output;
+		
+		// TODO - convert to formal query
+		res.item(class_query).send();
+
+    }
+	
+	function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in inserting classlist from CSV');
+            return next(err);
+        }
+
+        res.send();
+    }
+
+    start();
+}
