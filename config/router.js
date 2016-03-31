@@ -19,7 +19,7 @@ module.exports = (router) => {
     router.get ('/student', __.student.retrieve_all_student);
     router.put ('/student/:id', __.student.update_student);
     router.delete('/student/:id', __.student.delete_student);
-    router.get('/volunteer_times/:id',__.student.get_times_student_volunteered);
+    router.get('/volunteer/:id',__.student.get_times_student_volunteered);
     //Routes for log-in
     router.post('/login', __.user.login_user);
 
