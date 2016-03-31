@@ -17,6 +17,31 @@ const sh      	= require('shelljs');
  * @apiSuccess {String} date_created Time when the user was created
  * @apiSuccess {String} date_updated Time when last update occurred
  */
+exports.view_class = (req, res, next) => {
+	function start () {
+	mysql.use('master')
+			.query(
+			'SELECT s.last_name, s.first_name, s.middle_initial FROM student s, student_class sc WHERE sc.class_id = ? and s.student_id = sc.student_id',
+			[req.params.id],
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in viewing class', last_query);
+			return next(err);
+		}
+		if (!result.length) {
+			return res.status(404)
+			.error({code: 'CLASS404', message: 'Class not found'})
+			.send();
+		}
+		res.item(result[0])
+		.send();
+	}
+	start();
+}; 
 
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
