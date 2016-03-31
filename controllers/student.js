@@ -174,7 +174,7 @@ exports.get_times_student_volunteered = (req, res, next) => {
 	function start () {
 		mysql.use('master')
 		.query(
-			 'SELECT * FROM student WHERE student_id = ? LIMIT 1;',
+			 'SELECT * FROM volunteer_student WHERE student_id = ? LIMIT 1;',
 			[req.params.id],
 			function(err,results){
 				if (err) {
@@ -194,7 +194,7 @@ exports.get_times_student_volunteered = (req, res, next) => {
 	function getVolunteerTimes(){
 		mysql.use('master')
 		.query(
-			'SELECT COUNT(*) AS volunteer_times FROM volunteer_student WHERE student_id = ?;',
+			'SELECT COUNT(*) AS volunteer_times FROM volunteer WHERE volunteer_id = ?;',
 			[req.params.id],
 			send_response
 		)
