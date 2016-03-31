@@ -169,3 +169,40 @@ exports.retrieve_all_student = (req, res, next) => {
 
     start();
 };
+
+exports.get_times_student_volunteered = (req, res, next) => {
+	function start () {
+		mysql.use('master')
+		.query(
+			 'SELECT * FROM student WHERE student_id = ? LIMIT 1;',
+			[req.params.id],
+			function(err,results){
+				if (err) {
+					winston.error('Error in getting student', last_query);
+					return next(err);
+				}
+				if (!results.length) {
+					return res.status(404)
+					.error({code: 'STUDENT404', message: 'student not found'})
+					.send();
+				}
+				getVolunteerTimes(); 
+			}
+		)
+		.end();
+	}
+	function getVolunteerTimes(){
+		mysql.use('master')
+		.query(
+			'SELECT COUNT(*) AS volunteer_times FROM volunteer_student WHERE student_id = ?;',
+			[req.params.id],
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {	
+		res.item(result[0])
+		.send();
+	}
+	start();
+};
