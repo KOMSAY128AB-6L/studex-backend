@@ -39,6 +39,23 @@ exports.create_user = (req, res, next) => {
 
         mysql.use('master')
             .query(
+                'SELECT * FROM teacher WHERE email = ?;',
+                [data.email],
+                send_validate_response
+            ) 
+            
+     	.end();
+    }
+    
+    function send_validate_response (err, result, args, last_query) {
+         if (result.length) {
+            return res.status(404)
+                .error({code: 'USER404', message: 'User email is existing'})
+                .send();
+        }
+        
+        mysql.use('master')
+        .query(
                 'INSERT INTO teacher(email, password, first_name, middle_initial,\
                                     last_name) \
                  VALUES(?, PASSWORD(CONCAT(MD5(?), ?)), ?, ?, ?);',
@@ -46,15 +63,17 @@ exports.create_user = (req, res, next) => {
                  data.middle_initial, data.last_name],
                 send_response
             )
-            .end();
+            
+     	.end();
     }
 
     function send_response (err, result, args, last_query) {
+             
         if (err) {
-            winston.error('Error in creating user', last_query);
+            winston.error('Error creating user', last_query);	
             return next(err);
         }
-
+        
         return res.status(200)
                 .item({message: 'User successfully created'})
                 .send();
@@ -253,6 +272,48 @@ exports.confirm_reset_password = (req, res, next) => {
         }
 
         return res.status(200);
+    }
+
+    start();
+};
+
+
+
+exports.login_user = (req, res, next) => {
+    const data = util.get_data(
+        {
+            email : '',
+            password : '' 
+        },
+        req.body
+    );
+
+    function start(){
+        if (data instanceof Error) {
+            return res.warn(400, {message: data.message});
+        }
+
+        mysql.use('master')
+            .query(
+                'SELECT teacher_id from teacher where email = ? and password = PASSWORD(CONCAT(MD5(?), ?))', [data.email, data.password, config.SALT],
+                send_response
+            )
+            .end();
+    }
+
+    function send_response(err, result) {
+        if (err) {
+            winston.error('Error in selecting teacher_id', last_query);
+            return next(err);
+        }
+
+        if(!result.length) {
+            res.item("User Email or Password is incorrect.")
+                .send();
+        } else {
+            req.session.userid = result[0].teacher_id;
+            res.send('User succesfully logged in.');
+        }
     }
 
     start();

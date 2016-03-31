@@ -20,15 +20,21 @@ module.exports = (router) => {
     router.put ('/student/:id', __.student.update_student);
     router.delete('/student/:id', __.student.delete_student);
 
+    //Routes for log-in
+    router.post('/login', __.user.login_user);
+
     router.get('/teacher', __.teacher.get_teachers);
     router.get('/teacher/:id', __.teacher.get_teacher);
     router.post('/teacher', __.teacher.post_teacher);
     router.put('/teacher/:id',__.teacher.update_teacher);
     router.delete('/teacher/:id',__.teacher.delete_teacher);
 
+    router.post('/class/csv', __.class.insert_csv_classlist);
     router.put('/class', __.class.update_class);
     router.delete('/class/:id', __.class.delete_class);
 
+    router.post('/randomize', __.randomize.getNumVolunteers);
+    
     router.all('*', (req, res) => {
         res.status(404)
             .send({message: 'Nothing to do here.'});

@@ -89,8 +89,6 @@ exports.post_teacher = (req, res, next) => {
 
 exports.update_teacher = (req, res, next) => {
 	
-	console.log(req.body);
-	
 	function start () {
 		mysql.use('master')
 			.query(

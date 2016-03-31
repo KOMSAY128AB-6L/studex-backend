@@ -3,6 +3,8 @@
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 const csv_writer = require('fast-csv');
+const util  	= require(__dirname + '/../helpers/util');
+const sh      	= require('shelljs');
 
 /**
  * @api {get} /user/:id Get user information
@@ -39,6 +41,7 @@ exports.update_class = (req, res, next) => {
 			.end();
 
 	}
+	
 	function send_response (err, result, args, last_query) {
 		if (err) {
 			winston.error('Error in updating class', last_query);
@@ -52,7 +55,7 @@ exports.update_class = (req, res, next) => {
 		}
 
 		res.item(result[0])
-		.send();
+			.send();
 	}
 
 	start();
@@ -126,3 +129,40 @@ exports.write_to_csv = (res, req, next) => {
 	
 	start();
 };
+exports.insert_csv_classlist = (req, res, next) => {
+
+    function start () {
+		
+		let class_query;
+		
+		sh.cd('controllers');
+		sh.config.silent = true;
+		sh.exec('sudo chmod 755 ../helpers/classlist.js');
+		sh.config.silent = false;
+		sh.exec('node ../helpers/classlist.js ../uploads/csv/classlist.csv > ../database/classlist.sql', function (err) {
+
+			if (err) {
+				winston.error('Error in inserting classlist from CSV');
+				return next(err);
+			}
+
+		});
+		class_query = sh.exec('cat ../database/classlist.sql').output;
+		
+		// TODO - convert to formal query
+		res.item(class_query).send();
+
+    }
+	
+	function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in inserting classlist from CSV');
+            return next(err);
+        }
+
+        res.send();
+    }
+
+    start();
+}
+>>>>>>> 02d9fbbaa290c882e7193d40d347f99314c53213
