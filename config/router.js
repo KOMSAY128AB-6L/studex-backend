@@ -19,7 +19,7 @@ module.exports = (router) => {
     router.get ('/student', __.student.retrieve_all_student);
     router.put ('/student/:id', __.student.update_student);
     router.delete('/student/:id', __.student.delete_student);
-
+    router.get('/volunteer_times/:id',__.student.get_times_student_volunteered);
     //Routes for log-in
     router.post('/login', __.user.login_user);
 
@@ -30,6 +30,7 @@ module.exports = (router) => {
     router.delete('/teacher/:id',__.teacher.delete_teacher);
 
     // Routes for class
+    router.get('/class/:id',__.class.view_class);
     router.put('/class', __.class.update_class);
     router.delete('/class/:id', __.class.delete_class);
 	
