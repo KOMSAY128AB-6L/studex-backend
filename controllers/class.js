@@ -136,8 +136,7 @@ exports.write_to_csv = (res, req, next) => {
 	 		return next(err);
 	 	}
 	 	
-		 return console.log(res.send);
-	 	// res.send();
+	 	res.send();
 	 }
 	
 	start();
@@ -164,7 +163,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 		class_query = sh.exec('cat ../database/classlist.sql').output;
 		
 		// TODO - convert to formal query
-		res.item(class_query).send();
+		res.send();
 
     }
 	
