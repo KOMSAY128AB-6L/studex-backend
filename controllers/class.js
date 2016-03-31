@@ -22,7 +22,7 @@ exports.update_class = (req, res, next) => {
 			className,
 			section
 		},
-	req.body
+		req.body
 	);
 
 	function start () {
@@ -39,23 +39,23 @@ exports.update_class = (req, res, next) => {
 			.end();
 
 	}
-		function send_response (err, result, args, last_query) {
-			if (err) {
-				winston.error('Error in updating class', last_query);
-				return next(err);
-			}
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in updating class', last_query);
+			return next(err);
+		}
 
-			if (!result.length) {
-				return res.status(404)
-		 		   .error({code: 'CLASS404', message: 'Class not found'})
-				.send();
-			}
-
-			res.item(result[0])
+		if (!result.length) {
+			return res.status(404)
+				.error({code: 'CLASS404', message: 'Class not found'})
 			.send();
 		}
 
-start();
+		res.item(result[0])
+		.send();
+	}
+
+	start();
 };
 
 exports.delete_class = (req, res, next) => {
