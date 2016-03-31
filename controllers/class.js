@@ -99,36 +99,50 @@ exports.write_to_csv = (res, req, next) => {
 			.query(
 				'SELECT * FROM student',
 				[],
-				send_response
+				write_to_csv
 			)
 			.end();
 	}
 	
 	function write_to_csv(err, result, args, last_query){
+		
+		let values = [];
+		
 		if(err){
 			winston.error('Selection query of students failed', last_query);
 			return next(err);
 		}
 		
+		
+		result.forEach(function (element) {
+			values.push([
+				element.email,
+				element.first_name,
+				element.middle_initial,
+				element.last_name,
+				element.picture,
+			]);
+		});
+		
+		// TODO - make filenames more descriptive
 		csv_writer
-			.writeToPath("students.csv", [
-				result
-			], {headers: true})
-			.on("finish", send_response)
+			.writeToPath("uploads/csv/students.csv", values, {headers: true})
+			.on("finish", send_response);
 	}
 	
-	function send_response(err, result, args, last_query){
+	function send_response(err, result, args){
 	 	if(err){
-	 		winston.error('Could not write to CSV', last_query);
+	 		winston.error('Could not write to CSV');
 	 		return next(err);
-	 	} 
+	 	}
 	 	
-	 	res.item(result[0])
-	 		.send()
+		 return console.log(res.send);
+	 	// res.send();
 	 }
 	
 	start();
 };
+
 exports.insert_csv_classlist = (req, res, next) => {
 
     function start () {
@@ -165,4 +179,3 @@ exports.insert_csv_classlist = (req, res, next) => {
 
     start();
 }
->>>>>>> 02d9fbbaa290c882e7193d40d347f99314c53213
