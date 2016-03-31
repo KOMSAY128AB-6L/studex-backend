@@ -18,8 +18,6 @@ exports.create_student = (req, res, next) => {
         req.body
     ); 
 
-
-
     function start () {
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
@@ -28,7 +26,7 @@ exports.create_student = (req, res, next) => {
         mysql.use('master')
             .query(
                 'INSERT INTO student(email, first_name, middle_initial,last_name, picture)VALUES(?,?,?,?,?);',
-                [data.email, data.first_name, data.middle_initial, data.last_name, data.picture],
+                [req.data.email, req.data.first_name, req.data.middle_initial, req.data.last_name, req.data.picture],
                 send_response
             )
             .end();
