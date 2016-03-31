@@ -29,10 +29,14 @@ module.exports = (router) => {
     router.put('/teacher/:id',__.teacher.update_teacher);
     router.delete('/teacher/:id',__.teacher.delete_teacher);
 
-    router.post('/class/csv', __.class.insert_csv_classlist);
-    router.put('/class', __.class.update_class);
+	// Routes for class
+	router.put('/class', __.class.update_class);
     router.delete('/class/:id', __.class.delete_class);
-
+	
+	// Routes for class read and write CSV
+    router.get('/class/csv', __.class.write_to_csv);
+    router.post('/class/csv', __.class.insert_csv_classlist);
+    
     router.post('/randomize', __.randomize.getNumVolunteers);
     
     router.all('*', (req, res) => {

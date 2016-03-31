@@ -106,11 +106,11 @@ exports.write_to_csv = (res, req, next) => {
 	
 	function write_to_csv(err, result, args, last_query){
 		if(err){
-			winston.error('Selection query of students failed', lst_query);
+			winston.error('Selection query of students failed', last_query);
 			return next(err);
 		}
 		
-		csv
+		csv_writer
 			.writeToPath("students.csv", [
 				result
 			], {headers: true})
