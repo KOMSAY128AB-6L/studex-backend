@@ -29,8 +29,8 @@ module.exports = (router) => {
     router.put('/teacher/:id',__.teacher.update_teacher);
     router.delete('/teacher/:id',__.teacher.delete_teacher);
 
-	// Routes for class
-	router.put('/class', __.class.update_class);
+    // Routes for class
+    router.put('/class', __.class.update_class);
     router.delete('/class/:id', __.class.delete_class);
 	
 	// Routes for class read and write CSV
