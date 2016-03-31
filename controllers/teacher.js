@@ -20,7 +20,7 @@ exports.get_teachers = (req, res, next) => {
             return next(err);
         }
 
-        res.item(result[0])
+        res.item(result)
             .send();
     }
 
