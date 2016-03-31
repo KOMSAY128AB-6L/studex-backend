@@ -45,13 +45,12 @@ exports.view_class = (req, res, next) => {
 
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
-	    id,
-			className,
-			section
+	  	 	id:'',
+			className:'',
+			section:''
 		},
-		req.body
+	req.body
 	);
-
 	function start () {
 		if (data instanceof Error) {
             return res.warn(400, {message: data.message});
@@ -66,32 +65,32 @@ exports.update_class = (req, res, next) => {
 			.end();
 
 	}
-	
-	function send_response (err, result, args, last_query) {
-		if (err) {
-			winston.error('Error in updating class', last_query);
-			return next(err);
-		}
+		function send_response (err, result, args, last_query) {
+			if (err) {
+				winston.error('Error in updating class', last_query);
+				return next(err);
+			}
 
-		if (!result.length) {
-			return res.status(404)
-				.error({code: 'CLASS404', message: 'Class not found'})
+			if (result.affectedRows === 0) {
+				return res.status(404)
+		 		   .error({code: 'CLASS404', message: 'Class not found'})
+				.send();
+			}
+
+			res.item({message:'Class successfully updated'})
 			.send();
 		}
 
-		res.item(result[0])
-			.send();
-	}
-
-	start();
+start();
 };
 
 exports.delete_class = (req, res, next) => {
 
     function start () {
+    	
         mysql.use('master')
             .query(
-                'DELETE * FROM class WHERE class_id = ? LIMIT 1;',
+                'DELETE FROM class WHERE class_id = ?',
                 [req.params.id],
                 send_response
             )
@@ -103,14 +102,13 @@ exports.delete_class = (req, res, next) => {
             winston.error('Error in deleting class', last_query);
             return next(err);
         }
-
-        if (!result.length) {
+        if (result.affectedRows === 0) {
             return res.status(404)
-                .error({code: 'USER404', message: 'Class not found'})
+                .error({code: 'CLASS404', message: 'Class not found'})
                 .send();
         }
 
-        res.item(result[0])
+        res.item({message:'Class successfully deleted'})
             .send();
     }
 
