@@ -19,7 +19,7 @@ const start = () => {
         console.log(err);
 	});
 
-    console.log('use studex\n');
+    console.log('use studex;\n');
 	
 	lr.on('line', (line) => {
         let tokens = line.split(',');
@@ -38,7 +38,7 @@ const start = () => {
         
         if (line_arr.length === 3) {
             for (let i = 0; i < 3; i += 1) {
-                line_arr[i] = line_arr[i].replace('\'','\\"');
+                line_arr[i] = line_arr[i].replace('\'','\\\"');
                 if (i != 2) {
                     line_arr[i] = '\'' + line_arr[i] + '\'';
                     line_arr[i] += ',';
@@ -46,8 +46,8 @@ const start = () => {
             }
             class_name = line_arr[0];
             console.log(
-                ['INSERT INTO class (class_name, section, teacher_id)',
-                'VALUES (', line_arr[0], line_arr[1], line_arr[2], ')\n'].join('')
+                ['INSERT INTO class ("class_name", "section", "teacher_id")',
+                ' VALUES (', line_arr[0], line_arr[1], line_arr[2], ');\n'].join('')
             );
         }
         
@@ -60,15 +60,15 @@ const start = () => {
                 }
             }
             console.log(
-                ['INSERT INTO student (email, password, first_name, middle_initial, last_name, picture)',
-                'VALUES (', line_arr[0], line_arr[1], line_arr[2],  line_arr[3],  line_arr[4], ')'].join('')
+                ['INSERT INTO student ("email", "password", "first_name", "middle_initial", "last_name", "picture")',
+                ' VALUES (', line_arr[0], line_arr[1], line_arr[2],  line_arr[3],  line_arr[4], ');'].join('')
             );
             console.log(
-                ['INSERT INTO student_class ',
-                'VALUES (',
+                ['INSERT INTO student_class ("class_id", "student_id")',
+                ' VALUES (',
                     '(SELECT class_id FROM class WHERE class_name=', class_name, '),',
                     '(SELECT student_id FROM student WHERE email=', line_arr[0].split(',')[0],')',
-                ')\n'].join('')
+                ');\n'].join('')
             );
         }
 	});
