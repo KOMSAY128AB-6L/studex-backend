@@ -194,7 +194,7 @@ exports.get_times_student_volunteered = (req, res, next) => {
 	function getVolunteerTimes(){
 		mysql.use('master')
 		.query(
-			'SELECT COUNT(v.*) AS volunteer_times FROM volunteer v, volunteer_student vs WHERE vs.class_id = ?;',
+			'SELECT COUNT(v.*) AS volunteer_times FROM volunteer v, volunteer_student vs WHERE vs.student_id = ?;',
 			[req.params.id],
 			send_response
 		)
