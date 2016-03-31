@@ -92,7 +92,7 @@ exports.delete_class = (req, res, next) => {
     start();
 };
 
-exports.write_to_csv = (res, req, next) => {
+exports.write_to_csv = (req, res, next) => {
 
 	function start(){
 		mysql.use('master')
