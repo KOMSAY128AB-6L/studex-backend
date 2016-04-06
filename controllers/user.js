@@ -323,7 +323,7 @@ exports.login_user = (req, res, next) => {
 
         else {
 
-            let user = {
+            req.session.user = {
                 teacher_id: result[0].teacher_id,
                 email: result[0].email,
                 first_name: result[0].first_name,
@@ -331,8 +331,6 @@ exports.login_user = (req, res, next) => {
                 last_name: result[0].last_name
             };
             
-            req.session.user = user;
-
             res.send('User succesfully logged in.');
         }
     }
