@@ -297,7 +297,7 @@ exports.login_user = (req, res, next) => {
             return res.status(403)
                     .error({
                         code: 'SESSION403',
-                        message: 'Unauthorized access'
+                        message: 'Already logged in'
                     })
                 .send();
         }
@@ -323,7 +323,7 @@ exports.login_user = (req, res, next) => {
 
         else {
 
-            req.session.user = {
+            let user = {
                 teacher_id: result[0].teacher_id,
                 email: result[0].email,
                 first_name: result[0].first_name,
@@ -331,6 +331,8 @@ exports.login_user = (req, res, next) => {
                 last_name: result[0].last_name
             };
             
+            req.session.user = user;
+
             res.send('User succesfully logged in.');
         }
     }
