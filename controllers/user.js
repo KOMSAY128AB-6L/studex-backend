@@ -293,6 +293,15 @@ exports.login_user = (req, res, next) => {
             return res.warn(400, {message: data.message});
         }
 
+        if (req.session && req.session.user) {
+            return res.status(403)
+                    .error({
+                        code: 'SESSION403',
+                        message: 'Unauthorized access'
+                    })
+                .send();
+        }
+
         mysql.use('master')
             .query(
                 'SELECT teacher_id from teacher where email = ? and password = PASSWORD(CONCAT(MD5(?), ?))', [data.email, data.password, config.SALT],
@@ -310,8 +319,18 @@ exports.login_user = (req, res, next) => {
         if(!result.length) {
             res.item("User Email or Password is incorrect.")
                 .send();
-        } else {
-            req.session.userid = result[0].teacher_id;
+        }
+
+        else {
+
+            req.session.user = {
+                teacher_id: result[0].teacher_id,
+                email: result[0].email,
+                first_name: result[0].first_name,
+                middle_initial: result[0].middle_initial,
+                last_name: result[0].last_name
+            };
+            
             res.send('User succesfully logged in.');
         }
     }
