@@ -66,12 +66,16 @@ exports.randomize_classes = (req, res, next) => {
 
 
 
-exports.getNumVolunteers = (req, res, next) => {
+exports.get_num_volunteers = (req, res, next) => {
+    const data = util.get_data(
+        {
+            'num_of_volunteers' : ''
+        },
+        req.body
+    ); 
 
     function start () {
-    	var n = req.body.numVolunteers; // for testing
-    	console.log(n);					// for testing
-        return req.body.numVolunteers;  
+        res.item(data.num_of_volunteers).send();
     }
 
     start();
