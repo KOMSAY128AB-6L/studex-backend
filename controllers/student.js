@@ -10,6 +10,7 @@ exports.create_student = (req, res, next) => {
 	const data = util.get_data(
         {
             email: '',
+            student_number: '',
             first_name: '',
             middle_initial: '',
             last_name: '',
@@ -25,8 +26,8 @@ exports.create_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'INSERT INTO student(email, first_name, middle_initial,last_name, picture)VALUES(?,?,?,?,?);',
-                [req.data.email, req.data.first_name, req.data.middle_initial, req.data.last_name, req.data.picture],
+                'INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture)VALUES(?,?,?,?,?);',
+                [data.email, data.student_number, data.first_name, data.middle_initial, data.last_name, data.picture],
                 send_response
             )
             .end();

@@ -69,7 +69,7 @@ exports.randomize_classes = (req, res, next) => {
 exports.get_num_volunteers = (req, res, next) => {
     const data = util.get_data(
         {
-            'num_of_volunteers' : ''
+            num_of_volunteers : ''
         },
         req.body
     ); 
