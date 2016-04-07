@@ -10,8 +10,11 @@ const config = {
 
     CORS:  {
         allowed_headers: 'Access-Token, X-Requested-With, Content-Type, Accept',
-        allowed_origins: '*',
-        allowed_methods: 'GET, POST, PUT, OPTIONS, DELETE'
+        allowed_origins_list: [
+            'localhost:8000'
+        ],
+        allowed_methods: 'GET, POST, PUT, OPTIONS, DELETE',
+        allow_credentials: true
     },
 
     UPLOAD_DIR: path.normalize(__dirname + '/../uploads/'),
