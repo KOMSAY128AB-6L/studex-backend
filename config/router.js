@@ -43,7 +43,7 @@ module.exports = (router) => {
     router.get('/class/csv',                        $, __.class.write_to_csv);
     router.post('/class/csv',                       $, __.class.insert_csv_classlist);
     
-    router.post('/randomize',                       $, __.randomize.getNumVolunteers);
+    router.post('/randomize/get_num',                       $, __.randomize.get_num_volunteers);
     
     router.all('*', (req, res) => {
         res.status(404)
