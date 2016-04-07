@@ -1,5 +1,6 @@
 'use strict';
 
+const config  = require(__dirname + '/../config/config');
 const util   = require(__dirname + '/../helpers/util');
 const random   = require(__dirname + '/../helpers/randomize');
 const mysql   = require('anytv-node-mysql');
@@ -58,6 +59,19 @@ exports.randomize_classes = (req, res, next) => {
 
         return res.item(random.randomize(result, data.settings))
                 .send();
+    }
+
+    start();
+};
+
+
+
+exports.getNumVolunteers = (req, res, next) => {
+
+    function start () {
+    	var n = req.body.numVolunteers; // for testing
+    	console.log(n);					// for testing
+        return req.body.numVolunteers;  
     }
 
     start();

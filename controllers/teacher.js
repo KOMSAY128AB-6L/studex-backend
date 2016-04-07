@@ -20,7 +20,7 @@ exports.get_teachers = (req, res, next) => {
             return next(err);
         }
 
-        res.item(result[0])
+        res.item(result)
             .send();
     }
 
@@ -88,8 +88,6 @@ exports.post_teacher = (req, res, next) => {
 };
 
 exports.update_teacher = (req, res, next) => {
-	
-	console.log(req.body);
 	
 	function start () {
 		mysql.use('master')

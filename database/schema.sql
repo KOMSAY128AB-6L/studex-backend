@@ -71,3 +71,13 @@ CREATE TABLE IF NOT EXISTS volunteer_student (
 	PRIMARY KEY(student_id, volunteer_id),
 	FOREIGN KEY(student_id) REFERENCES student(student_id)
 );
+
+
+CREATE TABLE IF NOT EXISTS reset_password (
+	email VARCHAR(64) PRIMARY KEY,
+	random_string VARCHAR(64) NOT NULL,
+	date_expiry DATETIME DEFAULT NULL
+);
+
+CREATE TRIGGER before_insert_on_reset_password BEFORE INSERT ON `reset_password` 
+FOR EACH ROW SET new.date_expiry = IFNULL(new.date_expiry,DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 DAY));
