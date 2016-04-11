@@ -40,7 +40,7 @@ exports.update_class = (req, res, next) => {
 			.end();
 
 	}
-	
+
 	function send_response (err, result, args, last_query) {
 		if (err) {
 			winston.error('Error in updating class', last_query);
@@ -94,35 +94,36 @@ exports.delete_class = (req, res, next) => {
 exports.insert_csv_classlist = (req, res, next) => {
 
     function start () {
-		
+
 		let class_query;
-		
+
 		sh.cd('controllers');
 		sh.config.silent = true;
 		sh.exec('sudo chmod 755 ../helpers/classlist.js');
 		sh.config.silent = false;
 		sh.exec('node ../helpers/classlist.js ../uploads/csv/classlist.csv > ../database/classlist.sql', function (err) {
-
 			if (err) {
 				winston.error('Error in inserting classlist from CSV');
 				return next(err);
 			}
-
 		});
+
 		class_query = sh.exec('cat ../database/classlist.sql').output;
-		
+
+		sh.exec('sudo mysql -uroot -p < ../database/classlist.sql', send_response);
+
 		// TODO - convert to formal query
-		res.item(class_query).send();
+		res.item(req.param).send();
 
     }
-	
-	function send_response (err, result, args, last_query) {
+
+	function send_response (err, result) {
         if (err) {
             winston.error('Error in inserting classlist from CSV');
             return next(err);
         }
 
-        res.send();
+        res.item(result).send();
     }
 
     start();
