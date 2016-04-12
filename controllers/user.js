@@ -331,7 +331,7 @@ exports.login_user = (req, res, next) => {
                 last_name: result[0].last_name
             };
             
-            res.send('User succesfully logged in.');
+            res.item({message:'User succesfully logged in.'}).send();
         }
     }
 
