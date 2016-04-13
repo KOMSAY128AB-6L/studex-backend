@@ -26,7 +26,7 @@ exports.create_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT student_id FROM student WHERE email = ? AND student_number = ? LIMIT 1;',
+                'SELECT student_id FROM student WHERE email = ? and student_number = ?;',
                 [data.email, data.student_number],
                 check_duplicate
             )
@@ -42,7 +42,7 @@ exports.create_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture)VALUES(?,?,?,?,?);',
+                'INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture)VALUES(?,?,?,?,?,?);',
                 [data.email, data.student_number, data.first_name, data.middle_initial, data.last_name, data.picture],
                 send_response
             )
@@ -67,6 +67,7 @@ exports.update_student = (req, res, next) => {
     const data = util.get_data(
         {
             email: '',
+            student_number: '',
             first_name: '',
             middle_initial: '',
             last_name: '',
@@ -111,7 +112,7 @@ exports.delete_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'DELETE FROM student_class WHERE student_id = ? LIMIT 1;',
+                'DELETE FROM student_class WHERE student_id = ?;',
                 [req.params.id],
                 delete_student_data
             )
@@ -127,7 +128,7 @@ exports.delete_student = (req, res, next) => {
 
          mysql.use('master')
             .query(
-                'DELETE FROM student WHERE student_id = ? LIMIT 1;',
+                'DELETE FROM student WHERE student_id = ?;',
                 [req.params.id],
                 send_response
             )

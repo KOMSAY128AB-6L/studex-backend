@@ -304,7 +304,7 @@ exports.login_user = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT teacher_id from teacher where email = ? and password = PASSWORD(CONCAT(MD5(?), ?))', [data.email, data.password, config.SALT],
+                'SELECT * from teacher where email = ? and password = PASSWORD(CONCAT(MD5(?), ?))', [data.email, data.password, config.SALT],
                 send_response
             )
             .end();
