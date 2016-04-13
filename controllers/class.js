@@ -5,6 +5,7 @@ const mysql   	= require('anytv-node-mysql');
 const winston 	= require('winston');
 const sh      	= require('shelljs');
 
+
 /**
  * @api {get} /user/:id Get user information
  * @apiName GetUser
@@ -93,37 +94,48 @@ exports.delete_class = (req, res, next) => {
 
 exports.insert_csv_classlist = (req, res, next) => {
 
+	console.log(req.files);
+	console.log(req.file);
+	console.log(req.body);
+
+	// upload(req,res,function(err) {
+	// 	if(err) {
+	// 		return res.end("Error uploading file.");
+	// 	}
+	//
+	// 	console.log(req.files);
+	// 	console.log(req.file);
+	// 	console.log(req.body);
+	//
+	// 	res.end("File is uploaded");
+    // });
+
     function start () {
-
-		let class_query;
-
-		sh.cd('controllers');
 		sh.config.silent = true;
+		sh.cd('controllers');
 		sh.exec('sudo chmod 755 ../helpers/classlist.js');
-		sh.config.silent = false;
-		sh.exec('node ../helpers/classlist.js ../uploads/csv/classlist.csv > ../database/classlist.sql', function (err) {
-			if (err) {
-				winston.error('Error in inserting classlist from CSV');
-				return next(err);
-			}
-		});
+		sh.exec('node ../helpers/classlist.js ../uploads/csv/classlist.csv > ../database/classlist.sql', execute_query);
+	}
 
-		class_query = sh.exec('cat ../database/classlist.sql').output;
+	function execute_query (err) {
+		if (err) {
+			winston.error('Error in parsing CSV file and converting it to into SQL format');
+			return next(err);
+		}
 
-		sh.exec('sudo mysql -uroot -p < ../database/classlist.sql', send_response);
+		sh.exec('sudo mysql -uroot < ../database/classlist.sql', send_response);
+	}
 
-		// TODO - convert to formal query
-		res.item(req.param).send();
-
-    }
-
-	function send_response (err, result) {
+	function send_response (err) {
         if (err) {
-            winston.error('Error in inserting classlist from CSV');
-            return next(err);
+            if (err === 1) winston.error('Some of the data may be duplicates');
+			else winston.error('Error in inserting classlist from CSV');
+
+            // return next(err);
+			return res.send();
         }
 
-        res.item(result).send();
+        res.item().send();
     }
 
     start();
