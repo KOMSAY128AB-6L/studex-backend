@@ -4,6 +4,8 @@ const util  	= require(__dirname + '/../helpers/util');
 const mysql   	= require('anytv-node-mysql');
 const winston 	= require('winston');
 const sh      	= require('shelljs');
+const multer	= require('multer');
+const upload	= multer({ dest: 'uploads/' });
 
 /**
  * @api {get} /user/:id Get user information
