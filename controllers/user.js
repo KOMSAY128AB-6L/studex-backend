@@ -337,3 +337,29 @@ exports.login_user = (req, res, next) => {
 
     start();
 };
+
+exports.logout_user = (req, res, next) => {
+
+    function start(){
+        
+        if (req.session && req.session.user) {
+            req.session.user = {};
+            req.session.destroy();
+            
+            res.send('User succesfully logged out.');
+        }
+        else{
+            res.status(403)
+               .error({
+                    code: 'SESSION403',
+                    message: 'Already logged out'
+                })
+               .send();
+        }
+
+        
+    }
+
+    
+    start();
+};
