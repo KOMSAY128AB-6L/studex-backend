@@ -7,12 +7,25 @@ DELETE FROM student;
 
 ALTER TABLE teacher AUTO_INCREMENT = 1;
 ALTER TABLE student AUTO_INCREMENT = 1;
+ALTER TABLE class AUTO_INCREMENT = 1;
 
 
 -- TEACHER SEED
-INSERT INTO teacher(email, password, first_name, middle_initial,last_name) \
+INSERT INTO teacher(email, password, first_name, middle_initial,last_name, picture) \
     VALUES("kpbautista@up.edu.ph", PASSWORD(CONCAT(MD5("tintin"), "q5cH9VoL")), \
-   	"Kristine Elaine", "P", "Bautista");
+   	"Kristine Elaine", "P", "Bautista", "kep.jpg");
+
+INSERT INTO teacher(email, password, first_name, middle_initial,last_name, picture) \
+    VALUES("lrlactuan@up.edu.ph", PASSWORD(CONCAT(MD5("lei"), "q5cH9VoL")), \
+   	"Lei Kristofer","R","Lactuan","lei.jpg");
+
+INSERT INTO teacher(email, password, first_name, middle_initial,last_name, picture) \
+    VALUES("mbderobles@up.edu.ph", PASSWORD(CONCAT(MD5("betel"), "q5cH9VoL")), \
+   	"Marie Betel", "B", "De Robles", "betel.jpg");
+
+INSERT INTO teacher(email, password, first_name, middle_initial,last_name, picture) \
+    VALUES("rcrecario@up.edu.ph", PASSWORD(CONCAT(MD5("reg"), "q5cH9VoL")), \
+   	"Reginald Neil","C","Recario","reg.jpg");
 
 
 -- STUDENT SEED
@@ -76,63 +89,81 @@ INSERT INTO student(email, student_number, first_name, middle_initial,last_name,
 
 -- CLASS SEED
 INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-6L","1");
+		VALUES("CMSC 128","AB-1L",1);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-2L",2);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-3L",3);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-4L",4);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-5L",2);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-6L",1);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-7L",3);
 
 
 -- STUDENT_CLASS SEED
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","1","1");
+		VALUES("6","1","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","2","1");
+		VALUES("6","2","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","3","1");
+		VALUES("6","3","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","4","1");
+		VALUES("6","4","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","5","1");
+		VALUES("6","5","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","6","1");
+		VALUES("6","6","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","7","1");
+		VALUES("6","7","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","8","1");
+		VALUES("6","8","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","9","1");
+		VALUES("6","9","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","10","1");
+		VALUES("6","10","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","11","1");
+		VALUES("6","11","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","12","1");
+		VALUES("6","12","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","13","1");
+		VALUES("6","13","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","14","1");
+		VALUES("6","14","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","15","1");
+		VALUES("6","15","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","16","1");
+		VALUES("6","16","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","17","1");
+		VALUES("6","17","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","18","1");
+		VALUES("6","18","1");
 
 INSERT INTO student_class(class_id, student_id, times_called)\
-		VALUES("1","19","1");
+		VALUES("6","19","1");
