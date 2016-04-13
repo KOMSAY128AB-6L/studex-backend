@@ -74,8 +74,6 @@ exports.create_user = (req, res, next) => {
             return next(err);
         }
         
-        console.log(result)
-
         return res.status(200)
                 .item({message: 'User successfully created'})
                 .send();
