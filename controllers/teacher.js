@@ -33,7 +33,7 @@ exports.get_teacher = (req, res, next) => {
         mysql.use('master')
             .query(
                 'SELECT * FROM teacher WHERE teacher_id = ?;',
-                [req.params.id],
+                [req.session.user.teacher_id],
                 send_response
             )
             .end();
@@ -79,7 +79,7 @@ exports.post_teacher = (req, res, next) => {
             winston.error('Error in creating teacher', last_query);
             return next(err);
         }
-
+        
         res.item(result[0])
             .send();
     }
