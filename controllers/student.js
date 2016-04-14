@@ -242,3 +242,29 @@ exports.get_times_student_volunteered = (req, res, next) => {
 	}
 	start();
 };
+
+exports.retrieve_log_of_volunteers = (req, res, next) => {
+
+    function start () {
+        mysql.use('master')
+            .query(
+                'SELECT * FROM volunteer;',
+                send_response
+            )
+            .end();
+    }
+
+    function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in retrieving log of volunteers', last_query);
+            return next(err);
+        }
+
+        res.item(result)
+            .send();
+  
+      
+    }
+
+    start();
+};

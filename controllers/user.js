@@ -283,7 +283,7 @@ exports.logout_user = (req,res,next) => {
 		req.session.destroy();
 	}
 	start();
-   	res.send('User succesfully logged out.');
+	res.item({message:'User succesfully logged out.'}).send();
 };
 
 
