@@ -278,6 +278,15 @@ exports.confirm_reset_password = (req, res, next) => {
 };
 
 
+exports.logout_user = (req,res,next) => {
+	function start () {
+		req.session.destroy();
+	}
+	start();
+   	res.send('User succesfully logged out.');
+};
+
+
 
 exports.login_user = (req, res, next) => {
     const data = util.get_data(
@@ -304,7 +313,7 @@ exports.login_user = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT teacher_id from teacher where email = ? and password = PASSWORD(CONCAT(MD5(?), ?))', [data.email, data.password, config.SALT],
+                'SELECT * from teacher where email = ? and password = PASSWORD(CONCAT(MD5(?), ?))', [data.email, data.password, config.SALT],
                 send_response
             )
             .end();
@@ -331,7 +340,7 @@ exports.login_user = (req, res, next) => {
                 last_name: result[0].last_name
             };
             
-            res.send('User succesfully logged in.');
+            res.item({message:'User succesfully logged in.'}).send();
         }
     }
 
