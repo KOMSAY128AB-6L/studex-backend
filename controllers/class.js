@@ -20,7 +20,7 @@ const sh      	= require('shelljs');
 
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
-	    id,
+		    id,
 			className,
 			section
 		},
@@ -94,25 +94,7 @@ exports.delete_class = (req, res, next) => {
 
 exports.insert_csv_classlist = (req, res, next) => {
 
-	console.dir(req.headers['content-type']);
-
-	console.log(req.files);
-	console.log(req.file);
-	console.log(req.body);
-
-	// upload(req,res,function(err) {
-	// 	if(err) {
-	// 		return res.end("Error uploading file.");
-	// 	}
-	//
-	// 	console.log(req.files);
-	// 	console.log(req.file);
-	// 	console.log(req.body);
-	//
-	// 	res.end("File is uploaded");
-    // });
-
-    function start () {
+	function start () {
 		sh.config.silent = true;
 		sh.cd('controllers');
 		sh.exec('sudo chmod 755 ../helpers/classlist.js');
@@ -125,19 +107,28 @@ exports.insert_csv_classlist = (req, res, next) => {
 			return next(err);
 		}
 
-		sh.exec('sudo mysql -uroot < ../database/classlist.sql', send_response);
+		sh.exec('sudo mysql -uroot < ../database/classlist.sql', clean_sql);
+	}
+
+	function clean_sql (err) {
+		if (err) {
+            if (err === 1) winston.error('Some of the data may be duplicates');
+			else winston.error('Error in inserting classlist from CSV');
+
+            return next(err);
+        }
+
+		sh.exec('sudo rm ../database/classlist.sql', send_response);
 	}
 
 	function send_response (err) {
         if (err) {
-            if (err === 1) winston.error('Some of the data may be duplicates');
-			else winston.error('Error in inserting classlist from CSV');
+			winston.error('Error in cleaning SQL file');
 
-            // return next(err);
-			return res.item({body: req.body, file: req.file, files: req.files}).send();
+            return next(err);
         }
 
-        res.item(req).send();
+        res.send({message: 'Success in classlist import'});
     }
 
     start();
