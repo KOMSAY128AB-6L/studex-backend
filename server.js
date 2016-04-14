@@ -10,6 +10,25 @@ const mysql       = require('anytv-node-mysql');
 const body_parser = require('body-parser');
 const winston     = require('winston');
 const express     = require('express');
+const multer	= require('multer');
+const storage =   multer.diskStorage( {
+    destination: (req, file, cb) => {
+		var destFolder = __dirname + '/uploads/csv';
+		//create folder if does not exists
+		if (!fs.existsSync(destFolder)) {
+			fs.mkdirSync(destFolder);
+		}
+
+		//set folder where files will be populated
+		cb(null, destFolder)
+    },
+    filename: (req, file, cb) => {
+		//set the names file within the folder
+		//as the original name of the file
+		cb(null,file.originalname);
+    }
+});
+const upload = multer({storage : storage}).single('csv');
 
 let app;
 let handler;
@@ -49,6 +68,7 @@ function start () {
     app.use(require('method-override')());
     app.use(body_parser.urlencoded({extended: false}));
     app.use(body_parser.json());
+	// app.use(upload);
     app.use(require('compression')());
 
 

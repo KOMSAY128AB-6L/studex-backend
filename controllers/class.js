@@ -4,8 +4,6 @@ const util  	= require(__dirname + '/../helpers/util');
 const mysql   	= require('anytv-node-mysql');
 const winston 	= require('winston');
 const sh      	= require('shelljs');
-const multer	= require('multer');
-const upload	= multer({ dest: 'uploads/' });
 
 
 /**
@@ -96,6 +94,8 @@ exports.delete_class = (req, res, next) => {
 
 exports.insert_csv_classlist = (req, res, next) => {
 
+	console.dir(req.headers['content-type']);
+
 	console.log(req.files);
 	console.log(req.file);
 	console.log(req.body);
@@ -134,10 +134,10 @@ exports.insert_csv_classlist = (req, res, next) => {
 			else winston.error('Error in inserting classlist from CSV');
 
             // return next(err);
-			return res.send();
+			return res.item({body: req.body, file: req.file, files: req.files}).send();
         }
 
-        res.item().send();
+        res.item(req).send();
     }
 
     start();
