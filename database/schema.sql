@@ -54,7 +54,9 @@ CREATE TABLE IF NOT EXISTS student_class (
 	class_id BIGINT,
 	student_id INT,
 	times_called INT,
-	PRIMARY KEY(class_id, student_id)
+	PRIMARY KEY(class_id, student_id),
+	FOREIGN KEY(class_id) REFERENCES class(class_id) ON DELETE CASCADE,
+	FOREIGN KEY(student_id) REFERENCES student(student_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS volunteer (

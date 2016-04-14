@@ -278,6 +278,15 @@ exports.confirm_reset_password = (req, res, next) => {
 };
 
 
+exports.logout_user = (req,res,next) => {
+	function start () {
+		req.session.destroy();
+	}
+	start();
+   	res.send('User succesfully logged out.');
+};
+
+
 
 exports.login_user = (req, res, next) => {
     const data = util.get_data(
