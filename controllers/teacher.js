@@ -20,7 +20,7 @@ exports.get_teachers = (req, res, next) => {
             return next(err);
         }
 
-        res.item(result[0])
+        res.item(result)
             .send();
     }
 
@@ -30,29 +30,7 @@ exports.get_teachers = (req, res, next) => {
 exports.get_teacher = (req, res, next) => {
 
     function start () {
-        mysql.use('master')
-            .query(
-                'SELECT * FROM teacher WHERE teacher_id = ?;',
-                [req.params.id],
-                send_response
-            )
-            .end();
-    }
-	
-    function send_response (err, result, args, last_query) {
-        if (err) {
-            winston.error('Error in getting teacher', last_query);
-            return next(err);
-        }
-
-        if (!result.length) {
-            return res.status(404)
-                .error({code: 'TEACHER404', message: 'teacher not found'})
-                .send();
-        }
-
-        res.item(result[0])
-            .send();
+        res.send(req.session.user);
     }
 
     start();
@@ -79,7 +57,7 @@ exports.post_teacher = (req, res, next) => {
             winston.error('Error in creating teacher', last_query);
             return next(err);
         }
-
+        
         res.item(result[0])
             .send();
     }

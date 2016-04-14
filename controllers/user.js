@@ -39,6 +39,23 @@ exports.create_user = (req, res, next) => {
 
         mysql.use('master')
             .query(
+                'SELECT * FROM teacher WHERE email = ?;',
+                [data.email],
+                send_validate_response
+            ) 
+            
+     	.end();
+    }
+    
+    function send_validate_response (err, result, args, last_query) {
+         if (result.length) {
+            return res.status(404)
+                .error({code: 'USER404', message: 'User email is existing'})
+                .send();
+        }
+        
+        mysql.use('master')
+        .query(
                 'INSERT INTO teacher(email, password, first_name, middle_initial,\
                                     last_name) \
                  VALUES(?, PASSWORD(CONCAT(MD5(?), ?)), ?, ?, ?);',
@@ -46,15 +63,17 @@ exports.create_user = (req, res, next) => {
                  data.middle_initial, data.last_name],
                 send_response
             )
-            .end();
+            
+     	.end();
     }
 
     function send_response (err, result, args, last_query) {
+             
         if (err) {
-            winston.error('Error in creating user', last_query);
+            winston.error('Error creating user', last_query);	
             return next(err);
         }
-
+        
         return res.status(200)
                 .item({message: 'User successfully created'})
                 .send();
@@ -253,6 +272,76 @@ exports.confirm_reset_password = (req, res, next) => {
         }
 
         return res.status(200);
+    }
+
+    start();
+};
+
+
+exports.logout_user = (req,res,next) => {
+	function start () {
+		req.session.destroy();
+	}
+	start();
+   	res.send('User succesfully logged out.');
+};
+
+
+
+exports.login_user = (req, res, next) => {
+    const data = util.get_data(
+        {
+            email : '',
+            password : '' 
+        },
+        req.body
+    );
+
+    function start(){
+        if (data instanceof Error) {
+            return res.warn(400, {message: data.message});
+        }
+
+        if (req.session && req.session.user) {
+            return res.status(403)
+                    .error({
+                        code: 'SESSION403',
+                        message: 'Already logged in'
+                    })
+                .send();
+        }
+
+        mysql.use('master')
+            .query(
+                'SELECT * from teacher where email = ? and password = PASSWORD(CONCAT(MD5(?), ?))', [data.email, data.password, config.SALT],
+                send_response
+            )
+            .end();
+    }
+
+    function send_response(err, result) {
+        if (err) {
+            winston.error('Error in selecting teacher', last_query);
+            return next(err);
+        }
+
+        if(!result.length) {
+            res.item("User Email or Password is incorrect.")
+                .send();
+        }
+
+        else {
+
+            req.session.user = {
+                teacher_id: result[0].teacher_id,
+                email: result[0].email,
+                first_name: result[0].first_name,
+                middle_initial: result[0].middle_initial,
+                last_name: result[0].last_name
+            };
+            
+            res.item({message:'User succesfully logged in.'}).send();
+        }
     }
 
     start();

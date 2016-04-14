@@ -1,8 +1,9 @@
 'use strict';
 
+const mysql   = require('anytv-node-mysql');
+const winston = require('winston');
+const csv_writer = require('fast-csv');
 const util  	= require(__dirname + '/../helpers/util');
-const mysql   	= require('anytv-node-mysql');
-const winston 	= require('winston');
 const sh      	= require('shelljs');
 
 
@@ -17,16 +18,40 @@ const sh      	= require('shelljs');
  * @apiSuccess {String} date_created Time when the user was created
  * @apiSuccess {String} date_updated Time when last update occurred
  */
+exports.view_class = (req, res, next) => {
+	function start () {
+	mysql.use('master')
+			.query(
+			'SELECT s.last_name, s.first_name, s.middle_initial FROM student s, student_class sc WHERE sc.class_id = ? and s.student_id = sc.student_id',
+			[req.params.id],
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in viewing class', last_query);
+			return next(err);
+		}
+		if (!result.length) {
+			return res.status(404)
+			.error({code: 'CLASS404', message: 'Class not found'})
+			.send();
+		}
+		res.item(result[0])
+		.send();
+	}
+	start();
+};
 
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
-		    id,
-			className,
-			section
+	  	 	id:'',
+			className:'',
+			section:''
 		},
-		req.body
+	req.body
 	);
-
 	function start () {
 		if (data instanceof Error) {
             return res.warn(400, {message: data.message});
@@ -48,14 +73,14 @@ exports.update_class = (req, res, next) => {
 			return next(err);
 		}
 
-		if (!result.length) {
+		if (result.affectedRows === 0) {
 			return res.status(404)
-				.error({code: 'CLASS404', message: 'Class not found'})
+	 		   .error({code: 'CLASS404', message: 'Class not found'})
 			.send();
 		}
 
-		res.item(result[0])
-			.send();
+		res.item({message:'Class successfully updated'})
+		.send();
 	}
 
 	start();
@@ -64,9 +89,10 @@ exports.update_class = (req, res, next) => {
 exports.delete_class = (req, res, next) => {
 
     function start () {
+
         mysql.use('master')
             .query(
-                'DELETE * FROM class WHERE class_id = ? LIMIT 1;',
+                'DELETE FROM class WHERE class_id = ?',
                 [req.params.id],
                 send_response
             )
@@ -78,18 +104,67 @@ exports.delete_class = (req, res, next) => {
             winston.error('Error in deleting class', last_query);
             return next(err);
         }
-
-        if (!result.length) {
+        if (result.affectedRows === 0) {
             return res.status(404)
-                .error({code: 'USER404', message: 'Class not found'})
+                .error({code: 'CLASS404', message: 'Class not found'})
                 .send();
         }
 
-        res.item(result[0])
+        res.item({message:'Class successfully deleted'})
             .send();
     }
 
     start();
+};
+
+exports.write_to_csv = (req, res, next) => {
+
+	function start(){
+		mysql.use('master')
+			.query(
+				'SELECT * FROM student',
+				[],
+				write_to_csv
+			)
+			.end();
+	}
+
+	function write_to_csv(err, result, args, last_query){
+
+		let values = [];
+
+		if(err){
+			winston.error('Selection query of students failed', last_query);
+			return next(err);
+		}
+
+
+		result.forEach(function (element) {
+			values.push([
+				element.email,
+				element.first_name,
+				element.middle_initial,
+				element.last_name,
+				element.picture,
+			]);
+		});
+
+		// TODO - make filenames more descriptive
+		csv_writer
+			.writeToPath("uploads/csv/students.csv", values, {headers: true})
+			.on("finish", send_response);
+	}
+
+	function send_response(err, result, args){
+	 	if(err){
+	 		winston.error('Could not write to CSV');
+	 		return next(err);
+	 	}
+
+	 	res.send();
+	 }
+
+	start();
 };
 
 exports.insert_csv_classlist = (req, res, next) => {

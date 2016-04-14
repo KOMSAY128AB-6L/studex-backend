@@ -10,6 +10,7 @@ exports.create_student = (req, res, next) => {
 	const data = util.get_data(
         {
             email: '',
+            student_number: '',
             first_name: '',
             middle_initial: '',
             last_name: '',
@@ -18,8 +19,6 @@ exports.create_student = (req, res, next) => {
         req.body
     ); 
 
-
-
     function start () {
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
@@ -27,8 +26,24 @@ exports.create_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'INSERT INTO student(email, first_name, middle_initial,last_name, picture)VALUES(?,?,?,?,?);',
-                [data.email, data.first_name, data.middle_initial, data.last_name, data.picture],
+                'SELECT student_id FROM student WHERE email = ? and student_number = ?;',
+                [data.email, data.student_number],
+                check_duplicate
+            )
+            .end();
+       
+    }
+
+    function check_duplicate (err, result) {
+
+        if(result.length){
+            return res.item({message:'Student already exists.'}).send();
+        }
+
+        mysql.use('master')
+            .query(
+                'INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture)VALUES(?,?,?,?,?,?);',
+                [data.email, data.student_number, data.first_name, data.middle_initial, data.last_name, data.picture],
                 send_response
             )
             .end();
@@ -52,6 +67,7 @@ exports.update_student = (req, res, next) => {
     const data = util.get_data(
         {
             email: '',
+            student_number: '',
             first_name: '',
             middle_initial: '',
             last_name: '',
@@ -93,13 +109,31 @@ exports.update_student = (req, res, next) => {
 
 exports.delete_student = (req, res, next) => {
 	function start () {
+
         mysql.use('master')
             .query(
-                'DELETE FROM student WHERE student_id = ? LIMIT 1;',
+                'DELETE FROM student_class WHERE student_id = ?;',
+                [req.params.id],
+                delete_student_data
+            )
+            .end();
+       
+    }
+
+    function delete_student_data (err, result){
+        if (err) {
+            winston.error('Error in deleting student in class', last_query);
+            return next(err);
+        }
+
+         mysql.use('master')
+            .query(
+                'DELETE FROM student WHERE student_id = ?;',
                 [req.params.id],
                 send_response
             )
             .end();
+
     }
 
     function send_response (err, result, args, last_query) {
@@ -170,4 +204,41 @@ exports.retrieve_all_student = (req, res, next) => {
     }
 
     start();
+};
+
+exports.get_times_student_volunteered = (req, res, next) => {
+	function start () {
+		mysql.use('master')
+		.query(
+			 'SELECT * FROM student WHERE student_id = ? LIMIT 1;',
+			[req.params.id],
+			function(err,results){
+				if (err) {
+					winston.error('Error in getting student', last_query);
+					return next(err);
+				}
+				if (!results.length) {
+					return res.status(404)
+					.error({code: 'STUDENT404', message: 'student not found'})
+					.send();
+				}
+				getVolunteerTimes(); 
+			}
+		)
+		.end();
+	}
+	function getVolunteerTimes(){
+		mysql.use('master')
+		.query(
+			'SELECT COUNT(*) AS volunteer_times FROM volunteer_student WHERE student_id = ?;',
+			[req.params.id],
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {	
+		res.item(result[0])
+		.send();
+	}
+	start();
 };

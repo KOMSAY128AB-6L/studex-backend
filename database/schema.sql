@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS teacher (
 CREATE TABLE IF NOT EXISTS student (
 	student_id INT AUTO_INCREMENT PRIMARY KEY,
 	email VARCHAR(64) UNIQUE,
+	student_number VARCHAR(10) UNIQUE,
 	first_name VARCHAR(64),
 	middle_initial VARCHAR(4),
 	last_name VARCHAR(64),
@@ -52,14 +53,19 @@ CREATE TABLE IF NOT EXISTS class (
 CREATE TABLE IF NOT EXISTS student_class (
 	class_id BIGINT,
 	student_id INT,
-	PRIMARY KEY(class_id, student_id)
+	times_called INT,
+	PRIMARY KEY(class_id, student_id),
+	FOREIGN KEY(class_id) REFERENCES class(class_id) ON DELETE CASCADE,
+	FOREIGN KEY(student_id) REFERENCES student(student_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS volunteer (
 	volunteer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
 	teacher_id INT,
+	class_id BIGINT,
 	volunteer_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
+	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id),
+	FOREIGN KEY(class_id) REFERENCES class(class_id)
 );
 
 CREATE TABLE IF NOT EXISTS volunteer_student (
