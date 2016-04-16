@@ -238,7 +238,8 @@ exports.insert_csv_classlist = (req, res, next) => {
 	function clean_sql (err) {
 		if (err) {
 			winston.error('Error in inserting classlist from CSV');
-            return next(err);
+			sh.rm('database/classlist.sql', path);
+			return next(err);
         }
 
 		sh.exec('rm database/classlist.sql', clean_csv);
