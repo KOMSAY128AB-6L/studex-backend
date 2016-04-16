@@ -41,7 +41,7 @@ module.exports = (router) => {
 
 	/*Routes for Class create and retrieve CSV*/
     router.get('/class/csv',                        $, __.class.write_to_csv);
-    router.post('/class/csv',                        __.class.insert_csv_classlist);
+    router.post('/class/csv',                       $, __.class.insert_csv_classlist);
 
     router.post('/randomize/get_num',               $, __.randomize.get_num_volunteers);
 
