@@ -9,24 +9,17 @@ const fs		= require('fs');
 const storage =   multer.diskStorage( {
     destination: (req, file, cb) => {
 		let destFolder =__dirname + '/../uploads/csv';
-		//create folder if does not exists
 		if (!fs.existsSync(destFolder)) {
 			fs.mkdirSync(destFolder);
 		}
 
-		console.log('File sent to: '  +destFolder);
-
-		//set folder where files will be populated
 		cb(null, destFolder);
     },
     filename: (req, file, cb) => {
-		//set the names file within the folder
-		//as the original name of the file
 		cb(null,file.originalname);
     }
 });
 const upload = multer({storage : storage}).single('csv');
-
 
 /**
  * @api {get} /user/:id Get user information
@@ -39,16 +32,40 @@ const upload = multer({storage : storage}).single('csv');
  * @apiSuccess {String} date_created Time when the user was created
  * @apiSuccess {String} date_updated Time when last update occurred
  */
+exports.view_class = (req, res, next) => {
+	function start () {
+	mysql.use('master')
+			.query(
+			'SELECT s.last_name, s.first_name, s.middle_initial FROM student s, student_class sc WHERE sc.class_id = ? and s.student_id = sc.student_id',
+			[req.params.id],
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in viewing class', last_query);
+			return next(err);
+		}
+		if (!result.length) {
+			return res.status(404)
+			.error({code: 'CLASS404', message: 'Class not found'})
+			.send();
+		}
+		res.item(result[0])
+		.send();
+	}
+	start();
+};
 
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
-	    id,
-			className,
-			section
+	  	 	id:'',
+			className:'',
+			section:''
 		},
-		req.body
+	req.body
 	);
-
 	function start () {
 		if (data instanceof Error) {
             return res.warn(400, {message: data.message});
@@ -70,14 +87,14 @@ exports.update_class = (req, res, next) => {
 			return next(err);
 		}
 
-		if (!result.length) {
+		if (result.affectedRows === 0) {
 			return res.status(404)
-				.error({code: 'CLASS404', message: 'Class not found'})
+	 		   .error({code: 'CLASS404', message: 'Class not found'})
 			.send();
 		}
 
-		res.item(result[0])
-			.send();
+		res.item({message:'Class successfully updated'})
+		.send();
 	}
 
 	start();
@@ -86,9 +103,10 @@ exports.update_class = (req, res, next) => {
 exports.delete_class = (req, res, next) => {
 
     function start () {
+
         mysql.use('master')
             .query(
-                'DELETE * FROM class WHERE class_id = ? LIMIT 1;',
+                'DELETE FROM class WHERE class_id = ?',
                 [req.params.id],
                 send_response
             )
@@ -100,48 +118,112 @@ exports.delete_class = (req, res, next) => {
             winston.error('Error in deleting class', last_query);
             return next(err);
         }
-
-        if (!result.length) {
+        if (result.affectedRows === 0) {
             return res.status(404)
-                .error({code: 'USER404', message: 'Class not found'})
+                .error({code: 'CLASS404', message: 'Class not found'})
                 .send();
         }
 
-        res.item(result[0])
+        res.item({message:'Class successfully deleted'})
             .send();
     }
 
     start();
 };
 
-exports.insert_csv_classlist = (req, res, next) => {
+exports.write_to_csv = (req, res, next) => {
 
-	console.dir(req.headers['content-type']);
+	function start(){
+		mysql.use('master')
+			.query(
+				'SELECT * FROM student',
+				[],
+				write_to_csv
+			)
+			.end();
+	}
 
-	console.log(req.files);
-	console.log(req.file);
-	console.log(req.body);
+	function write_to_csv(err, result, args, last_query){
 
-	upload(req,res,function(err) {
-		if(err) {
-			winston.error("Error uploading file.");
+		let values = [];
+
+		if(err){
+			winston.error('Selection query of students failed', last_query);
 			return next(err);
 		}
 
-		console.log(req.files);
-		console.log(req.file);
-		console.log(req.body);
 
-		res.item(req.body).send();
+		result.forEach(function (element) {
+			values.push([
+				element.email,
+				element.first_name,
+				element.middle_initial,
+				element.last_name,
+				element.picture,
+			]);
+		});
 
-		res.end("File is uploaded");
-    });
+		// TODO - make filenames more descriptive
+		csv_writer
+			.writeToPath("uploads/csv/students.csv", values, {headers: true})
+			.on("finish", send_response);
+	}
 
-    function start () {
-		sh.config.silent = true;
-		sh.cd('controllers');
-		sh.exec('sudo chmod 755 ../helpers/classlist.js');
-		sh.exec('node ../helpers/classlist.js ../uploads/csv/classlist.csv > ../database/classlist.sql', execute_query);
+	function send_response(err, result, args){
+	 	if(err){
+	 		winston.error('Could not write to CSV');
+	 		return next(err);
+	 	}
+
+	 	res.send();
+	 }
+
+	start();
+};
+
+exports.insert_csv_classlist = (req, res, next) => {
+
+	let path;
+
+	function start () {
+		upload(req, res, initialize_shell);
+	}
+
+	function initialize_shell (err) {
+		if(err) {
+			winston.error('Error uploading file.');
+			return next(err);
+		}
+
+		path = req.file.path;
+		sh.exec('cd ./', generate_container);
+	}
+
+	function generate_container (err) {
+		if (err) {
+			winston.error('Error in initializing shell');
+			return next(err);
+		}
+
+		sh.exec('touch uploads/csv', overwrite_permission);
+	}
+
+	function overwrite_permission (err) {
+		if (err) {
+			winston.error('Error in generating csv folder');
+			return next(err);
+		}
+
+		sh.exec('sudo chmod 755 helpers/classlist.js', generate_query);
+	}
+
+	function generate_query (err) {
+		if (err) {
+			winston.error('Error in setting permissions of helper function');
+			return next(err);
+		}
+
+		sh.exec('node helpers/classlist.js ' + path + ' > database/classlist.sql', execute_query);
 	}
 
 	function execute_query (err) {
@@ -150,20 +232,35 @@ exports.insert_csv_classlist = (req, res, next) => {
 			return next(err);
 		}
 
-		sh.exec('sudo mysql -uroot < ../database/classlist.sql', send_response);
+		sh.exec('sudo mysql -uroot < database/classlist.sql', clean_sql);
+	}
+
+	function clean_sql (err) {
+		if (err) {
+			winston.error('Error in inserting classlist from CSV');
+            return next(err);
+        }
+
+		sh.exec('rm database/classlist.sql', clean_csv);
+	}
+
+	function clean_csv (err) {
+		if (err) {
+			winston.error('Error in removing sql file');
+            return next(err);
+        }
+
+		sh.exec('rm ' + path, send_response);
 	}
 
 	function send_response (err) {
         if (err) {
-            if (err === 1) winston.error('Some of the data may be duplicates');
-			else winston.error('Error in inserting classlist from CSV');
-
-            // return next(err);
-			return res.item({body: req.body, file: req.file, files: req.files}).send();
+            winston.error('Error in removing csv file');
+            return next(err);
         }
 
-        res.item(req).send();
+        res.send({message: "Classlist inserted"});
     }
 
-    //start();
+    start();
 }
