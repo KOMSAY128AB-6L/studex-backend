@@ -43,6 +43,31 @@ exports.view_class = (req, res, next) => {
 	start();
 }; 
 
+exports.view_classes = (req, res, next) => {
+	function start () {
+	mysql.use('master')
+			.query(
+			'SELECT * FROM class',
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in viewing classes', last_query);
+			return next(err);
+		}
+		if (!result.length) {
+			return res.status(404)
+			.error({code: 'CLASS404', message: 'Classes not found'})
+			.send();
+		}
+		res.item(result)
+		.send();
+	}
+	start();
+};
+
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
 	  	 	id:'',
