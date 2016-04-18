@@ -4,6 +4,24 @@ const config  = require(__dirname + '/../config/config');
 const util   = require(__dirname + '/../helpers/util');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
+const sh        = require('shelljs');
+const multer    = require('multer');
+const fs        = require('fs');
+const storage   = multer.diskStorage({
+    destination: (req, file, cb) => {
+       let destFolder =__dirname + '/../uploads/students/pictures';
+
+       if (!fs.existsSync(destFolder)) {
+           fs.mkdirSync(destFolder);
+       }
+
+       cb(null, destFolder);
+    },
+    filename: (req, file, cb) => {
+       cb(null,file.originalname);
+    }
+});
+const upload    = multer({storage : storage}).single('pic');
 
 
 exports.create_student = (req, res, next) => {
@@ -266,5 +284,44 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
       
     }
 
+    start();
+};
+
+exports.upload_picture = (req, res, next) => {
+    
+    function start () {
+       sh.exec('mkdir -p uploads/students/', create_pictures_directory);
+   }
+
+   function create_pictures_directory (err) {
+
+       if (err) {
+           winston.error('Error in creating students directory');
+           return next(err);
+       }
+
+       sh.exec('mkdir -p uploads/students/pictures/', upload_picture);
+   }
+
+   function upload_picture (err) {
+
+       if (err) {
+           winston.error('Error in creating pictures directory');
+           return next(err);
+       }
+
+       upload(req, res, send_response);
+   }
+
+   function send_response (err) {
+
+       if (err) {
+           winston.error('Error in uploading picture');
+           return next(err);
+       }
+
+       res.item(req.file.path).send();
+   }
+    
     start();
 };

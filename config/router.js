@@ -27,6 +27,7 @@ module.exports = (router) => {
     router.put ('/student/:id',                     $, __.student.update_student);
     router.delete('/student/:id',                   $, __.student.delete_student);
     router.get('/volunteer/:id',                    $, __.student.get_times_student_volunteered);
+    router.post('/student/:id/upload',              $, __.student.upload_picture);
     
 
     
