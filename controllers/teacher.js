@@ -1,11 +1,11 @@
 'use strict';
 
-const mysql		= require('anytv-node-mysql');
-const winston	= require('winston');
-const sh		= require('shelljs');
+const mysql     = require('anytv-node-mysql');
+const winston   = require('winston');
+const sh        = require('shelljs');
 const multer    = require('multer');
-const fs		= require('fs');
-const storage	= multer.diskStorage( {
+const fs        = require('fs');
+const storage   = multer.diskStorage({
     destination: (req, file, cb) => {
 		let destFolder =__dirname + '/../uploads/teachers/pictures';
 
@@ -19,7 +19,7 @@ const storage	= multer.diskStorage( {
 		cb(null,file.originalname);
     }
 });
-const upload	= multer({storage : storage}).single('pic');
+const upload    = multer({storage : storage}).single('pic');
 
 exports.get_teachers = (req, res, next) => {
 
