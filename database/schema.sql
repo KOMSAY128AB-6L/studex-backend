@@ -32,6 +32,14 @@ CREATE TABLE IF NOT EXISTS teacher (
 	picture VARCHAR(64)
 );
 
+CREATE TABLE IF NOT EXISTS class (
+	class_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	class_name VARCHAR(128),
+	section VARCHAR(32),
+	teacher_id INT,
+	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
+);
+
 CREATE TABLE IF NOT EXISTS student (
 	student_id INT AUTO_INCREMENT PRIMARY KEY,
 	email VARCHAR(64) UNIQUE,
@@ -40,16 +48,8 @@ CREATE TABLE IF NOT EXISTS student (
 	middle_initial VARCHAR(4),
 	last_name VARCHAR(64),
 	picture VARCHAR(64),
-	class_id INT,
+	class_id BIGINT,
 	FOREIGN KEY(class_id) REFERENCES class(class_id)
-);
-
-CREATE TABLE IF NOT EXISTS class (
-	class_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-	class_name VARCHAR(128),
-	section VARCHAR(32),
-	teacher_id INT,
-	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
 );
 
 CREATE TABLE IF NOT EXISTS volunteer (
