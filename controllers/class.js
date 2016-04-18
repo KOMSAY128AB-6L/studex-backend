@@ -1,10 +1,11 @@
 'use strict';
 
-const mysql   = require('anytv-node-mysql');
-const winston = require('winston');
-const csv_writer = require('fast-csv');
-const util  	= require(__dirname + '/../helpers/util');
-const sh      	= require('shelljs');
+const mysql         = require('anytv-node-mysql');
+const winston       = require('winston');
+const csv_writer    = require('fast-csv');
+const util          = require(__dirname + '/../helpers/util');
+const date          = require(__dirname + '/../helpers/date');
+const sh            = require('shelljs');
 
 /**
  * @api {get} /user/:id Get user information
@@ -41,7 +42,7 @@ exports.view_class = (req, res, next) => {
 		.send();
 	}
 	start();
-}; 
+};
 
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
@@ -87,7 +88,7 @@ start();
 exports.delete_class = (req, res, next) => {
 
     function start () {
-    	
+
         mysql.use('master')
             .query(
                 'DELETE FROM class WHERE class_id = ?',
@@ -126,17 +127,17 @@ exports.write_to_csv = (req, res, next) => {
 			)
 			.end();
 	}
-	
+
 	function write_to_csv(err, result, args, last_query){
-		
+
 		let values = [];
-		
+
 		if(err){
 			winston.error('Selection query of students failed', last_query);
 			return next(err);
 		}
-		
-		
+
+
 		result.forEach(function (element) {
 			values.push([
 				element.email,
@@ -146,31 +147,29 @@ exports.write_to_csv = (req, res, next) => {
 				element.picture,
 			]);
 		});
-		
-		// TODO - make filenames more descriptive
-		csv_writer
-			.writeToPath("uploads/csv/students.csv", values, {headers: true})
+
+		csv_writer.writeToPath("uploads/csv/students-"+date.get_today()+".csv", values, {headers: true})
 			.on("finish", send_response);
 	}
-	
+
 	function send_response(err, result, args){
 	 	if(err){
 	 		winston.error('Could not write to CSV');
 	 		return next(err);
 	 	}
-	 	
+
 	 	res.send();
 	 }
-	
+
 	start();
 };
 
 exports.insert_csv_classlist = (req, res, next) => {
 
     function start () {
-		
+
 		let class_query;
-		
+
 		sh.cd('controllers');
 		sh.config.silent = true;
 		sh.exec('sudo chmod 755 ../helpers/classlist.js');
@@ -184,12 +183,12 @@ exports.insert_csv_classlist = (req, res, next) => {
 
 		});
 		class_query = sh.exec('cat ../database/classlist.sql').output;
-		
+
 		// TODO - convert to formal query
 		res.send();
 
     }
-	
+
 	function send_response (err, result, args, last_query) {
         if (err) {
             winston.error('Error in inserting classlist from CSV');
