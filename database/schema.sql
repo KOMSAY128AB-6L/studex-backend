@@ -39,7 +39,9 @@ CREATE TABLE IF NOT EXISTS student (
 	first_name VARCHAR(64),
 	middle_initial VARCHAR(4),
 	last_name VARCHAR(64),
-	picture VARCHAR(64)
+	picture VARCHAR(64),
+    class_id INT,
+	FOREIGN KEY(class_id) REFERENCES class(class_id)
 );
 
 CREATE TABLE IF NOT EXISTS class (
@@ -61,7 +63,7 @@ CREATE TABLE IF NOT EXISTS student_class (
 
 CREATE TABLE IF NOT EXISTS volunteer (
 	volunteer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-	student_id INT, 
+	student_id INT,
 	teacher_id INT,
 	class_id BIGINT,
 	volunteer_date DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -84,5 +86,5 @@ CREATE TABLE IF NOT EXISTS reset_password (
 	date_expiry DATETIME DEFAULT NULL
 );
 
-CREATE TRIGGER before_insert_on_reset_password BEFORE INSERT ON `reset_password` 
+CREATE TRIGGER before_insert_on_reset_password BEFORE INSERT ON `reset_password`
 FOR EACH ROW SET new.date_expiry = IFNULL(new.date_expiry,DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 DAY));
