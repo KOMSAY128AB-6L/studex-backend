@@ -172,11 +172,11 @@ INSERT INTO student_class(class_id, student_id, times_called)\
 -- VOLUNTEER seed
 INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("1", "1", "6", curdate());
 
-INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES(4,1,6,curdate());
+INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("4","1","6",curdate());
 
 INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("15","1","6",curdate());
 
 INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("18","3","3",curdate());
 
-INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("11","2",5, curdate());
+INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("11","2","5", curdate());
 
