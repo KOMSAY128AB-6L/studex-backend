@@ -167,3 +167,15 @@ INSERT INTO student_class(class_id, student_id, times_called)\
 
 INSERT INTO student_class(class_id, student_id, times_called)\
 		VALUES("6","19","1");
+
+--VOLUNTEER seed
+INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date)
+		VALUES("1", "4", "6", curdate());
+INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date)
+		VALUES("4", "4", "6", curdate());
+INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date)
+		VALUES("15", "4", "6", curdate());
+INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date)
+		VALUES("18", "3", "3", curdate());
+INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date)
+		VALUES("11", "2", "5", curdate());
