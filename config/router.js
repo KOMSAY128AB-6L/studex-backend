@@ -37,7 +37,7 @@ module.exports = (router) => {
     router.delete('/teacher/:id',                   $, __.teacher.delete_teacher);
 
     // Routes for class
-    router.get('/classes'			    $, __.class.view_classes);
+    router.get('/classes',			    $, __.class.view_classes);
     router.get('/class/:id',                        $, __.class.view_class);
     router.put('/class',                            $, __.class.update_class);
     router.delete('/class/:id',                     $, __.class.delete_class);
