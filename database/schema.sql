@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS student (
 	last_name VARCHAR(64),
 	picture VARCHAR(64),
     class_id INT,
-	FOREIGN KEY(class_id) REFERENCES class(class_id)
+    FOREIGN KEY(class_id) REFERENCES class(class_id)
 );
 
 CREATE TABLE IF NOT EXISTS class (
