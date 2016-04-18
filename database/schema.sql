@@ -52,15 +52,6 @@ CREATE TABLE IF NOT EXISTS class (
 	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
 );
 
-CREATE TABLE IF NOT EXISTS student_class (
-	class_id BIGINT,
-	student_id INT,
-	times_called INT,
-	PRIMARY KEY(class_id, student_id),
-	FOREIGN KEY(class_id) REFERENCES class(class_id) ON DELETE CASCADE,
-	FOREIGN KEY(student_id) REFERENCES student(student_id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS volunteer (
 	volunteer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
 	student_id INT,
