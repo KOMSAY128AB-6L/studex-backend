@@ -28,13 +28,12 @@ module.exports = (router) => {
     router.delete('/student/:id',                   $, __.student.delete_student);
     router.get('/volunteer/:id',                    $, __.student.get_times_student_volunteered);
     
-
-    
     router.get('/teachers',                         $, __.teacher.get_teachers);
     router.get('/teacher',                          $, __.teacher.get_teacher);
     router.post('/teacher',                         $, __.teacher.post_teacher);
     router.put('/teacher/:id',                      $, __.teacher.update_teacher);
     router.delete('/teacher/:id',                   $, __.teacher.delete_teacher);
+    router.get('/history/:id',						$, __.teacher.get_transaction_history);
 
     // Routes for class
     router.get('/class/:id',                        $, __.class.view_class);
