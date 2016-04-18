@@ -32,7 +32,7 @@ module.exports = (router) => {
 
     router.get('/teachers',                         $, __.teacher.get_teachers);
     router.get('/teacher',                          $, __.teacher.get_teacher);
-	router.post('/teacher',                         $, __.teacher.post_teacher);
+    router.post('/teacher',                         $, __.teacher.post_teacher);
     router.put('/teacher/:id',                      $, __.teacher.update_teacher);
     router.delete('/teacher/:id',                   $, __.teacher.delete_teacher);
     router.post('/teacher/:id/upload',              $, __.teacher.upload_picture);
