@@ -1,18 +1,18 @@
 /**
-    @rules
-        all caps on mysql keywords
-        use plural form on table names
-        snake case everywhere
-        use DATETIME type for dates
-        start the column name with `date_` IF type is DATETIME, e.g. `date_created`, `date_updated`, `date_expiration`
-        use VARCHAR(37) as primary key for ID's exposed to the user
-        use INT(11) AUTO_INCREMENT as primary key for ID's not exposed to the user
-        use the proper mysql engine Innodb or MyISAM
-        mind the column charset and table collation
-        all tables should have an id (PRIMARY KEY), date_created and date_updated
-            *table id will follow the this format :
-                `<singular form of table_name>_id` PRIMARY KEY VARCHAR(32) or INT(11) AUTO_INCREMENT
-        see sample below:
+	@rules
+		all caps on mysql keywords
+		use plural form on table names
+		snake case everywhere
+		use DATETIME type for dates
+		start the column name with `date_` IF type is DATETIME, e.g. `date_created`, `date_updated`, `date_expiration`
+		use VARCHAR(37) as primary key for ID's exposed to the user
+		use INT(11) AUTO_INCREMENT as primary key for ID's not exposed to the user
+		use the proper mysql engine Innodb or MyISAM
+		mind the column charset and table collation
+		all tables should have an id (PRIMARY KEY), date_created and date_updated
+			*table id will follow the this format :
+				`<singular form of table_name>_id` PRIMARY KEY VARCHAR(32) or INT(11) AUTO_INCREMENT
+		see sample below:
 */
 
 
@@ -39,7 +39,9 @@ CREATE TABLE IF NOT EXISTS student (
 	first_name VARCHAR(64),
 	middle_initial VARCHAR(4),
 	last_name VARCHAR(64),
-	picture VARCHAR(64)
+	picture VARCHAR(64),
+	class_id INT,
+	FOREIGN KEY(class_id) REFERENCES class(class_id)
 );
 
 CREATE TABLE IF NOT EXISTS class (
@@ -50,18 +52,9 @@ CREATE TABLE IF NOT EXISTS class (
 	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
 );
 
-CREATE TABLE IF NOT EXISTS student_class (
-	class_id BIGINT,
-	student_id INT,
-	times_called INT,
-	PRIMARY KEY(class_id, student_id),
-	FOREIGN KEY(class_id) REFERENCES class(class_id) ON DELETE CASCADE,
-	FOREIGN KEY(student_id) REFERENCES student(student_id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS volunteer (
 	volunteer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-	student_id INT, 
+	student_id INT,
 	teacher_id INT,
 	class_id BIGINT,
 	volunteer_date DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -84,5 +77,5 @@ CREATE TABLE IF NOT EXISTS reset_password (
 	date_expiry DATETIME DEFAULT NULL
 );
 
-CREATE TRIGGER before_insert_on_reset_password BEFORE INSERT ON `reset_password` 
+CREATE TRIGGER before_insert_on_reset_password BEFORE INSERT ON `reset_password`
 FOR EACH ROW SET new.date_expiry = IFNULL(new.date_expiry,DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 DAY));
