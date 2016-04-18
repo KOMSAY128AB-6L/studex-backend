@@ -47,7 +47,8 @@ exports.view_classes = (req, res, next) => {
 	function start () {
 	mysql.use('master')
 			.query(
-			'SELECT * FROM class',
+			'SELECT * FROM class WHERE teacher_id=?',
+			[req.session.user.teacher_id],
 			send_response
 		)
 		.end();
