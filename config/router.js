@@ -35,7 +35,7 @@ module.exports = (router) => {
 	router.post('/teacher',                         $, __.teacher.post_teacher);
     router.put('/teacher/:id',                      $, __.teacher.update_teacher);
     router.delete('/teacher/:id',                   $, __.teacher.delete_teacher);
-    router.post('/teacher/:id/upload',               __.teacher.upload_picture);
+    router.post('/teacher/:id/upload',              $, __.teacher.upload_picture);
 
     // Routes for class
     router.get('/class/:id',                        $, __.class.view_class);
