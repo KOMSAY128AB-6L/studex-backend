@@ -180,7 +180,7 @@ exports.upload_picture = (req, res, next) => {
 			return next(err);
 		}
 
-		res.item(req.file).send();
+		res.item(req.file.path).send();
 	}
 
 	start();
