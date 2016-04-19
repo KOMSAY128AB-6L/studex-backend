@@ -135,8 +135,8 @@ exports.get_transaction_history = (req, res, next) => {
 	function start () {
 		mysql.use('master')
 			.query(
-				'SELECT teacher_id FROM teacher WHERE teacher_id = ?;',
-				[req.params.id],
+				'SELECT * FROM history WHERE teacher_id = ?;',
+				[req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -144,35 +144,20 @@ exports.get_transaction_history = (req, res, next) => {
 	
 	function send_response (err, result, args, last_query){
 		if(err){
-			winston.error('Error in getting teacher', last_query);
+			winston.error('Error in retrieving transaction log', last_query);
 			return next(err);
 		}
 
 		if(!result.length){
 			return res.status(404)
-			.error({code: 'TEACHER404', message: 'teacher not found'})
-			.send();
+					.error({code: 'TEACHER404', message: 'Teacher Transaction Log not found'})
+					.send();
 		}
-
-		//logger.log(req.session.user.teacher_id, last_query);
-
-		mysql.use('master')
-		.query(
-			'SELECT * FROM history WHERE teacher_id = ?;',
-			[req.params.id],
-			send_response_2
-		)
-		.end();
-
 		
-	}
+		logger.logg(req.session.user.teacher_id, last_query);
 
-	function send_response_2 (err, result, args, last_query){
-		if(err){
-			winston.error('Error in getting student', last_query);
-			return next(err);
-		}
-		res.send(result[0]);
+		res.item(result[0])
+            .send();   
 	}
 
 	start();

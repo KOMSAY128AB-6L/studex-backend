@@ -3,7 +3,7 @@
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
-function log(id, query_log){
+function logg(id, query_log){
 	mysql.use('master')
 		.query(
 			'INSERT INTO history (teacher_id, log_text) VALUES (?,?)',
@@ -15,7 +15,7 @@ function log(id, query_log){
 
 function send_response (err, result, args, last_query){
 	if(err){
-		winston.error('Error in getting teacher', last query);
+		winston.error('Error in getting teacher', last_query);
 		return next(err);
 	}
 	
@@ -29,5 +29,5 @@ function send_response (err, result, args, last_query){
 }
 
 module.exports = {
-	log
+	logg
 };
