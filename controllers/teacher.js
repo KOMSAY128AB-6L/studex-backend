@@ -161,8 +161,6 @@ exports.get_transaction_history = (req, res, next) => {
 					.error({code: 'TEACHER404', message: 'Teacher Transaction Log not found'})
 					.send();
 		}
-		
-		logger.logg(req.session.user.teacher_id, last_query);
 
 		res.item(result)
             .send();   
