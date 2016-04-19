@@ -94,11 +94,3 @@ CREATE TABLE IF NOT EXISTS history (
 	teacher_id INT, log_text VARCHAR(255),
 	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
 );
-
-CREATE TABLE IF NOT EXISTS history (
-	log_id INT AUTO_INCREMENT PRIMARY KEY,
-	log_time timestamp NOT NULL default CURRENT_TIMESTAMP,
-	teacher_id INT, 
-	log_text VARCHAR(255),
-	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
-);

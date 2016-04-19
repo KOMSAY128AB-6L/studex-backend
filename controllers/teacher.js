@@ -1,6 +1,6 @@
 'use strict';
 
-//const logger = require('../helpers/logger');
+const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
