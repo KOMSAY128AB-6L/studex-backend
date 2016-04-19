@@ -1,7 +1,6 @@
 USE studex;
 
 DELETE FROM class;
-DELETE FROM student_class;
 DELETE FROM teacher;
 DELETE FROM student;
 DELETE FROM volunteer;
