@@ -42,19 +42,21 @@ exports.randomize_students = (req, res, next) => {
                 student_ids.push(student.student_id)
             );
             
-            //TODO modify query to only select students of that teacher
             mysql.use('master')
-                 .query(`SELECT s.*, COUNT(*) AS volunteer FROM student s, 
-                         volunteer_student vs WHERE s.student_id IN ? AND 
-                         s.student_id IN (SELECT * from 
-                         s.student_id = vs.student_id GROUP BY s.student_id`, 
-                         [[student_ids]],
+                 .query(`SELECT s.*, GET_VOLUNTEER_COUNT(s.student_id) AS 
+                         volunteer FROM student s LEFT JOIN 
+                         volunteer_student vs ON s.student_id=vs.student_id 
+                         WHERE s.student_id IN (SELECT s.student_id FROM 
+                         student s, class c WHERE s.class_id = c.class_id AND 
+                         c.teacher_id = ?) AND s.student_id IN ?`, 
+                         [req.session.user.teacher_id, [student_ids]],
                          by_chance
                  )
                  .end();
         } else {
+            //TODO modify query to only select students of that teacher
             mysql.use('master')
-                 .query('INSERT INTO volunteer(teacher_id) VALUES(?)', 1, insert_volunteers)
+                 .query('INSERT INTO volunteer(teacher_id) VALUES(?)', req.session.user.teacher_id, insert_volunteers)
                  .end();
         }
     }
@@ -65,8 +67,11 @@ exports.randomize_students = (req, res, next) => {
             return next(err);
         }
 
-        res.item(result).send();
+        data.student_list = result;
 
+        mysql.use('master')
+             .query('INSERT INTO volunteer(teacher_id) VALUES(?)', req.session.user.teacher_id, insert_volunteers)
+             .end();
     }
 
     function insert_volunteers(err, result, args, last_query) {
