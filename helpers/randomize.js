@@ -53,6 +53,20 @@ function randomize_distinct_with_chance(studentList, numberOfVolunteers) {
     return volunteer;
 }
 
+function randomize_distinct(studentList, numberOfVolunteers) {
+    let volunteer = [];
+    while (numberOfVolunteers-- > 0) {
+        volunteer.push(studentList.splice(Math.floor(Math.random()*studentList.length), 1)[0]);
+    }
+}
+
+function randomize(studentList, numberOfVolunteers) {
+    let volunteer = [];
+    while (numberOfVolunteers-- > 0) {
+        volunteer.push(studentList[Math.floor(Math.random()*studentList.length)]);
+    }
+}
+
 
 const freshWeight = 50; //default weight
 /**
@@ -65,8 +79,14 @@ const freshWeight = 50; //default weight
  **/
 function randomize(studentList, settings) {
     
-    if (!settings.minWeight) settings.minWeight = 0;
-    if (!settings.freshWeight) settings.freshWeight = freshWeight;
+    if (!settings.minWeight) {
+        settings.minWeight = 0;
+    }
+
+    if (!settings.freshWeight) {
+        settings.freshWeight = freshWeight;
+    }
+
     if(settings.byCount) {
         studentList.forEach((student) => student.weight = (student.volunteerCount > settings.freshWeight)? settings.minWeight: settings.freshWeight - student.volunteerCount);
         settings.withChance = true;
@@ -81,6 +101,12 @@ function randomize(studentList, settings) {
             return randomize_distinct_with_chance(studentList, settings.numberOfVolunteers);
         } else {
             return randomize_with_chance(studentList, settings.numberOfVolunteers);
+        }
+    } else {
+        if (settings.unique) {
+            return randomize_distinct(studentList, settings.numberOfVolunteers);
+        } else {
+            return randomize(studentList, settings.numberOfVolunteers);
         }
     }
 }

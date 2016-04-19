@@ -1,6 +1,5 @@
 'use strict';
 
-const config  = require(__dirname + '/../config/config');
 const util   = require(__dirname + '/../helpers/util');
 const random   = require(__dirname + '/../helpers/randomize');
 const mysql   = require('anytv-node-mysql');
@@ -9,6 +8,7 @@ const winston = require('winston');
 
 
 exports.randomize_students = (req, res, next) => {
+    //TODO add controllers specific for byChance for getting the data
     const data = util.get_data(
         {
             student_list: [{
@@ -37,7 +37,6 @@ exports.randomize_students = (req, res, next) => {
         if (data.settings.byCount) {
             let student_ids = [];
 
-            let iii;
             data.student_list.forEach((student) => 
                 student_ids.push(student.student_id)
             );
@@ -129,7 +128,6 @@ exports.randomize_classes = (req, res, next) => {
             ],
             settings: {
                 _byCount: false,
-                _byChance: false,
                 _unique: false,
                 numberOfVolunteers: 0
             }
@@ -147,7 +145,7 @@ exports.randomize_classes = (req, res, next) => {
         }
 
         mysql.use('master')
-            .query('SELECT *, .10 as chance FROM student_class WHERE class_id in ?',
+            .query('SELECT *, .10 as chance FROM student WHERE class_id in ?',
                 [[data.class_list]],
                 send_response
             )
@@ -169,7 +167,7 @@ exports.randomize_classes = (req, res, next) => {
 
 
 
-exports.get_num_volunteers = (req, res, next) => {
+exports.get_num_volunteers = (req, res) => {
     const data = util.get_data(
         {
             num_of_volunteers : ''
