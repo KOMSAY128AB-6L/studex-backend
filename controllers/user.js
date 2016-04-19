@@ -75,7 +75,7 @@ exports.create_user = (req, res, next) => {
         }
         
         return res.status(200)
-                .item({message: 'User successfully created'})
+                .item({code: 'USER200', message: 'User successfully created'})
                 .send();
     }
 
@@ -283,7 +283,7 @@ exports.logout_user = (req,res,next) => {
 		req.session.destroy();
 	}
 	start();
-	res.item({message:'User succesfully logged out.'}).send();
+	res.item({code: 'USER200', message:'User succesfully logged out.'}).send();
 };
 
 
@@ -326,7 +326,7 @@ exports.login_user = (req, res, next) => {
         }
 
         if(!result.length) {
-            res.item("User Email or Password is incorrect.")
+            res.item({code: 'USER200', message: 'User Email or Password is incorrect.'})
                 .send();
         }
 
@@ -340,7 +340,7 @@ exports.login_user = (req, res, next) => {
                 last_name: result[0].last_name
             };
             
-            res.item({message:'User succesfully logged in.'}).send();
+            res.item({code :'USER200', message:'User succesfully logged in.'}).send();
         }
     }
 
