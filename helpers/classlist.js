@@ -46,8 +46,12 @@ const start = () => {
             }
             class_name = line_arr[1];
             console.log(
-                ['INSERT INTO class (class_name, section, teacher_id)',
-                ' VALUES (', line_arr[0], line_arr[1], line_arr[2], ');\n'].join('')
+                ['\nINSERT INTO class (class_name, section, teacher_id) ',
+                'VALUES (', line_arr[0], line_arr[1], line_arr[2], ') ',
+                'ON DUPLICATE KEY UPDATE ',
+                    'class_name = ', line_arr[0],
+                    'section = ', line_arr[1].split(',')[0],
+                ';'].join('')
             );
         }
 
@@ -60,15 +64,12 @@ const start = () => {
                 }
             }
             console.log(
-                ['INSERT INTO student (email, first_name, middle_initial, last_name, picture)',
-                ' VALUES (', line_arr[0], line_arr[1], line_arr[2],  line_arr[3],  line_arr[4], ');'].join('')
-            );
-            console.log(
-                ['INSERT INTO student_class (class_id, student_id)',
-                ' VALUES (',
-                    '(SELECT class_id FROM class WHERE section=', class_name.split(',')[0], ' LIMIT 1),',
-                    '(SELECT student_id FROM student WHERE email=', line_arr[0].split(',')[0],' LIMIT 1)',
-                ');\n'].join('')
+                ['INSERT INTO student (email, first_name, middle_initial, last_name, picture, class_id)',
+                ' VALUES (', line_arr[0], line_arr[1], line_arr[2],  line_arr[3],  line_arr[4],
+                ', (SELECT class_id FROM class WHERE class_name = ', class_name.split(',')[0], ' LIMIT 1))',
+                ' ON DUPLICATE KEY UPDATE ',
+                    'email = ', line_arr[0].split(',')[0],
+                ';'].join('')
             );
         }
 	});

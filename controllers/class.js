@@ -58,6 +58,32 @@ exports.view_class = (req, res, next) => {
 	start();
 };
 
+exports.view_classes = (req, res, next) => {
+	function start () {
+	mysql.use('master')
+			.query(
+			'SELECT * FROM class WHERE teacher_id=?',
+			[req.session.user.teacher_id],
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in viewing classes', last_query);
+			return next(err);
+		}
+		if (!result.length) {
+			return res.status(404)
+			.error({code: 'CLASS404', message: 'Classes not found'})
+			.send();
+		}
+		res.item(result)
+		.send();
+	}
+	start();
+};
+
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
 	  	 	id:'',
@@ -181,6 +207,63 @@ exports.write_to_csv = (req, res, next) => {
 	start();
 };
 
+
+exports.create_class = (req, res, next) => {
+	const data = util.get_data(
+        {
+            class_name: '',
+            section: '',
+            teacher_id: ''
+        },
+        req.body
+    ); 
+
+    function start () {
+        if (data instanceof Error) {
+            return res.warn(400, {message: data.message});
+        }
+
+        mysql.use('master')
+            .query(
+                'SELECT class_id FROM class WHERE class_name = ? and section = ?;',
+                [data.class_name, data.section],
+                check_duplicate
+            )
+            .end();
+       
+    }
+
+    function check_duplicate (err, result) {
+
+        if(result.length){
+            return res.status(409)
+                .error({code: 'CLASS409', message: 'CONFLICT:Class already exists'})
+                .send();
+        }
+
+        mysql.use('master')
+        	.query(
+        		'INSERT INTO class (class_name, section, teacher_id) VALUES (?,?,?);',
+        		[data.class_name,data.section,data.teacher_id],
+        		send_response
+        	)
+        	.end();
+    }
+
+    function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in creating class', last_query);
+            return next(err);
+        }
+
+        return res.status(200)
+                .item({message: 'Class successfully created'})
+                .send();
+    }
+
+    start();
+};
+
 exports.insert_csv_classlist = (req, res, next) => {
 
 	let path;
@@ -238,7 +321,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 	function clean_sql (err) {
 		if (err) {
 			winston.error('Error in inserting classlist from CSV');
-			sh.rm('database/classlist.sql', path);
+			// sh.rm('database/classlist.sql', path);
 			return next(err);
         }
 
