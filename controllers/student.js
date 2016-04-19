@@ -14,7 +14,8 @@ exports.create_student = (req, res, next) => {
             first_name: '',
             middle_initial: '',
             last_name: '',
-            picture: ''
+            picture: '',
+            class_id: ''
         },
         req.body
     ); 
@@ -26,8 +27,8 @@ exports.create_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT student_id FROM student WHERE email = ? and student_number = ?;',
-                [data.email, data.student_number],
+                'SELECT student_id FROM student WHERE email = ? and class_id = ?;',
+                [data.email, req.params.id],
                 check_duplicate
             )
             .end();
@@ -42,8 +43,8 @@ exports.create_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture)VALUES(?,?,?,?,?,?);',
-                [data.email, data.student_number, data.first_name, data.middle_initial, data.last_name, data.picture],
+                'INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture, class_id)VALUES(?,?,?,?,?,?,?);',
+                [data.email, data.student_number, data.first_name, data.middle_initial, data.last_name, data.picture, req.params.id],
                 send_response
             )
             .end();
@@ -248,7 +249,7 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
     function start () {
         mysql.use('master')
             .query(
-                'SELECT * FROM volunteer;',
+                'SELECT concat(concat(student.last_name, ", "), student.first_name) as "STUDENT" , concat(concat(teacher.last_name, ", "), teacher.first_name) as "TEACHER", concat(concat(class.class_name, " "), class.section) as "CLASS/SECTION", volunteer_date FROM volunteer, teacher, student, class WHERE student.student_id=volunteer.student_id and teacher.teacher_id=volunteer.teacher_id and class.class_id=volunteer.class_id ORDER BY volunteer_date DESC;',
                 send_response
             )
             .end();

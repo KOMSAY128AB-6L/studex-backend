@@ -21,7 +21,7 @@ module.exports = (router) => {
     router.post('/randomize/students',              $, __.randomize.randomize_students);
 
     /*Routes for Student CRUD*/
-    router.post('/student',                         $, __.student.create_student);
+    router.post('/student/:class_id',               $, __.student.create_student);
     router.get ('/student/:id',                     $, __.student.retrieve_student);
     router.get ('/student',                         $, __.student.retrieve_all_student);
     router.get ('/student_logs',                    $, __.student.retrieve_log_of_volunteers);
@@ -38,6 +38,7 @@ module.exports = (router) => {
     router.delete('/teacher/:id',                   $, __.teacher.delete_teacher);
 
     // Routes for class
+    router.get('/classes',			    $, __.class.view_classes);
     router.get('/class/:id',                        $, __.class.view_class);
     router.put('/class',                            $, __.class.update_class);
     router.delete('/class/:id',                     $, __.class.delete_class);
@@ -45,7 +46,7 @@ module.exports = (router) => {
 	// Routes for class read and write CSV
     router.get('/class/csv',                        $, __.class.write_to_csv);
     router.post('/class/csv',                       $, __.class.insert_csv_classlist);
-    
+    router.post('/class',                           $, __.class.create_class);
     router.post('/randomize/get_num',               $, __.randomize.get_num_volunteers);
     
     router.all('*', (req, res) => {
