@@ -44,13 +44,13 @@ exports.randomize_students = (req, res, next) => {
             
             mysql.use('master')
                  .query(`SELECT s.*, GET_VOLUNTEER_COUNT(s.student_id) AS 
-                         volunteer FROM student s LEFT JOIN 
+                         volunteerCount FROM student s LEFT JOIN 
                          volunteer_student vs ON s.student_id=vs.student_id 
                          WHERE s.student_id IN (SELECT s.student_id FROM 
                          student s, class c WHERE s.class_id = c.class_id AND 
                          c.teacher_id = ?) AND s.student_id IN ?`, 
                          [req.session.user.teacher_id, [student_ids]],
-                         by_chance
+                         chance_by_count
                  )
                  .end();
         } else {
@@ -61,7 +61,7 @@ exports.randomize_students = (req, res, next) => {
         }
     }
 
-    function by_chance(err, result, args, last_query) {
+    function chance_by_count(err, result, args, last_query) {
         if(err) {
             winston.error('Error in selecting number volunteers of student', last_query);
             return next(err);
@@ -90,6 +90,7 @@ exports.randomize_students = (req, res, next) => {
         }
         query += '(?, ' + result.insertId + ')';
         volunteerIds.push(volunteers[iii].student_id);
+        //TODO what to do about case of multiple volunteer to same student
         mysql.use('master')
              .query('INSERT INTO volunteer_student VALUES ' + query,
                     volunteerIds,
