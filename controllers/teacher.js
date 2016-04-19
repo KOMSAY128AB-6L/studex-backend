@@ -20,7 +20,9 @@ exports.get_teachers = (req, res, next) => {
             winston.error('Error in getting teachers', last_query);
             return next(err);
         }
-
+        
+		logger.logg(req.session.user.teacher_id, last_query);
+		
         res.item(result)
             .send();
     }
@@ -59,6 +61,8 @@ exports.post_teacher = (req, res, next) => {
             return next(err);
         }
         
+        logger.logg(req.session.user.teacher_id, last_query);
+        
         res.item(result[0])
             .send();
     }
@@ -89,7 +93,9 @@ exports.update_teacher = (req, res, next) => {
 			return res.status(404)
 				.error({code: 'teacher404', message: 'teacher not found'})
 				.send();
-		}        
+		}
+		
+		logger.logg(req.session.user.teacher_id, last_query);        
 		
 		res.item(result[0])
 			.send();
@@ -122,6 +128,8 @@ exports.delete_teacher = (req, res, next) => {
 				.error({code: 'teacher404', message: 'teacher not found'})
 				.send();
 		}
+		
+		logger.logg(req.session.user.teacher_id, last_query);
 	
 		res.item(result[0])
 			.send();
@@ -156,7 +164,7 @@ exports.get_transaction_history = (req, res, next) => {
 		
 		logger.logg(req.session.user.teacher_id, last_query);
 
-		res.item(result[0])
+		res.item(result)
             .send();   
 	}
 
