@@ -28,6 +28,27 @@ INSERT INTO teacher(email, password, first_name, middle_initial,last_name, pictu
     VALUES("rcrecario@up.edu.ph", PASSWORD(CONCAT(MD5("reg"), "q5cH9VoL")), \
    	"Reginald Neil","C","Recario","reg.jpg");
 
+-- CLASS SEED
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-1L",1);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-2L",2);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-3L",3);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-4L",4);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-5L",2);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-6L",1);
+
+INSERT INTO class(class_name, section, teacher_id)\
+		VALUES("CMSC 128","AB-7L",3);
 
 -- STUDENT SEED
 INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture, class_id)\
@@ -86,29 +107,6 @@ INSERT INTO student(email, student_number, first_name, middle_initial,last_name,
 
 INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture, class_id)\
 		VALUES("kbpios@up.edu.ph","2013-13571","Karl Jasson","B","Pios","pios.jpg", 6);
-
-
--- CLASS SEED
-INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-1L",1);
-
-INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-2L",2);
-
-INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-3L",3);
-
-INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-4L",4);
-
-INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-5L",2);
-
-INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-6L",1);
-
-INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-7L",3);
 
 
 -- VOLUNTEER seed
