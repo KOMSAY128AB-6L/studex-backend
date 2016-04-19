@@ -14,7 +14,8 @@ exports.create_student = (req, res, next) => {
             first_name: '',
             middle_initial: '',
             last_name: '',
-            picture: ''
+            picture: '',
+            class_id: ''
         },
         req.body
     ); 
@@ -26,8 +27,8 @@ exports.create_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT student_id FROM student WHERE email = ? and student_number = ?;',
-                [data.email, data.student_number],
+                'SELECT student_id FROM student WHERE email = ? and class_id = ?;',
+                [data.email, req.params.id],
                 check_duplicate
             )
             .end();
@@ -42,8 +43,8 @@ exports.create_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture)VALUES(?,?,?,?,?,?);',
-                [data.email, data.student_number, data.first_name, data.middle_initial, data.last_name, data.picture],
+                'INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture, class_id)VALUES(?,?,?,?,?,?,?);',
+                [data.email, data.student_number, data.first_name, data.middle_initial, data.last_name, data.picture, req.params.id],
                 send_response
             )
             .end();
