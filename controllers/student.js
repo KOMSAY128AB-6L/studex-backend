@@ -2,6 +2,8 @@
 
 const config  = require(__dirname + '/../config/config');
 const util   = require(__dirname + '/../helpers/util');
+const logger = require('../helpers/logger');
+const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
@@ -55,6 +57,8 @@ exports.create_student = (req, res, next) => {
             winston.error('Error in creating student', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         return res.status(200)
                 .item({message: 'Student successfully created'})
@@ -101,6 +105,8 @@ exports.update_student = (req, res, next) => {
         if (err) {
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.send({message: 'Student successfully updated'});
     }
@@ -142,6 +148,8 @@ exports.delete_student = (req, res, next) => {
             winston.error('Error in deleting student', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.item(result[0])
             .send();
@@ -173,6 +181,8 @@ exports.retrieve_student = (req, res, next) => {
                 .error({code: 'STUDENT404', message: 'Student not found'})
                 .send();
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.item(result[0])
             .send();
@@ -197,6 +207,8 @@ exports.retrieve_all_student = (req, res, next) => {
             winston.error('Error in selecting students', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.item(result)
             .send();
@@ -237,7 +249,10 @@ exports.get_times_student_volunteered = (req, res, next) => {
 		)
 		.end();
 	}
-	function send_response (err, result, args, last_query) {	
+	function send_response (err, result, args, last_query) {
+		
+		logger.logg(req.session.user.teacher_id, last_query);
+	
 		res.item(result[0])
 		.send();
 	}
@@ -266,6 +281,8 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
             winston.error('Error in retrieving log of volunteers', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.item(result)
             .send();

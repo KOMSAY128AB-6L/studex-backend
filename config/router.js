@@ -12,7 +12,7 @@ module.exports = (router) => {
 
     router.post('/user',                            __.user.create_user);
     router.post('/login',                           __.user.login_user);
-    router.post('/logout',                           __.user.logout_user);
+    router.post('/logout',                          __.user.logout_user);
     router.post('/reset',                           __.user.reset_password);
     router.post('/confirm_reset',                   __.user.confirm_reset_password);
 
@@ -28,13 +28,12 @@ module.exports = (router) => {
     router.delete('/student/:id',                   $, __.student.delete_student);
     router.get('/volunteer/:id',                    $, __.student.get_times_student_volunteered);
     
-
-    
     router.get('/teachers',                         $, __.teacher.get_teachers);
     router.get('/teacher',                          $, __.teacher.get_teacher);
     router.post('/teacher',                         $, __.teacher.post_teacher);
     router.put('/teacher/:id',                      $, __.teacher.update_teacher);
     router.delete('/teacher/:id',                   $, __.teacher.delete_teacher);
+    router.get('/history/:id',						$, __.teacher.get_transaction_history);
 
     // Routes for class
     router.get('/classes',			    $, __.class.view_classes);
