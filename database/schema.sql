@@ -62,9 +62,10 @@ CREATE TABLE IF NOT EXISTS volunteer (
 );
 
 CREATE TABLE IF NOT EXISTS volunteer_student (
+	vs_id BIGINT AUTO_INCREMENT PRIMARY KEY,
 	student_id INT,
 	volunteer_id BIGINT,
-	PRIMARY KEY(student_id, volunteer_id),
+	PRIMARY KEY(vs_id, student_id, volunteer_id),
 	FOREIGN KEY(student_id) REFERENCES student(student_id)
 );
 
