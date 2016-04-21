@@ -3,7 +3,6 @@
 const config  = require(__dirname + '/../config/config');
 const util   = require(__dirname + '/../helpers/util');
 const logger = require('../helpers/logger');
-const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
@@ -58,7 +57,7 @@ exports.create_student = (req, res, next) => {
             return next(err);
         }
         
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added student #' + data.student_number + '.');
 
         return res.status(200)
                 .item({message: 'Student successfully created'})
@@ -106,7 +105,7 @@ exports.update_student = (req, res, next) => {
             return next(err);
         }
         
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' updated student #' + data.student_number + '.');
 
         res.send({message: 'Student successfully updated'});
     }
@@ -149,7 +148,7 @@ exports.delete_student = (req, res, next) => {
             return next(err);
         }
         
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' deleted student #' + req.params.id + '.');
 
         res.item(result[0])
             .send();
@@ -182,7 +181,7 @@ exports.retrieve_student = (req, res, next) => {
                 .send();
         }
         
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed student #' + req.params.id + '\'s details.');
 
         res.item(result[0])
             .send();
@@ -208,12 +207,10 @@ exports.retrieve_all_student = (req, res, next) => {
             return next(err);
         }
         
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed all students\' details.');
 
         res.item(result)
             .send();
-  
-      
     }
 
     start();
@@ -251,7 +248,7 @@ exports.get_times_student_volunteered = (req, res, next) => {
 	}
 	function send_response (err, result, args, last_query) {
 		
-		logger.logg(req.session.user.teacher_id, last_query);
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed the number of times student #' + req.params.id + ' has volunteered.');
 	
 		res.item(result[0])
 		.send();
@@ -282,7 +279,7 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
             return next(err);
         }
         
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed log of volunteers.');
 
         res.item(result)
             .send();
