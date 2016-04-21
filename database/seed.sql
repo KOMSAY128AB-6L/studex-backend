@@ -1,13 +1,15 @@
 USE studex;
 
+DELETE FROM volunteer_student;
+DELETE FROM volunteer;
+DELETE FROM student;
 DELETE FROM class;
 DELETE FROM teacher;
-DELETE FROM student;
-DELETE FROM volunteer;
 
 ALTER TABLE teacher AUTO_INCREMENT = 1;
 ALTER TABLE student AUTO_INCREMENT = 1;
 ALTER TABLE class AUTO_INCREMENT = 1;
+ALTER TABLE volunteer AUTO_INCREMENT = 1;
 
 
 -- TEACHER SEED
@@ -109,13 +111,12 @@ INSERT INTO student(email, student_number, first_name, middle_initial,last_name,
 
 
 -- VOLUNTEER seed
-INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("1", "1", "6", curdate());
+INSERT INTO volunteer(teacher_id, class_id, volunteer_date) VALUES("1", "6", curdate());
+INSERT INTO volunteer(teacher_id, class_id, volunteer_date) VALUES("3", "2", curdate());
 
-INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("4","1","6",curdate());
-
-INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("15","1","6",curdate());
-
-INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("18","3","3",curdate());
-
-INSERT INTO volunteer(student_id, teacher_id, class_id, volunteer_date) VALUES("11","2","5", curdate());
-
+-- Add Student to Volunteers
+INSERT INTO volunteer_student(student_id, volunteer_id) VALUES("1", "1");
+INSERT INTO volunteer_student(student_id, volunteer_id) VALUES("2", "1");
+INSERT INTO volunteer_student(student_id, volunteer_id) VALUES("3", "1");
+INSERT INTO volunteer_student(student_id, volunteer_id) VALUES("4", "1");
+INSERT INTO volunteer_student(student_id, volunteer_id) VALUES("5", "1");

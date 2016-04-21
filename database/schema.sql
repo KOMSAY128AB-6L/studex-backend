@@ -25,17 +25,17 @@ USE studex;
 CREATE TABLE IF NOT EXISTS teacher (
 	teacher_id INT AUTO_INCREMENT PRIMARY KEY,
 	email VARCHAR(64) UNIQUE,
-	password VARCHAR(128),
-	first_name VARCHAR(64),
-	middle_initial VARCHAR(4),
-	last_name VARCHAR(64),
+	password VARCHAR(128) NOT NULL,
+	first_name VARCHAR(64) NOT NULL,
+	middle_initial VARCHAR(4) NOT NULL,
+	last_name VARCHAR(64) NOT NULL,
 	picture VARCHAR(64)
 );
 
 CREATE TABLE IF NOT EXISTS class (
 	class_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-	class_name VARCHAR(128),
-	section VARCHAR(32),
+	class_name VARCHAR(128) NOT NULL,
+	section VARCHAR(32) NOT NULL,
 	teacher_id INT,
 	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
 );
@@ -44,9 +44,9 @@ CREATE TABLE IF NOT EXISTS student (
 	student_id INT AUTO_INCREMENT PRIMARY KEY,
 	email VARCHAR(64) UNIQUE,
 	student_number VARCHAR(10) UNIQUE,
-	first_name VARCHAR(64),
-	middle_initial VARCHAR(4),
-	last_name VARCHAR(64),
+	first_name VARCHAR(64) NOT NULL,
+	middle_initial VARCHAR(4) NOT NULL,
+	last_name VARCHAR(64) NOT NULL,
 	picture VARCHAR(64),
 	class_id BIGINT,
 	FOREIGN KEY(class_id) REFERENCES class(class_id)
@@ -64,10 +64,11 @@ CREATE TABLE IF NOT EXISTS volunteer (
 );
 
 CREATE TABLE IF NOT EXISTS volunteer_student (
+	vs_id BIGINT AUTO_INCREMENT PRIMARY KEY,
 	student_id INT,
 	volunteer_id BIGINT,
-	PRIMARY KEY(student_id, volunteer_id),
-	FOREIGN KEY(student_id) REFERENCES student(student_id)
+	FOREIGN KEY(student_id) REFERENCES student(student_id),
+	FOREIGN KEY(volunteer_id) REFERENCES volunteer(volunteer_id)
 );
 
 
@@ -79,3 +80,13 @@ CREATE TABLE IF NOT EXISTS reset_password (
 
 CREATE TRIGGER before_insert_on_reset_password BEFORE INSERT ON `reset_password`
 FOR EACH ROW SET new.date_expiry = IFNULL(new.date_expiry,DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 DAY));
+
+SET GLOBAL log_output = 'TABLE';
+SET GLOBAL general_log = 'ON';
+
+CREATE TABLE IF NOT EXISTS history (
+	log_id INT AUTO_INCREMENT PRIMARY KEY,
+	log_time timestamp NOT NULL default CURRENT_TIMESTAMP,
+	teacher_id INT, log_text VARCHAR(255),
+	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
+);

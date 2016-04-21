@@ -2,6 +2,7 @@
 
 const config  = require(__dirname + '/../config/config');
 const util   = require(__dirname + '/../helpers/util');
+const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
@@ -18,7 +19,7 @@ exports.create_student = (req, res, next) => {
             class_id: ''
         },
         req.body
-    ); 
+    );
 
     function start () {
         if (data instanceof Error) {
@@ -32,7 +33,7 @@ exports.create_student = (req, res, next) => {
                 check_duplicate
             )
             .end();
-       
+
     }
 
     function check_duplicate (err, result) {
@@ -56,6 +57,8 @@ exports.create_student = (req, res, next) => {
             return next(err);
         }
 
+        logger.logg(req.session.user.teacher_id, last_query);
+
         return res.status(200)
                 .item({message: 'Student successfully created'})
                 .send();
@@ -75,7 +78,7 @@ exports.update_student = (req, res, next) => {
             picture: ''
         },
         req.body
-    ); 
+    );
 
 
     function start () {
@@ -102,6 +105,8 @@ exports.update_student = (req, res, next) => {
             return next(err);
         }
 
+        logger.logg(req.session.user.teacher_id, last_query);
+
         res.send({message: 'Student successfully updated'});
     }
 
@@ -118,7 +123,7 @@ exports.delete_student = (req, res, next) => {
                 delete_student_data
             )
             .end();
-       
+
     }
 
     function delete_student_data (err, result){
@@ -142,6 +147,8 @@ exports.delete_student = (req, res, next) => {
             winston.error('Error in deleting student', last_query);
             return next(err);
         }
+
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.item(result[0])
             .send();
@@ -174,6 +181,8 @@ exports.retrieve_student = (req, res, next) => {
                 .send();
         }
 
+        logger.logg(req.session.user.teacher_id, last_query);
+
         res.item(result[0])
             .send();
     }
@@ -198,10 +207,12 @@ exports.retrieve_all_student = (req, res, next) => {
             return next(err);
         }
 
+        logger.logg(req.session.user.teacher_id, last_query);
+
         res.item(result)
             .send();
-  
-      
+
+
     }
 
     start();
@@ -223,7 +234,7 @@ exports.get_times_student_volunteered = (req, res, next) => {
 					.error({code: 'STUDENT404', message: 'student not found'})
 					.send();
 				}
-				getVolunteerTimes(); 
+				getVolunteerTimes();
 			}
 		)
 		.end();
@@ -237,7 +248,10 @@ exports.get_times_student_volunteered = (req, res, next) => {
 		)
 		.end();
 	}
-	function send_response (err, result, args, last_query) {	
+	function send_response (err, result, args, last_query) {
+
+		logger.logg(req.session.user.teacher_id, last_query);
+
 		res.item(result[0])
 		.send();
 	}
@@ -249,8 +263,14 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
     function start () {
         mysql.use('master')
             .query(
-                'SELECT concat(concat(student.last_name, ", "), student.first_name) as "STUDENT" , concat(concat(teacher.last_name, ", "), teacher.first_name) as "TEACHER", concat(concat(class.class_name, " "), class.section) as "CLASS/SECTION", volunteer_date FROM volunteer, teacher, student, class WHERE student.student_id=volunteer.student_id and teacher.teacher_id=volunteer.teacher_id and class.class_id=volunteer.class_id ORDER BY volunteer_date DESC;',
-                send_response
+                'SELECT CONCAT(CONCAT(teacher.first_name, ", "), teacher.last_name) as "Teacher",\
+                    CONCAT(CONCAT(class.class_name, "-"), class.section) as "Class",\
+                    CONCAT(CONCAT(student.first_name, ", "), student.last_name) as "Volunteer", student.picture as Picture, \
+                    volunteer_date FROM volunteer, teacher, class, volunteer_student, student WHERE volunteer.volunteer_id = ? and \
+                    teacher.teacher_id = volunteer.teacher_id and class.class_id = volunteer.class_id\
+                    and volunteer_student.volunteer_id = ? and student.student_id= volunteer_student.student_id;',
+                    [req.params.id, req.params.id],
+                    send_response
             )
             .end();
     }
@@ -261,10 +281,12 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
             return next(err);
         }
 
+        logger.logg(req.session.user.teacher_id, last_query);
+
         res.item(result)
             .send();
-  
-      
+
+
     }
 
     start();

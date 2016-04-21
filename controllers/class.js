@@ -1,13 +1,15 @@
 'use strict';
 
-const util  	= require(__dirname + '/../helpers/util');
-const date  	= require(__dirname + '/../helpers/date');
-const mysql   	= require('anytv-node-mysql');
-const winston 	= require('winston');
-const sh      	= require('shelljs');
-const multer    = require('multer');
-const fs		= require('fs');
-const storage =   multer.diskStorage( {
+const util  	   = require(__dirname + '/../helpers/util');
+const date  	   = require(__dirname + '/../helpers/date');
+const logger       = require('../helpers/logger');
+const csv_writer   = require('fast-csv');
+const mysql   	   = require('anytv-node-mysql');
+const winston 	   = require('winston');
+const sh       	   = require('shelljs');
+const multer       = require('multer');
+const fs		   = require('fs');
+const storage      =   multer.diskStorage( {
     destination: (req, file, cb) => {
 		let destFolder =__dirname + '/../uploads/csv';
 		if (!fs.existsSync(destFolder)) {
@@ -37,7 +39,7 @@ exports.view_class = (req, res, next) => {
 	function start () {
 	mysql.use('master')
 			.query(
-			'SELECT s.last_name, s.first_name, s.middle_initial FROM student s, student_class sc WHERE sc.class_id = ? and s.student_id = sc.student_id',
+			'SELECT last_name, first_name, middle_initial, picture FROM student  WHERE class_id = ?',
 			[req.params.id],
 			send_response
 		)
@@ -53,7 +55,36 @@ exports.view_class = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Class not found'})
 			.send();
 		}
+
+		logger.logg(req.session.user.teacher_id, last_query);
+
 		res.item(result[0])
+		.send();
+	}
+	start();
+};
+
+exports.view_classes = (req, res, next) => {
+	function start () {
+	mysql.use('master')
+			.query(
+			'SELECT * FROM class WHERE teacher_id=?',
+			[req.session.user.teacher_id],
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in viewing classes', last_query);
+			return next(err);
+		}
+		if (!result.length) {
+			return res.status(404)
+			.error({code: 'CLASS404', message: 'Classes not found'})
+			.send();
+		}
+		res.item(result)
 		.send();
 	}
 	start();
@@ -116,9 +147,9 @@ exports.update_class = (req, res, next) => {
 
 		if (result.affectedRows === 0) {
 			return res.status(404)
-	 		   .error({code: 'CLASS404', message: 'Class not found'})
-			.send();
-		}
+                .error({code: 'CLASS404', message: 'Class not found'})
+                .send();
+        }
 
 		res.item({message:'Class successfully updated'})
 		.send();
@@ -150,6 +181,8 @@ exports.delete_class = (req, res, next) => {
                 .error({code: 'CLASS404', message: 'Class not found'})
                 .send();
         }
+
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.item({message:'Class successfully deleted'})
             .send();
@@ -201,6 +234,8 @@ exports.write_to_csv = (req, res, next) => {
 	 		winston.error('Could not write to CSV');
 	 		return next(err);
 	 	}
+
+	 	logger.logg(req.session.user.teacher_id, last_query);
 
 	 	res.send();
 	 }
@@ -335,6 +370,8 @@ exports.insert_csv_classlist = (req, res, next) => {
             winston.error('Error in removing csv file');
             return next(err);
         }
+
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.send({message: "Classlist inserted"});
     }
