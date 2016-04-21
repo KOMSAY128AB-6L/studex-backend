@@ -248,8 +248,13 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
     function start () {
         mysql.use('master')
             .query(
-                'SELECT concat(concat(student.last_name, ", "), student.first_name) as "STUDENT" , concat(concat(teacher.last_name, ", "), teacher.first_name) as "TEACHER", concat(concat(class.class_name, " "), class.section) as "CLASS/SECTION", volunteer_date FROM volunteer, teacher, student, class WHERE student.student_id=volunteer.student_id and teacher.teacher_id=volunteer.teacher_id and class.class_id=volunteer.class_id ORDER BY volunteer_date DESC;',
-                send_response
+                'SELECT CONCAT(CONCAT(teacher.first_name, ", "), teacher.last_name) as "Teacher",\
+                    CONCAT(CONCAT(class.class_name, "-"), class.section) as "Class",\
+                    CONCAT(CONCAT(student.first_name, ", "), student.last_name) as "Volunteer", student.picture as Picture, \
+                    volunteer_date FROM volunteer, teacher, class, volunteer_student, student WHERE volunteer.teacher_id = ? and \
+                    teacher.teacher_id = volunteer.teacher_id and class.class_id = volunteer.class_id\;',
+               	    [req.session.user.teacher_id, req.session.user.teacher_id],
+                    send_response
             )
             .end();
     }
@@ -259,6 +264,8 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
             winston.error('Error in retrieving log of volunteers', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.item(result)
             .send();
