@@ -253,7 +253,7 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
                     CONCAT(CONCAT(student.first_name, ", "), student.last_name) as "Volunteer", student.picture as Picture, \
                     volunteer_date FROM volunteer, teacher, class, volunteer_student, student WHERE volunteer.teacher_id = ? and \
                     teacher.teacher_id = volunteer.teacher_id and class.class_id = volunteer.class_id\;',
-               	    [req.session.user.teacher_id, req.session.user.teacher_id],
+               	    [req.session.user.teacher_id],
                     send_response
             )
             .end();
