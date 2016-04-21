@@ -18,7 +18,7 @@ const nodemailer = require('nodemailer');
  * @apiParam {String} middle_initial User's middle initial
  * @apiParam {String} last_name User's last name
  *
- * @apiSuccess 
+ * @apiSuccess
  */
 exports.create_user = (req, res, next) => {
     const data = util.get_data(
@@ -43,40 +43,40 @@ exports.create_user = (req, res, next) => {
                 'SELECT * FROM teacher WHERE email = ?;',
                 [data.email],
                 send_validate_response
-            ) 
-            
+            )
+
      	.end();
     }
-    
+
     function send_validate_response (err, result, args, last_query) {
          if (result.length) {
             return res.status(404)
                 .error({code: 'USER404', message: 'User email is existing'})
                 .send();
         }
-        
+
         mysql.use('master')
         .query(
                 'INSERT INTO teacher(email, password, first_name, middle_initial,\
                                     last_name) \
                  VALUES(?, PASSWORD(CONCAT(MD5(?), ?)), ?, ?, ?);',
-                [data.email, data.password, config.SALT, data.first_name, 
+                [data.email, data.password, config.SALT, data.first_name,
                  data.middle_initial, data.last_name],
                 send_response
             )
-            
+
      	.end();
     }
 
     function send_response (err, result, args, last_query) {
-             
+
         if (err) {
-            winston.error('Error creating user', last_query);	
+            winston.error('Error creating user', last_query);
             return next(err);
         }
-        
+
         logger.logg(req.session.user.teacher_id, last_query);
-        
+
         return res.status(200)
                 .item({code: 'USER200', message: 'User successfully created'})
                 .send();
@@ -92,7 +92,7 @@ exports.reset_password = (req, res, next) => {
         },
         req.body
     );
-    
+
     let user = {
         first_name: '',
         random_string: ''
@@ -117,7 +117,7 @@ exports.reset_password = (req, res, next) => {
                 send_email
             )
             .end();
-        
+
     }
 
     function find_user (err, result, args, last_query) {
@@ -178,7 +178,7 @@ exports.reset_password = (req, res, next) => {
                 winston.error('Error in sending email containing password reset key', error);
                 return next(error);
             }
-            
+
             logger.logg(req.session.user.teacher_id, last_query);
 
             res.status(200)
@@ -245,7 +245,7 @@ exports.confirm_reset_password = (req, res, next) => {
                 send_response
             )
             .end();
-            
+
             logger.logg(req.session.user.teacher_id, last_query);
 
         return res.status(200);
@@ -266,7 +266,7 @@ exports.confirm_reset_password = (req, res, next) => {
                 remove_request
             )
             .end();
-            
+
             logger.logg(req.session.user.teacher_id, last_query);
 
         return res.status(200)
@@ -279,7 +279,7 @@ exports.confirm_reset_password = (req, res, next) => {
             winston.error('Error in deleting reset password request', last_query);
             return next(err);
         }
-        
+
         logger.logg(req.session.user.teacher_id, last_query);
 
         return res.status(200);
@@ -287,6 +287,42 @@ exports.confirm_reset_password = (req, res, next) => {
 
     start();
 };
+
+exports.change_password = (req, res, next) => {
+
+    function start () {
+        if (data instanceof Error) {
+
+            return res.warn(400, {message: data.message});
+        }
+
+        mysql.use('master')
+
+            .query(
+              'UPDATE teacher WHERE teacher_id = (?)  SET password = (?);',
+              [req.session.user.teacher_id,req.params.id],
+              send_response
+            )
+            .end();
+
+    }
+
+    function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in changing password', last_query);
+            return next(err);
+        }
+
+        return res.status(200)
+                .item({message: 'Password changed'})
+                .send();
+    }
+
+
+
+    start();
+};
+
 
 
 exports.logout_user = (req,res,next) => {
@@ -303,7 +339,7 @@ exports.login_user = (req, res, next) => {
     const data = util.get_data(
         {
             email : '',
-            password : '' 
+            password : ''
         },
         req.body
     );
@@ -350,7 +386,7 @@ exports.login_user = (req, res, next) => {
                 middle_initial: result[0].middle_initial,
                 last_name: result[0].last_name
             };
-            
+
             res.item({code :'USER200', message:'User succesfully logged in.'}).send();
         }
     }
