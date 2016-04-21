@@ -33,7 +33,7 @@ module.exports = (router) => {
     router.post('/teacher',                         $, __.teacher.post_teacher);
     router.put('/teacher/:id',                      $, __.teacher.update_teacher);
     router.delete('/teacher/:id',                   $, __.teacher.delete_teacher);
-    router.get('/history/:id',						$, __.teacher.get_transaction_history);
+    router.get('/history',						$, __.teacher.get_transaction_history);
 
     // Routes for class
     router.get('/class/:id',                        $, __.class.view_class);
