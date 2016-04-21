@@ -46,12 +46,7 @@ const start = () => {
             }
             class_name = line_arr[1];
             console.log(
-                ['\nINSERT INTO class (class_name, section, teacher_id) ',
-                'VALUES (', line_arr[0], line_arr[1], line_arr[2], ') ',
-                'ON DUPLICATE KEY UPDATE ',
-                    'class_name = ', line_arr[0],
-                    'section = ', line_arr[1].split(',')[0],
-                ';'].join('')
+                ['\nCALL ADD_CLASS (', line_arr[0], line_arr[1], line_arr[2], ');'].join('')
             );
         }
 

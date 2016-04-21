@@ -216,7 +216,7 @@ exports.create_class = (req, res, next) => {
             teacher_id: ''
         },
         req.body
-    ); 
+    );
 
     function start () {
         if (data instanceof Error) {
@@ -230,7 +230,7 @@ exports.create_class = (req, res, next) => {
                 check_duplicate
             )
             .end();
-       
+
     }
 
     function check_duplicate (err, result) {
@@ -269,17 +269,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 	let path;
 
 	function start () {
-		upload(req, res, initialize_shell);
-	}
-
-	function initialize_shell (err) {
-		if(err) {
-			winston.error('Error uploading file.');
-			return next(err);
-		}
-
-		path = req.file.path;
-		sh.exec('cd ./', generate_container);
+		upload(req, res, generate_container);
 	}
 
 	function generate_container (err) {
@@ -288,6 +278,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 			return next(err);
 		}
 
+		path = req.file.path;
 		sh.exec('touch uploads/csv', overwrite_permission);
 	}
 
@@ -306,12 +297,24 @@ exports.insert_csv_classlist = (req, res, next) => {
 			return next(err);
 		}
 
-		sh.exec('node helpers/classlist.js ' + path + ' > database/classlist.sql', execute_query);
+		sh.exec('node helpers/classlist.js ' + path + ' > database/classlist.sql', filter_query);
+	}
+
+    function filter_query (err) {
+
+        let query;
+
+        if (err) {
+			winston.error('Error in parsing CSV file and converting it to into SQL format');
+			return next(err);
+		}
+
+		sh.exec('sudo mysql -uroot < database/classlist.sql', execute_query);
 	}
 
 	function execute_query (err) {
 		if (err) {
-			winston.error('Error in parsing CSV file and converting it to into SQL format');
+			winston.error('Error in filtering query');
 			return next(err);
 		}
 
