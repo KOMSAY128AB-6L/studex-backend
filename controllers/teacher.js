@@ -2,6 +2,7 @@
 
 const mysql     = require('anytv-node-mysql');
 const winston   = require('winston');
+const logger = require('../helpers/logger');
 const sh        = require('shelljs');
 const multer    = require('multer');
 const fs        = require('fs');
@@ -37,6 +38,8 @@ exports.get_teachers = (req, res, next) => {
             winston.error('Error in getting teachers', last_query);
             return next(err);
         }
+
+		logger.logg(req.session.user.teacher_id, last_query);
 
         res.item(result)
             .send();
@@ -76,6 +79,8 @@ exports.post_teacher = (req, res, next) => {
             return next(err);
         }
 
+        logger.logg(req.session.user.teacher_id, last_query);
+
         res.item(result[0])
             .send();
     }
@@ -108,6 +113,8 @@ exports.update_teacher = (req, res, next) => {
 				.send();
 		}
 
+		logger.logg(req.session.user.teacher_id, last_query);
+
 		res.item(result[0])
 			.send();
 	}
@@ -139,6 +146,8 @@ exports.delete_teacher = (req, res, next) => {
 				.error({code: 'teacher404', message: 'teacher not found'})
 				.send();
 		}
+
+		logger.logg(req.session.user.teacher_id, last_query);
 
 		res.item(result[0])
 			.send();
@@ -185,3 +194,34 @@ exports.upload_picture = (req, res, next) => {
 
 	start();
 }
+
+exports.get_transaction_history = (req, res, next) => {
+
+	function start () {
+		mysql.use('master')
+			.query(
+				'SELECT * FROM history WHERE teacher_id = ?;',
+				[req.session.user.teacher_id],
+				send_response
+			)
+			.end();
+	}
+
+	function send_response (err, result, args, last_query){
+		if(err){
+			winston.error('Error in retrieving transaction log', last_query);
+			return next(err);
+		}
+
+		if(!result.length){
+			return res.status(404)
+					.error({code: 'TEACHER404', message: 'Teacher Transaction Log not found'})
+					.send();
+		}
+
+		res.item(result)
+            .send();
+	}
+
+	start();
+};
