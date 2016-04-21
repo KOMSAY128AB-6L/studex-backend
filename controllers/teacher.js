@@ -76,7 +76,7 @@ exports.update_teacher = (req, res, next) => {
 		mysql.use('master')
 			.query(
 				'UPDATE teacher SET ? WHERE teacher_id=?',
-				[req.body, req.params.id],
+				[req.body, req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -110,7 +110,7 @@ exports.delete_teacher = (req, res, next) => {
 		mysql.use('master')
 			.query(
 				'DELETE from teacher WHERE teacher_id=?;',
-				[req.params.id],
+				[req.session.user.teacher_id],
 				send_response
 			)
 			.end();

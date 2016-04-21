@@ -25,21 +25,21 @@ module.exports = (router) => {
     router.get ('/student',                         $, __.student.retrieve_all_student);
     router.get ('/student_logs/:id',                $, __.student.retrieve_log_of_volunteers);
     router.put ('/student/:id',                     $, __.student.update_student);
-    router.delete('/student/:id',                   $, __.student.delete_student);
-    router.get('/volunteer/:id',                    $, __.student.get_times_student_volunteered);
+    router.del ('/student/:id',                     $, __.student.delete_student);
+    router.get ('/volunteer/:id',                   $, __.student.get_times_student_volunteered);
     
-    router.get('/teachers',                         $, __.teacher.get_teachers);
-    router.get('/teacher',                          $, __.teacher.get_teacher);
+    router.get ('/teachers',                        $, __.teacher.get_teachers);
+    router.get ('/teacher',                         $, __.teacher.get_teacher);
     router.post('/teacher',                         $, __.teacher.post_teacher);
-    router.put('/teacher/:id',                      $, __.teacher.update_teacher);
-    router.delete('/teacher/:id',                   $, __.teacher.delete_teacher);
-    router.get('/history',			    $, __.teacher.get_transaction_history);
+    router.put ('/teacher',                         $, __.teacher.update_teacher);
+    router.del ('/teacher',                         $, __.teacher.delete_teacher);
+    router.get ('/history',			                $, __.teacher.get_transaction_history);
 
     // Routes for class
-    router.get('/classes',			    $, __.class.view_classes);
-    router.get('/class/:id',                        $, __.class.view_class);
-    router.put('/class',                            $, __.class.update_class);
-    router.delete('/class/:id',                     $, __.class.delete_class);
+    router.get ('/classes',			                $, __.class.view_classes);
+    router.get ('/class/:id',                       $, __.class.view_class);
+    router.put ('/class',                           $, __.class.update_class);
+    router.del ('/class/:id',                       $, __.class.delete_class);
 	
 	// Routes for class read and write CSV
     router.get('/class/csv',                        $, __.class.write_to_csv);
