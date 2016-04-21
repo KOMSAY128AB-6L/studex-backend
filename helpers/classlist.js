@@ -1,5 +1,3 @@
-/*CONVERT TO AN UPLOADED FILE OVER ARGUMENT READING*/
-
 'use strict';
 
 const start = () => {

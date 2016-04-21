@@ -1,6 +1,7 @@
 'use strict';
 
 const util  	= require(__dirname + '/../helpers/util');
+const date  	= require(__dirname + '/../helpers/date');
 const mysql   	= require('anytv-node-mysql');
 const winston 	= require('winston');
 const sh      	= require('shelljs');
@@ -266,6 +267,7 @@ exports.create_class = (req, res, next) => {
 
 exports.insert_csv_classlist = (req, res, next) => {
 
+    const timestamp = date.get_today();
 	let path;
 
 	function start () {
@@ -288,7 +290,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 			return next(err);
 		}
 
-		sh.exec('node helpers/classlist.js ' + path + ' > database/classlist.sql', filter_query);
+		sh.exec('node helpers/classlist.js ' + path + ' > database/classlist-' + timestamp + '.sql', filter_query);
 	}
 
     function filter_query (err) {
@@ -297,7 +299,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 			return next(err);
 		}
 
-		sh.exec('sudo mysql -uroot < database/classlist.sql', execute_query);
+		sh.exec('sudo mysql -uroot < database/classlist-' + timestamp + '.sql', execute_query);
 	}
 
 	function execute_query (err) {
@@ -306,17 +308,17 @@ exports.insert_csv_classlist = (req, res, next) => {
 			return next(err);
 		}
 
-		sh.exec('sudo mysql -uroot < database/classlist.sql', clean_sql);
+		sh.exec('sudo mysql -uroot < database/classlist-' + timestamp + '.sql', clean_sql);
 	}
 
 	function clean_sql (err) {
 		if (err) {
 			winston.error('Error in inserting classlist from CSV');
-			sh.rm('database/classlist.sql', path);
+			sh.rm('database/classlist-' + timestamp + '.sql', path);
 			return next(err);
         }
 
-		sh.exec('rm database/classlist.sql', clean_csv);
+		sh.exec('rm database/classlist-' + timestamp + '.sql', clean_csv);
 	}
 
 	function clean_csv (err) {
