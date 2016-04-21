@@ -283,8 +283,6 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
 
         res.item(result)
             .send();
-  
-      
     }
 
     start();
