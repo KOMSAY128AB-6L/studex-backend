@@ -269,25 +269,16 @@ exports.insert_csv_classlist = (req, res, next) => {
 	let path;
 
 	function start () {
-		upload(req, res, generate_container);
-	}
-
-	function generate_container (err) {
-		if (err) {
-			winston.error('Error in initializing shell');
-			return next(err);
-		}
-
-		path = req.file.path;
-		sh.exec('touch uploads/csv', overwrite_permission);
+		upload(req, res, overwrite_permission);
 	}
 
 	function overwrite_permission (err) {
 		if (err) {
-			winston.error('Error in generating csv folder');
+			winston.error('Error in uploading csv file');
 			return next(err);
 		}
 
+		path = req.file.path;
 		sh.exec('sudo chmod 755 helpers/classlist.js', generate_query);
 	}
 
@@ -324,7 +315,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 	function clean_sql (err) {
 		if (err) {
 			winston.error('Error in inserting classlist from CSV');
-			// sh.rm('database/classlist.sql', path);
+			sh.rm('database/classlist.sql', path);
 			return next(err);
         }
 
