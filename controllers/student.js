@@ -3,7 +3,6 @@
 const config  = require(__dirname + '/../config/config');
 const util   = require(__dirname + '/../helpers/util');
 const logger = require('../helpers/logger');
-const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
@@ -267,10 +266,10 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
                 'SELECT CONCAT(CONCAT(teacher.first_name, ", "), teacher.last_name) as "Teacher",\
                     CONCAT(CONCAT(class.class_name, "-"), class.section) as "Class",\
                     CONCAT(CONCAT(student.first_name, ", "), student.last_name) as "Volunteer", student.picture as Picture, \
-                    volunteer_date FROM volunteer, teacher, class, volunteer_student, student WHERE volunteer.volunteer_id = ? and \
+                    volunteer_date FROM volunteer, teacher, class, volunteer_student, student WHERE teacher.teacher_id = ? and \
                     teacher.teacher_id = volunteer.teacher_id and class.class_id = volunteer.class_id\
-                    and volunteer_student.volunteer_id = ? and student.student_id= volunteer_student.student_id;',
-                    [req.params.id, req.params.id],
+                    and student.student_id= volunteer_student.student_id;',
+                    [req.session.user.teacher_id],
                     send_response
             )
             .end();
