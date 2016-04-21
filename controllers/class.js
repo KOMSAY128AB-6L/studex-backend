@@ -292,9 +292,6 @@ exports.insert_csv_classlist = (req, res, next) => {
 	}
 
     function filter_query (err) {
-
-        let query;
-
         if (err) {
 			winston.error('Error in parsing CSV file and converting it to into SQL format');
 			return next(err);
