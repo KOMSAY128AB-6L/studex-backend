@@ -1,6 +1,7 @@
 'use strict';
 
 const util   = require(__dirname + '/../helpers/util');
+const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 const config  = require(__dirname + '/../config/config');
@@ -74,8 +75,10 @@ exports.create_user = (req, res, next) => {
             return next(err);
         }
         
+        logger.logg(req.session.user.teacher_id, last_query);
+        
         return res.status(200)
-                .item({message: 'User successfully created'})
+                .item({code: 'USER200', message: 'User successfully created'})
                 .send();
     }
 
@@ -175,6 +178,8 @@ exports.reset_password = (req, res, next) => {
                 winston.error('Error in sending email containing password reset key', error);
                 return next(error);
             }
+            
+            logger.logg(req.session.user.teacher_id, last_query);
 
             res.status(200)
                 .item({message: 'Message sent'})
@@ -240,6 +245,8 @@ exports.confirm_reset_password = (req, res, next) => {
                 send_response
             )
             .end();
+            
+            logger.logg(req.session.user.teacher_id, last_query);
 
         return res.status(200);
 
@@ -259,6 +266,8 @@ exports.confirm_reset_password = (req, res, next) => {
                 remove_request
             )
             .end();
+            
+            logger.logg(req.session.user.teacher_id, last_query);
 
         return res.status(200)
                 .item({message: 'Reset password request successfully claimed'})
@@ -270,6 +279,8 @@ exports.confirm_reset_password = (req, res, next) => {
             winston.error('Error in deleting reset password request', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         return res.status(200);
     }
@@ -283,7 +294,7 @@ exports.logout_user = (req,res,next) => {
 		req.session.destroy();
 	}
 	start();
-	res.item({message:'User succesfully logged out.'}).send();
+	res.item({code: 'USER200', message:'User succesfully logged out.'}).send();
 };
 
 
@@ -326,7 +337,7 @@ exports.login_user = (req, res, next) => {
         }
 
         if(!result.length) {
-            res.item("User Email or Password is incorrect.")
+            res.item({code: 'USER200', message: 'User Email or Password is incorrect.'})
                 .send();
         }
 
@@ -340,7 +351,7 @@ exports.login_user = (req, res, next) => {
                 last_name: result[0].last_name
             };
             
-            res.item({message:'User succesfully logged in.'}).send();
+            res.item({code :'USER200', message:'User succesfully logged in.'}).send();
         }
     }
 

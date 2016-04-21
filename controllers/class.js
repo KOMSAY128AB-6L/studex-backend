@@ -1,6 +1,7 @@
 'use strict';
 
 const mysql   = require('anytv-node-mysql');
+const logger = require('../helpers/logger');
 const winston = require('winston');
 const csv_writer = require('fast-csv');
 const util  	= require(__dirname + '/../helpers/util');
@@ -21,7 +22,7 @@ exports.view_class = (req, res, next) => {
 	function start () {
 	mysql.use('master')
 			.query(
-			'SELECT s.last_name, s.first_name, s.middle_initial FROM student s, student_class sc WHERE sc.class_id = ? and s.student_id = sc.student_id',
+			'SELECT last_name, first_name, middle_initial, picture FROM student  WHERE class_id = ?',
 			[req.params.id],
 			send_response
 		)
@@ -37,6 +38,9 @@ exports.view_class = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Class not found'})
 			.send();
 		}
+		
+		logger.logg(req.session.user.teacher_id, last_query);
+		
 		res.item(result[0])
 		.send();
 	}
@@ -102,6 +106,8 @@ exports.update_class = (req, res, next) => {
 		 		   .error({code: 'CLASS404', message: 'Class not found'})
 				.send();
 			}
+			
+			logger.logg(req.session.user.teacher_id, last_query);
 
 			res.item({message:'Class successfully updated'})
 			.send();
@@ -133,6 +139,8 @@ exports.delete_class = (req, res, next) => {
                 .error({code: 'CLASS404', message: 'Class not found'})
                 .send();
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.item({message:'Class successfully deleted'})
             .send();
@@ -184,6 +192,8 @@ exports.write_to_csv = (req, res, next) => {
 	 		winston.error('Could not write to CSV');
 	 		return next(err);
 	 	}
+	 	
+	 	logger.logg(req.session.user.teacher_id, last_query);
 	 	
 	 	res.send();
 	 }
@@ -278,6 +288,8 @@ exports.insert_csv_classlist = (req, res, next) => {
             winston.error('Error in inserting classlist from CSV');
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         res.send();
     }
