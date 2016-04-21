@@ -251,8 +251,10 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
                 'SELECT CONCAT(CONCAT(teacher.first_name, ", "), teacher.last_name) as "Teacher",\
                     CONCAT(CONCAT(class.class_name, "-"), class.section) as "Class",\
                     CONCAT(CONCAT(student.first_name, ", "), student.last_name) as "Volunteer", student.picture as Picture, \
-                    volunteer_date FROM volunteer, teacher, class, volunteer_student, student WHERE volunteer.teacher_id = ? and \
-                    teacher.teacher_id = volunteer.teacher_id and class.class_id = volunteer.class_id\;',
+                    volunteer_date FROM volunteer, teacher, class, volunteer_student, student WHERE teacher.teacher_id = ? and \
+                    teacher.teacher_id = volunteer.teacher_id and student.student_id = volunteer.student_id and class.class_id = volunteer.class_id and\
+                    student.student_id= volunteer_student.student_id;',
+    
                	    [req.session.user.teacher_id],
                     send_response
             )
