@@ -1,5 +1,6 @@
 'use strict';
 
+const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
@@ -19,7 +20,9 @@ exports.get_teachers = (req, res, next) => {
             winston.error('Error in getting teachers', last_query);
             return next(err);
         }
-
+        
+		logger.logg(req.session.user.teacher_id, last_query);
+		
         res.item(result)
             .send();
     }
@@ -58,6 +61,8 @@ exports.post_teacher = (req, res, next) => {
             return next(err);
         }
         
+        logger.logg(req.session.user.teacher_id, last_query);
+        
         res.item(result[0])
             .send();
     }
@@ -71,7 +76,7 @@ exports.update_teacher = (req, res, next) => {
 		mysql.use('master')
 			.query(
 				'UPDATE teacher SET ? WHERE teacher_id=?',
-				[req.body, req.params.id],
+				[req.body, req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -88,7 +93,9 @@ exports.update_teacher = (req, res, next) => {
 			return res.status(404)
 				.error({code: 'teacher404', message: 'teacher not found'})
 				.send();
-		}        
+		}
+		
+		logger.logg(req.session.user.teacher_id, last_query);        
 		
 		res.item(result[0])
 			.send();
@@ -103,7 +110,7 @@ exports.delete_teacher = (req, res, next) => {
 		mysql.use('master')
 			.query(
 				'DELETE from teacher WHERE teacher_id=?;',
-				[req.params.id],
+				[req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -121,10 +128,43 @@ exports.delete_teacher = (req, res, next) => {
 				.error({code: 'teacher404', message: 'teacher not found'})
 				.send();
 		}
+		
+		logger.logg(req.session.user.teacher_id, last_query);
 	
 		res.item(result[0])
 			.send();
 	}
 	
+	start();
+};
+
+exports.get_transaction_history = (req, res, next) => {
+	
+	function start () {
+		mysql.use('master')
+			.query(
+				'SELECT * FROM history WHERE teacher_id = ?;',
+				[req.session.user.teacher_id],
+				send_response
+			)
+			.end();
+	}
+	
+	function send_response (err, result, args, last_query){
+		if(err){
+			winston.error('Error in retrieving transaction log', last_query);
+			return next(err);
+		}
+
+		if(!result.length){
+			return res.status(404)
+					.error({code: 'TEACHER404', message: 'Teacher Transaction Log not found'})
+					.send();
+		}
+
+		res.item(result)
+            .send();   
+	}
+
 	start();
 };

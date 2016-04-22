@@ -62,10 +62,11 @@ CREATE TABLE IF NOT EXISTS volunteer (
 );
 
 CREATE TABLE IF NOT EXISTS volunteer_student (
+	vs_id BIGINT AUTO_INCREMENT PRIMARY KEY,
 	student_id INT,
 	volunteer_id BIGINT,
-	PRIMARY KEY(student_id, volunteer_id),
-	FOREIGN KEY(student_id) REFERENCES student(student_id)
+	FOREIGN KEY(student_id) REFERENCES student(student_id),
+	FOREIGN KEY(volunteer_id) REFERENCES volunteer(volunteer_id)
 );
 
 
@@ -77,3 +78,13 @@ CREATE TABLE IF NOT EXISTS reset_password (
 
 CREATE TRIGGER before_insert_on_reset_password BEFORE INSERT ON `reset_password`
 FOR EACH ROW SET new.date_expiry = IFNULL(new.date_expiry,DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 DAY));
+
+SET GLOBAL log_output = 'TABLE';
+SET GLOBAL general_log = 'ON';
+
+CREATE TABLE IF NOT EXISTS history (
+	log_id INT AUTO_INCREMENT PRIMARY KEY,
+	log_time timestamp NOT NULL default CURRENT_TIMESTAMP,
+	teacher_id INT, log_text VARCHAR(255),
+	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
+);

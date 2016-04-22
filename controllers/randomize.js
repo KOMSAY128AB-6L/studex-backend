@@ -2,6 +2,7 @@
 
 const util   = require(__dirname + '/../helpers/util');
 const random   = require(__dirname + '/../helpers/randomize');
+const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
@@ -157,6 +158,8 @@ exports.randomize_classes = (req, res, next) => {
             winston.error('Error in selecting students from class', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, last_query);
 
         return res.item(random.randomize(result, data.settings))
                 .send();
@@ -176,6 +179,8 @@ exports.get_num_volunteers = (req, res) => {
     ); 
 
     function start () {
+    	logger.logg(req.session.user.teacher_id, last_query);
+    	
         res.item(data.num_of_volunteers).send();
     }
 
