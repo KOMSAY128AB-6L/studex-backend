@@ -9,12 +9,11 @@ const winston = require('winston');
 
 
 exports.randomize_students = (req, res, next) => {
-    //TODO add controllers specific for byChance for getting the data
     const data = util.get_data(
         {
             student_list: [{
                 student_id : 0,
-                _chance: 0.0
+                chance: 0.0                         //chance is required to avoid defining a new function to require it
             }],
             settings: {
                 _byCount: false,
@@ -34,14 +33,13 @@ exports.randomize_students = (req, res, next) => {
             return res.warn(400, {message: data.message});
         }
 
+        let student_ids = [];
+
+        data.student_list.forEach((student) => 
+            student_ids.push(student.student_id)
+        );
         
         if (data.settings.byCount) {
-            let student_ids = [];
-
-            data.student_list.forEach((student) => 
-                student_ids.push(student.student_id)
-            );
-            
             mysql.use('master')
                  .query(`SELECT s.*, GET_VOLUNTEER_COUNT(s.student_id) AS 
                          volunteerCount FROM student s LEFT JOIN 
@@ -54,9 +52,13 @@ exports.randomize_students = (req, res, next) => {
                  )
                  .end();
         } else {
-            //TODO modify query to only select students of that teacher
             mysql.use('master')
-                 .query('INSERT INTO volunteer(teacher_id) VALUES(?)', req.session.user.teacher_id, insert_volunteers)
+                 .query(`SELECT s.student_id FROM student s, class c WHERE
+                         s.class_id = c.class_id AND c.teacher_id = ? AND
+                         s.student_id IN ?`, 
+                         [req.session.user.teacher_id, [student_ids]],
+                         filter_non_students
+                 )
                  .end();
         }
     }
@@ -68,6 +70,19 @@ exports.randomize_students = (req, res, next) => {
         }
 
         data.student_list = result;
+
+        mysql.use('master')
+             .query('INSERT INTO volunteer(teacher_id) VALUES(?)', req.session.user.teacher_id, insert_volunteers)
+             .end();
+    }
+
+    function filter_non_students(err, result, args, last_query) {
+        if(err) {
+            winston.error('Error in selecting students of teacher', last_query);
+            return next(err);
+        }
+
+        data.student_list = data.student_list.filter((student) => result.indexOf(student.student_id) === -1);
 
         mysql.use('master')
              .query('INSERT INTO volunteer(teacher_id) VALUES(?)', req.session.user.teacher_id, insert_volunteers)
@@ -90,9 +105,8 @@ exports.randomize_students = (req, res, next) => {
         }
         query += '(?, ' + result.insertId + ')';
         volunteerIds.push(volunteers[iii].student_id);
-        //TODO what to do about case of multiple volunteer to same student
         mysql.use('master')
-             .query('INSERT INTO volunteer_student VALUES ' + query,
+             .query('INSERT INTO volunteer_student(student_id, volunteer_id) VALUES ' + query,
                     volunteerIds,
                     send_response)
              .end();

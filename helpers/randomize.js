@@ -58,17 +58,23 @@ function randomize_distinct(studentList, numberOfVolunteers) {
     while (numberOfVolunteers-- > 0) {
         volunteer.push(studentList.splice(Math.floor(Math.random()*studentList.length), 1)[0]);
     }
+
+    return volunteer;
 }
 
-function randomize(studentList, numberOfVolunteers) {
+function randomize_normal(studentList, numberOfVolunteers) {
     let volunteer = [];
+    console.log(JSON.stringify(studentList));
     while (numberOfVolunteers-- > 0) {
         volunteer.push(studentList[Math.floor(Math.random()*studentList.length)]);
     }
+
+    return volunteer;
 }
 
 
 const freshWeight = 50; //default weight
+const minWeight = 0;
 /**
  * All in one randomize function
  * @param1 the list of students to be randomized
@@ -80,7 +86,7 @@ const freshWeight = 50; //default weight
 function randomize(studentList, settings) {
     
     if (!settings.minWeight) {
-        settings.minWeight = 0;
+        settings.minWeight = minWeight;
     }
 
     if (!settings.freshWeight) {
@@ -90,7 +96,6 @@ function randomize(studentList, settings) {
     if(settings.byCount) {
         studentList.forEach((student) => student.weight = (student.volunteerCount > settings.freshWeight)? settings.minWeight: settings.freshWeight - student.volunteerCount);
         settings.withChance = true;
-        console.log(settings.freshWeight);
     } else if (settings.byChance) {
         studentList.forEach((student) => student.weight = Math.ceil(settings.freshWeight * student.chance));
         settings.withChance = true;
@@ -106,7 +111,7 @@ function randomize(studentList, settings) {
         if (settings.unique) {
             return randomize_distinct(studentList, settings.numberOfVolunteers);
         } else {
-            return randomize(studentList, settings.numberOfVolunteers);
+            return randomize_normal(studentList, settings.numberOfVolunteers);
         }
     }
 }
