@@ -64,7 +64,6 @@ function randomize_distinct(studentList, numberOfVolunteers) {
 
 function randomize_normal(studentList, numberOfVolunteers) {
     let volunteer = [];
-    console.log(JSON.stringify(studentList));
     while (numberOfVolunteers-- > 0) {
         volunteer.push(studentList[Math.floor(Math.random()*studentList.length)]);
     }
