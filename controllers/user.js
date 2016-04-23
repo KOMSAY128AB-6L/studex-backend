@@ -75,7 +75,7 @@ exports.create_user = (req, res, next) => {
             return next(err);
         }
         
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' created user ' + data.first_name + ' ' + data.middle_initial + ' ' + data.last_name + '.');
         
         return res.status(200)
                 .item({code: 'USER200', message: 'User successfully created'})
@@ -179,7 +179,7 @@ exports.reset_password = (req, res, next) => {
                 return next(error);
             }
             
-            logger.logg(req.session.user.teacher_id, last_query);
+            logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' requested to change password.');
 
             res.status(200)
                 .item({message: 'Message sent'})
@@ -245,8 +245,6 @@ exports.confirm_reset_password = (req, res, next) => {
                 send_response
             )
             .end();
-            
-            logger.logg(req.session.user.teacher_id, last_query);
 
         return res.status(200);
 
@@ -268,6 +266,8 @@ exports.confirm_reset_password = (req, res, next) => {
             .end();
             
             logger.logg(req.session.user.teacher_id, last_query);
+            
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' successfully changed password.');
 
         return res.status(200)
                 .item({message: 'Reset password request successfully claimed'})
@@ -294,6 +294,8 @@ exports.logout_user = (req,res,next) => {
 		req.session.destroy();
 	}
 	start();
+	
+	logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' logged out of StudEx.');
 	res.item({code: 'USER200', message:'User succesfully logged out.'}).send();
 };
 
@@ -351,6 +353,7 @@ exports.login_user = (req, res, next) => {
                 last_name: result[0].last_name
             };
             
+            logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' logged in to StudEx.');
             res.item({code :'USER200', message:'User succesfully logged in.'}).send();
         }
     }
