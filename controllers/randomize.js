@@ -9,21 +9,39 @@ const winston = require('winston');
 
 
 exports.randomize_students = (req, res, next) => {
-    const data = util.get_data(
-        {
-            student_list: [{
-                student_id : 0,
-                chance: 0.0                         //chance is required to avoid defining a new function to require it
-            }],
-            settings: {
-                _byCount: false,
-                _byChance: false,
-                _unique: false,
-                numberOfVolunteers: 0
-            }
-        },
-        req.body
-    );
+    let data;
+    if (req.body.settings && req.body.settings.byChance) {
+        data = util.get_data(
+            {
+                student_list: [{
+                    student_id : 0,
+                    chance: 0.0
+                }],
+                settings: {
+                    _byCount: false,
+                    _byChance: false,
+                    _unique: false,
+                    numberOfVolunteers: 0
+                }
+            },
+            req.body
+        );
+    } else {
+        data = util.get_data(
+            {
+                student_list: [{
+                    student_id : 0,
+                }],
+                settings: {
+                    _byCount: false,
+                    _byChance: false,
+                    _unique: false,
+                    numberOfVolunteers: 0
+                }
+            },
+            req.body
+        );
+    }
 
     let volunteers;
 
@@ -41,7 +59,7 @@ exports.randomize_students = (req, res, next) => {
         
         if (data.settings.byCount) {
             mysql.use('master')
-                 .query(`SELECT s.*, GET_VOLUNTEER_COUNT(s.student_id) AS 
+                 .query(`SELECT DISTINCT s.*, GET_VOLUNTEER_COUNT(s.student_id) AS 
                          volunteerCount FROM student s LEFT JOIN 
                          volunteer_student vs ON s.student_id=vs.student_id 
                          WHERE s.student_id IN (SELECT s.student_id FROM 
@@ -71,6 +89,10 @@ exports.randomize_students = (req, res, next) => {
 
         data.student_list = result;
 
+        if (data.settings.unique && data.settings.numberOfVolunteers > data.student_list.length) {
+            return res.item({message: 'Number of volunteers requested is greater than the number of students'}).send();
+        }
+
         mysql.use('master')
              .query('INSERT INTO volunteer(teacher_id) VALUES(?)', req.session.user.teacher_id, insert_volunteers)
              .end();
@@ -83,6 +105,10 @@ exports.randomize_students = (req, res, next) => {
         }
 
         data.student_list = data.student_list.filter((student) => result.indexOf(student.student_id) === -1);
+
+        if (data.settings.unique && data.settings.numberOfVolunteers > data.student_list.length) {
+            return res.item({message: 'Number of volunteers requested is greater than the number of students'}).send();
+        }
 
         mysql.use('master')
              .query('INSERT INTO volunteer(teacher_id) VALUES(?)', req.session.user.teacher_id, insert_volunteers)
