@@ -16,16 +16,14 @@ function logg(id, query_log){
 function send_response (err, result, args, last_query){
 	if(err){
 		winston.error('Error in getting teacher', last_query);
-		return next(err);
+		return;
 	}
 	
 	if(!result.affectedRows){
-		return res.status(404)
+		return result.status(404)
 				.error({code: 'teacher404', message: 'teacher not found'})
 				.send();
 	}
-	
-	res.send({'message':'Log added.'});
 }
 
 module.exports = {
