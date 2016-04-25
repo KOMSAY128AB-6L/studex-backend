@@ -265,8 +265,6 @@ exports.confirm_reset_password = (req, res, next) => {
             )
             .end();
             
-            logger.logg(req.session.user.teacher_id, last_query);
-            
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' successfully changed password.');
 
         return res.status(200)
@@ -279,8 +277,6 @@ exports.confirm_reset_password = (req, res, next) => {
             winston.error('Error in deleting reset password request', last_query);
             return next(err);
         }
-        
-        logger.logg(req.session.user.teacher_id, last_query);
 
         return res.status(200);
     }
@@ -295,7 +291,6 @@ exports.logout_user = (req,res,next) => {
 	}
 	start();
 	
-	logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' logged out of StudEx.');
 	res.item({code: 'USER200', message:'User succesfully logged out.'}).send();
 };
 
