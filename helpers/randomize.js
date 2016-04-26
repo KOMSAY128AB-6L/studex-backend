@@ -2,9 +2,11 @@
 
 
 
-function randomize_with_chance(studentList, numberOfVolunteers) {
-    let fullWeight = 0;
-    studentList.forEach((student) => fullWeight += student.weight);
+function randomize_with_chance(studentList, numberOfVolunteers, fullWeight) {
+    if (typeof fullWeight === 'undefined') {
+        fullWeight = 0;
+        studentList.forEach((student) => fullWeight += student.weight);
+    }
     let selectedWeights = [];
 
     while (numberOfVolunteers-- > 0) {
@@ -23,6 +25,9 @@ function randomize_with_chance(studentList, numberOfVolunteers) {
             currentWeightIndex++;
             continue;
         }
+        if (accumulatedWeight > fullWeight) {
+            accumulatedWeight -= fullWeight;
+        }
         accumulatedWeight += studentList[iii].weight;
         iii++;
     }
@@ -30,10 +35,12 @@ function randomize_with_chance(studentList, numberOfVolunteers) {
     return volunteer;
 }
 
-function randomize_distinct_with_chance(studentList, numberOfVolunteers) {
-    let fullWeight = 0;
+function randomize_distinct_with_chance(studentList, numberOfVolunteers, fullWeight) {
+    if (typeof fullWeight === 'undefined') {
+        fullWeight = 0;
+        studentList.forEach((student) => fullWeight += student.weight);
+    }
     let volunteer = [];
-    studentList.forEach((student) => fullWeight += student.weight);
 
     let accumulatedWeight;
     let selectedWeight;
@@ -92,19 +99,22 @@ function randomize(studentList, settings) {
         settings.freshWeight = freshWeight;
     }
 
+    let fullWeight;
+
     if(settings.byCount) {
         studentList.forEach((student) => student.weight = (student.volunteerCount > settings.freshWeight)? settings.minWeight: settings.freshWeight - student.volunteerCount);
         settings.withChance = true;
     } else if (settings.byChance) {
-        studentList.forEach((student) => student.weight = Math.ceil(settings.freshWeight * student.chance));
+        fullWeight = studentList.length * 100;
+        studentList.forEach((student) => student.weight = Math.ceil(fullWeight * student.chance));
         settings.withChance = true;
     }
 
     if (settings.withChance) {
         if (settings.unique) {
-            return randomize_distinct_with_chance(studentList, settings.numberOfVolunteers);
+            return randomize_distinct_with_chance(studentList, settings.numberOfVolunteers, fullWeight);
         } else {
-            return randomize_with_chance(studentList, settings.numberOfVolunteers);
+            return randomize_with_chance(studentList, settings.numberOfVolunteers, fullWeight);
         }
     } else {
         if (settings.unique) {

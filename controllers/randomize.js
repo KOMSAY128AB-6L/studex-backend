@@ -14,6 +14,9 @@ exports.randomize_students = (req, res, next) => {
                 student_list: [{
                     student_id : 0,
                 }],
+                _tags: [
+                    ''
+                ],
                 settings: {
                     _byCount: false,
                     _byChance: false,
@@ -59,7 +62,7 @@ exports.randomize_students = (req, res, next) => {
                  .query(`SELECT DISTINCT * FROM student WHERE student_id IN 
                          (SELECT s.student_id FROM student s, class c 
                          WHERE s.class_id = c.class_id AND 
-                         c.teacher_id = ?) AND student_id IN ?`, 
+                         c.teacher_id = ?) AND student_id IN ? ORDER BY chance DESC`, 
                          [req.session.user.teacher_id, [student_ids]],
                          chance_by_count
                  )
@@ -118,6 +121,9 @@ exports.randomize_students = (req, res, next) => {
 
         let query = '';
         volunteers = random.randomize(data.student_list, data.settings);
+        if (volunteers.length === 0) {
+            return res.item(volunteers).send();
+        }
         let volunteerIds = [];
         let iii;
         for(iii = 0; iii < volunteers.length - 1; iii++) {
