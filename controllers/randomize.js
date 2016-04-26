@@ -56,10 +56,10 @@ exports.randomize_students = (req, res, next) => {
                  .end();
         } else if (data.settings.byChance) {
             mysql.use('master')
-                 .query(`SELECT DISTINCT s.* FROM student WHERE student_id IN 
+                 .query(`SELECT DISTINCT * FROM student WHERE student_id IN 
                          (SELECT s.student_id FROM student s, class c 
                          WHERE s.class_id = c.class_id AND 
-                         c.teacher_id = ?) AND s.student_id IN ?`, 
+                         c.teacher_id = ?) AND student_id IN ?`, 
                          [req.session.user.teacher_id, [student_ids]],
                          chance_by_count
                  )
