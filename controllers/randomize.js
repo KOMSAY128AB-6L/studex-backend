@@ -9,25 +9,7 @@ const winston = require('winston');
 
 
 exports.randomize_students = (req, res, next) => {
-    let data;
-    if (req.body.settings && req.body.settings.byChance) {
-        data = util.get_data(
-            {
-                student_list: [{
-                    student_id : 0,
-                    chance: 0.0
-                }],
-                settings: {
-                    _byCount: false,
-                    _byChance: false,
-                    _unique: false,
-                    numberOfVolunteers: 0
-                }
-            },
-            req.body
-        );
-    } else {
-        data = util.get_data(
+    const data = util.get_data(
             {
                 student_list: [{
                     student_id : 0,
@@ -41,7 +23,6 @@ exports.randomize_students = (req, res, next) => {
             },
             req.body
         );
-    }
 
     let volunteers;
 
@@ -49,6 +30,10 @@ exports.randomize_students = (req, res, next) => {
     function start () {
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
+        }
+
+        if (data.settings.numberOfVolunteers < 0) {
+            return res.item({message: 'Number of volunteers requested is less than 0'}).send();
         }
 
         let student_ids = [];
@@ -64,6 +49,16 @@ exports.randomize_students = (req, res, next) => {
                          volunteer_student vs ON s.student_id=vs.student_id 
                          WHERE s.student_id IN (SELECT s.student_id FROM 
                          student s, class c WHERE s.class_id = c.class_id AND 
+                         c.teacher_id = ?) AND s.student_id IN ?`, 
+                         [req.session.user.teacher_id, [student_ids]],
+                         chance_by_count
+                 )
+                 .end();
+        } else if (data.settings.byChance) {
+            mysql.use('master')
+                 .query(`SELECT DISTINCT s.* FROM student WHERE student_id IN 
+                         (SELECT s.student_id FROM student s, class c 
+                         WHERE s.class_id = c.class_id AND 
                          c.teacher_id = ?) AND s.student_id IN ?`, 
                          [req.session.user.teacher_id, [student_ids]],
                          chance_by_count

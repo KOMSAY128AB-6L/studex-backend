@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS student (
 	last_name VARCHAR(64) NOT NULL,
 	picture VARCHAR(64),
 	class_id BIGINT,
+    chance FLOAT DEFAULT .1 NOT NULL,
 	FOREIGN KEY(class_id) REFERENCES class(class_id)
 );
 
@@ -87,4 +88,11 @@ CREATE TABLE IF NOT EXISTS history (
 	log_time timestamp NOT NULL default CURRENT_TIMESTAMP,
 	teacher_id INT, log_text VARCHAR(255),
 	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
+);
+
+CREATE TABLE IF NOT EXISTS student_tag (
+    student_id INT,
+    tag VARCHAR(16),
+    FOREIGN KEY(student_id) REFERENCES student(student_id),
+    PRIMARY KEY(student_id, tag)
 );
