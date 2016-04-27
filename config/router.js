@@ -18,6 +18,7 @@ module.exports = (router) => {
 
     //For sample purposes only
     router.post('/randomize/classes',               $, __.randomize.randomize_classes);
+    router.post('/randomize/students',              $, __.randomize.randomize_students);
 
     /*Routes for Student CRUD*/
     router.post('/student/:id',                     $, __.student.create_student);

@@ -2,9 +2,11 @@
 
 
 
-function randomize_with_chance(studentList, numberOfVolunteers) {
-    let fullWeight = 0;
-    studentList.forEach((student) => fullWeight += student.weight);
+function randomize_with_chance(studentList, numberOfVolunteers, fullWeight) {
+    if (typeof fullWeight === 'undefined') {
+        fullWeight = 0;
+        studentList.forEach((student) => fullWeight += student.weight);
+    }
     let selectedWeights = [];
 
     while (numberOfVolunteers-- > 0) {
@@ -23,6 +25,9 @@ function randomize_with_chance(studentList, numberOfVolunteers) {
             currentWeightIndex++;
             continue;
         }
+        if (accumulatedWeight > fullWeight) {
+            accumulatedWeight -= fullWeight;
+        }
         accumulatedWeight += studentList[iii].weight;
         iii++;
     }
@@ -30,10 +35,12 @@ function randomize_with_chance(studentList, numberOfVolunteers) {
     return volunteer;
 }
 
-function randomize_distinct_with_chance(studentList, numberOfVolunteers) {
-    let fullWeight = 0;
+function randomize_distinct_with_chance(studentList, numberOfVolunteers, fullWeight) {
+    if (typeof fullWeight === 'undefined') {
+        fullWeight = 0;
+        studentList.forEach((student) => fullWeight += student.weight);
+    }
     let volunteer = [];
-    studentList.forEach((student) => fullWeight += student.weight);
 
     let accumulatedWeight;
     let selectedWeight;
@@ -53,8 +60,27 @@ function randomize_distinct_with_chance(studentList, numberOfVolunteers) {
     return volunteer;
 }
 
+function randomize_distinct(studentList, numberOfVolunteers) {
+    let volunteer = [];
+    while (numberOfVolunteers-- > 0) {
+        volunteer.push(studentList.splice(Math.floor(Math.random()*studentList.length), 1)[0]);
+    }
+
+    return volunteer;
+}
+
+function randomize_normal(studentList, numberOfVolunteers) {
+    let volunteer = [];
+    while (numberOfVolunteers-- > 0) {
+        volunteer.push(studentList[Math.floor(Math.random()*studentList.length)]);
+    }
+
+    return volunteer;
+}
+
 
 const freshWeight = 50; //default weight
+const minWeight = 0;
 /**
  * All in one randomize function
  * @param1 the list of students to be randomized
@@ -65,21 +91,36 @@ const freshWeight = 50; //default weight
  **/
 function randomize(studentList, settings) {
     
-    if (!settings.minWeight) settings.minWeight = 0;
-    if (!settings.freshWeight) settings.freshWeight = freshWeight;
+    if (!settings.minWeight) {
+        settings.minWeight = minWeight;
+    }
+
+    if (!settings.freshWeight) {
+        settings.freshWeight = freshWeight;
+    }
+
+    let fullWeight;
+
     if(settings.byCount) {
-        studentList.forEach((student) => student.weight = (student.volunteer > settings.freshWeight)? settings.minWeight: settings.freshWeight - student.volunteerCount);
+        studentList.forEach((student) => student.weight = (student.volunteerCount > settings.freshWeight)? settings.minWeight: settings.freshWeight - student.volunteerCount);
         settings.withChance = true;
     } else if (settings.byChance) {
-        studentList.forEach((student) => student.weight = Math.ceil(settings.freshWeight * student.chance));
+        fullWeight = studentList.length * 100;
+        studentList.forEach((student) => student.weight = Math.ceil(fullWeight * student.chance));
         settings.withChance = true;
     }
 
     if (settings.withChance) {
         if (settings.unique) {
-            return randomize_distinct_with_chance(studentList, settings.numberOfVolunteers);
+            return randomize_distinct_with_chance(studentList, settings.numberOfVolunteers, fullWeight);
         } else {
-            return randomize_with_chance(studentList, settings.numberOfVolunteers);
+            return randomize_with_chance(studentList, settings.numberOfVolunteers, fullWeight);
+        }
+    } else {
+        if (settings.unique) {
+            return randomize_distinct(studentList, settings.numberOfVolunteers);
+        } else {
+            return randomize_normal(studentList, settings.numberOfVolunteers);
         }
     }
 }
