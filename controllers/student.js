@@ -173,12 +173,17 @@ exports.delete_student = (req, res, next) => {
 };
 
 exports.retrieve_student = (req, res, next) => {
-
+    const data = util.get_data(
+        {
+            last_name: ''
+        },
+        req.body
+    ); 
     function start () {
         mysql.use('master')
             .query(
-                'SELECT * FROM student WHERE student_id = ? LIMIT 1;',
-                [req.params.id],
+                'SELECT * FROM student WHERE last_name = ? and class_id = ?;',
+                [data.last_name, req.params.id],
                 send_response
             )
             .end();
@@ -198,7 +203,7 @@ exports.retrieve_student = (req, res, next) => {
         
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed student #' + req.params.id + '\'s details.');
 
-        res.item(result[0])
+        res.item(result)
             .send();
     }
 
