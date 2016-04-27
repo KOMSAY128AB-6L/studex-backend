@@ -15,8 +15,7 @@ exports.create_student = (req, res, next) => {
             first_name: '',
             middle_initial: '',
             last_name: '',
-            picture: '',
-            class_id: ''
+            picture: ''
         },
         req.body
     ); 
