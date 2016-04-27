@@ -1,0 +1,565 @@
+[33mcommit 23fa8ccc82c8ff59f9c456c1c4622229383a11b4[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Wed Apr 27 16:45:53 2016 +0800
+
+    search student by last name
+
+[33mcommit 96e545a58111a79b3fc0292af703b362b3bef626[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Wed Apr 27 16:33:14 2016 +0800
+
+    fixed create student
+
+[33mcommit e7f23141fa9d0ded9dc2366268e0306f75129747[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Wed Apr 27 16:28:57 2016 +0800
+
+    fixed update student, added field for chance
+
+[33mcommit 0616e1f7dd27bef8a2f74c86eefa0193856dcb1a[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Wed Apr 27 16:22:21 2016 +0800
+
+    fixed retrieve students, class_id as params
+
+[33mcommit 7d40a85352bd8ccb836d6305745cf52ac5aed18c[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Wed Apr 27 16:16:55 2016 +0800
+
+    fixed delete students
+
+[33mcommit 15380c0d9b26c58f6f7ea66e3dc4b982403becf4[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Wed Apr 27 15:47:56 2016 +0800
+
+    updated routes for searching student
+
+[33mcommit 703351fde268f6ce0e7df05c4e4fa9bb7a26ba14[m
+Merge: 19e40b5 6c357cb
+Author: Almer Mendoza <atmalmer23@gmail.com>
+Date:   Tue Apr 26 22:02:10 2016 -0700
+
+    Merge pull request #63 from KOMSAY128AB-6L/%-chance
+    
+    % chance
+
+[33mcommit 6c357cbb6121ef273be2464f526b9ac511be66bf[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Tue Apr 26 18:57:56 2016 +0800
+
+    Fixed randomizer for 100% chance
+
+[33mcommit 7d1e0f53adc4dc729640c90cdd5d6d26c3f7c759[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Tue Apr 26 18:07:29 2016 +0800
+
+    Fixed broken query
+
+[33mcommit 8181b389130dbc12bd5feda7236282586a619b0e[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Tue Apr 26 17:58:57 2016 +0800
+
+    Changed schema for student to have chance, added table for tags, adjusted randomize controller
+
+[33mcommit 7e9ac0557993a4bba9f46462054b0c0922258a09[m
+Merge: 059e562 19e40b5
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Tue Apr 26 00:24:13 2016 +0800
+
+    Merge branch 'master' into %-chance
+
+[33mcommit 059e56235a46330568c244801fc2ee3bc389c0ef[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Tue Apr 26 00:22:56 2016 +0800
+
+    Added routines, fixed randomizer controller bug
+
+[33mcommit 19e40b5db55d3c8c42aa6bfc706f75176c15d115[m
+Merge: feef296 4499dac
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Mon Apr 25 23:01:38 2016 +0800
+
+    Merge pull request #68 from KOMSAY128AB-6L/fix_logs
+    
+    Fixed logger.js
+
+[33mcommit 4499dac0d8f90e6728721b6bf597c9a3b9cdf091[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Mon Apr 25 10:02:11 2016 +0800
+
+    Fixed logger.js
+
+[33mcommit feef2964a43a0d45805b4ac1f98b261afa48b596[m
+Merge: 8f3709f 6933bae
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Sat Apr 23 19:40:50 2016 +0800
+
+    Merge pull request #62 from KOMSAY128AB-6L/view_transaction_log_updated
+    
+    View transaction log (UPDATED)
+
+[33mcommit f6e12fbc43873889490ed0f025618c1b58a1b232[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Fri Apr 22 22:42:49 2016 +0800
+
+    Removed console log
+
+[33mcommit 244f70c0d7530e57c7355a3a198688e7ac6ce638[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Fri Apr 22 22:37:53 2016 +0800
+
+    Fixed randomizer bug
+
+[33mcommit e7b5008dfc43f0a615ea7d8fb37df9da89beea8b[m
+Merge: 30e0424 8f3709f
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Fri Apr 22 08:00:29 2016 +0800
+
+    Merge branch 'master' into %-chance
+
+[33mcommit 6933bae4f686a9b94e82a4eb872d1382a4eb3ed9[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Thu Apr 21 15:23:33 2016 +0800
+
+    Modified user.js
+
+[33mcommit ffe6aa0725ad3164bb3b2df41071c214c89c81b2[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Thu Apr 21 15:18:01 2016 +0800
+
+    Modified student.js
+
+[33mcommit d378ed63739f931ceeacee3f46b8700da28e732d[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Thu Apr 21 15:17:34 2016 +0800
+
+    Modified student.js
+
+[33mcommit c0d0aa0478f39c8c3750ca92716a2c3e2a3f6515[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Thu Apr 21 15:06:42 2016 +0800
+
+    Modified randomize.js
+
+[33mcommit 8f3709f93a0f80a0f4ed59357c3785fa9feb7603[m
+Merge: ce5d8eb 2298101
+Author: Almer Mendoza <atmalmer23@gmail.com>
+Date:   Thu Apr 21 00:03:40 2016 -0700
+
+    Merge pull request #60 from KOMSAY128AB-6L/session-transition
+    
+    Session transition
+
+[33mcommit ed3a45c8aa164431b4fb4bfb0170fca76ba89d4a[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Thu Apr 21 15:03:12 2016 +0800
+
+    Modified class.js
+
+[33mcommit 2298101c3b45520f56295a858199683a8ba65377[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Thu Apr 21 14:46:51 2016 +0800
+
+    Format Fixing
+
+[33mcommit 3b81ab3f32a5223887483b307556cac45d928c08[m
+Merge: b7f182d ce5d8eb
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Thu Apr 21 14:46:10 2016 +0800
+
+    Merge branch 'master' into session-transition
+
+[33mcommit b7f182de83bfbffa8052d85d5c5db2ebb33f0fc3[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Thu Apr 21 14:45:20 2016 +0800
+
+    Used session instead of params. Fixed formatting of router
+
+[33mcommit ce5d8eb27d0c17f5c4d44c00954aea0245a51af1[m
+Merge: e6e2a8e e85e74f
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Thu Apr 21 14:26:43 2016 +0800
+
+    Merge pull request #59 from KOMSAY128AB-6L/logvolunteers
+    
+    edited retrieve_log_of_volunteers
+
+[33mcommit 5666eb00333cec52071f5ab6e9bd849cddfa5074[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Thu Apr 21 14:25:04 2016 +0800
+
+    Modified teacher.js
+
+[33mcommit e85e74f579b8a809cae61a17daeb9b5252d4972b[m
+Merge: e8facad 42dda58
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Thu Apr 21 14:19:39 2016 +0800
+
+    edited student.js
+
+[33mcommit e8facadb1781272595075e9bfe580c8c1ed09574[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Thu Apr 21 14:16:48 2016 +0800
+
+    edited student.js
+
+[33mcommit 42dda5850f0ef525b58501a164b6860a3bf5f777[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Thu Apr 21 14:14:55 2016 +0800
+
+    edited student.js
+
+[33mcommit e6e2a8e930f2310fc07b770e251810ca1fe4f88b[m
+Merge: a1916c4 adc4ba1
+Author: emmanuelconstantino19 <emmanuelconstantino19@gmail.com>
+Date:   Thu Apr 21 14:08:55 2016 +0800
+
+    Merge pull request #23 from KOMSAY128AB-6L/view_classlist
+    
+    view classlist added
+
+[33mcommit a1916c48b00da0e050ca9510ee6a294bdb2c83a0[m
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Thu Apr 21 13:39:54 2016 +0800
+
+    edit volunteer_student table
+
+[33mcommit 97ca34f1a19996639c7b0a5f2583c67bd6da0c59[m
+Author: mqcabailo <matthewqcabailo@gmail.com>
+Date:   Thu Apr 21 13:17:34 2016 +0800
+
+    Update router.js
+
+[33mcommit e438a8b399e188335254957cbf81298213ff7d5f[m
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Wed Apr 20 14:52:35 2016 +0800
+
+    edited volunteer_student table
+
+[33mcommit a4bea1c94a01c7274c431a605d11da307547d371[m
+Merge: 3f1a872 5e42096
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Wed Apr 20 14:36:26 2016 +0800
+
+    Merge pull request #49 from KOMSAY128AB-6L/view_transaction_log
+    
+    Added transaction history
+
+[33mcommit 30e0424c067fe5250805cf83291dc1faf8e8bd62[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Wed Apr 20 04:33:10 2016 +0800
+
+    Added other use case for randomizer logic. Prettified Code
+
+[33mcommit 5e420962410a380b22f9d2b6bf4e46321d1c978c[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Wed Apr 20 03:59:56 2016 +0800
+
+    Modified get_transaction_history on teacher.js
+
+[33mcommit d9aca157716ab36bd502ad969ca9f2c325eea22e[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Wed Apr 20 03:53:21 2016 +0800
+
+    Added logger.log to functions
+
+[33mcommit 0e3ec67d732c1cf9bc48ee5643995f82ccb069b6[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Wed Apr 20 03:46:49 2016 +0800
+
+    Fixed randomizer bug
+
+[33mcommit efed53df83920947800939e8cbd626fb6a43cda9[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Wed Apr 20 00:49:52 2016 +0800
+
+    Updated get_transaction_log
+
+[33mcommit 0f4eca8253f602bb148a04cb3ca34f6aa392d312[m
+Merge: f1a118e 3f1a872
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Wed Apr 20 00:31:47 2016 +0800
+
+    Merge branch 'master' into %-chance
+
+[33mcommit f1a118ed3d35e02c7758f4ca585492b8b7f501d0[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Wed Apr 20 00:13:12 2016 +0800
+
+    FInished query for selecting count
+
+[33mcommit 3f1a8725b51fc4832f67950f778ea1de0c67db6f[m
+Merge: 231ed58 049d55c
+Author: jgjadaoag <jgjadaoag@users.noreply.github.com>
+Date:   Wed Apr 20 00:10:36 2016 +0800
+
+    Merge pull request #56 from KOMSAY128AB-6L/logvolunteers
+    
+    Logvolunteers
+
+[33mcommit 049d55c558332a7257d3026df3b40e0b2a8e3942[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Tue Apr 19 23:39:14 2016 +0800
+
+    fixed log of volunteers
+
+[33mcommit adc4ba1211b423dc78700c94e45177e6857a4dfc[m
+Author: KarlJasson <kbpios@up.edu.ph>
+Date:   Tue Apr 19 22:47:39 2016 +0800
+
+    adjusted view_class query to new schema
+
+[33mcommit 6b530ac33fcca34c9da8fb0eefcce8566d332f90[m
+Merge: 0124791 231ed58
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Tue Apr 19 22:04:10 2016 +0800
+
+    Merge branch 'master' into %-chance
+
+[33mcommit 01247911d42c13b3c00e272eaa2ef0d3cab75fce[m
+Author: jgjadaoag <jjadaoag1@up.edu.ph>
+Date:   Tue Apr 19 22:03:35 2016 +0800
+
+    Starting Randomize Students
+
+[33mcommit 1abfae9f8f63099146b454985cfebbccdbd00964[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Tue Apr 19 21:38:37 2016 +0800
+
+    fixed logOfVolunteers routes
+
+[33mcommit ef9987652093fbc44768cd3a1d75d80253317471[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Tue Apr 19 21:36:51 2016 +0800
+
+    fixed res messages
+
+[33mcommit 0a99cb451afb1d4473a798a55118916cc8b0cd00[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Tue Apr 19 21:31:20 2016 +0800
+
+    fixed volunteer tables
+
+[33mcommit 231ed58dffcfd1e900cc292c76ed552c652277da[m
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Tue Apr 19 21:11:12 2016 +0800
+
+    fixed seed.sql
+
+[33mcommit 694be5911b0891fc5f36838cf1b917d10d87b754[m
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Tue Apr 19 21:07:24 2016 +0800
+
+    fixed seed.sql
+
+[33mcommit 64fa1d5038b78d519be7ac0d3128a19d3ade7ff5[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Tue Apr 19 12:56:34 2016 +0800
+
+    Updated schema.sql
+
+[33mcommit 8e8017af0605eaa89af37ea06cc8cbbc872a4b5c[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Tue Apr 19 12:47:08 2016 +0800
+
+    Added logger.js
+
+[33mcommit cb9ba29844ca078bcd4abdced9644fd2f5b1de40[m
+Merge: d62a13f db5fcf3
+Author: Almer Mendoza <atmalmer23@gmail.com>
+Date:   Mon Apr 18 03:34:57 2016 -0700
+
+    Merge pull request #55 from KOMSAY128AB-6L/schema
+    
+    Fixed foreign key constraint in student
+
+[33mcommit db5fcf37ca85f701df07a99a13f013aff0fe0f80[m
+Author: mamerisawesome <atmalmer23@gmail.com>
+Date:   Mon Apr 18 03:34:10 2016 -0700
+
+    Fixed foreign key constraint in student
+
+[33mcommit d62a13fab3c7c3a15f8b19a09526997581566c8b[m
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Mon Apr 18 18:29:29 2016 +0800
+
+    update create_student module
+
+[33mcommit f20ae5449f1ef7685674a4fc673ad1d08a6eaa88[m
+Author: emmanuelconstantino19 <emmanuelconstantino19@gmail.com>
+Date:   Mon Apr 18 18:26:14 2016 +0800
+
+    Update create_class route
+
+[33mcommit 49647205422875bdc1250be15198dada3df202a6[m
+Author: emmanuelconstantino19 <emmanuelconstantino19@gmail.com>
+Date:   Mon Apr 18 18:25:07 2016 +0800
+
+    added route for create_class manually
+
+[33mcommit 9fcaee27e6fe219522491a4c1c3753f90c463a1e[m
+Author: emmanuelconstantino19 <emmanuelconstantino19@gmail.com>
+Date:   Mon Apr 18 18:24:02 2016 +0800
+
+    Added create_class manually feature
+
+[33mcommit 38622a4ecc769e3384a9549fd4625f3f63d9b389[m
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Mon Apr 18 18:22:09 2016 +0800
+
+    updated route for create_student, added params
+
+[33mcommit e9b92b90db1c6261366314f8d92c7101c35fdbfe[m
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Mon Apr 18 18:03:03 2016 +0800
+
+    updated seed.sql
+
+[33mcommit 486c8035d7272af080b2939e7a856e430be554f6[m
+Merge: 4848486 daa20d7
+Author: Almer Mendoza <atmalmer23@gmail.com>
+Date:   Mon Apr 18 02:54:04 2016 -0700
+
+    Merge pull request #54 from KOMSAY128AB-6L/schema
+    
+    Schema
+
+[33mcommit daa20d77e4e66293130c91ac25fb57f64f98e638[m
+Author: mamerisawesome <atmalmer23@gmail.com>
+Date:   Mon Apr 18 02:50:35 2016 -0700
+
+    Updated whitespace
+
+[33mcommit 9e93741c3ffb6e4f9027acb112c0e5e339953d4e[m
+Author: mamerisawesome <atmalmer23@gmail.com>
+Date:   Mon Apr 18 02:49:46 2016 -0700
+
+    Updated whitespace
+
+[33mcommit 34c045dc548da13bda339f9e03862cf7ca5345a3[m
+Author: mamerisawesome <atmalmer23@gmail.com>
+Date:   Mon Apr 18 02:48:14 2016 -0700
+
+    Updated whitespace
+
+[33mcommit 5d262b4e68f4dcefd6468bd5eda00f9f787dccea[m
+Author: mamerisawesome <atmalmer23@gmail.com>
+Date:   Mon Apr 18 02:46:53 2016 -0700
+
+    Removed student_class table
+
+[33mcommit 5ef347581c708eb81b785b97c2aad8acdfd28c77[m
+Author: mamerisawesome <atmalmer23@gmail.com>
+Date:   Mon Apr 18 02:46:22 2016 -0700
+
+    Updated student
+
+[33mcommit 48484868f7db47ad6de26bcebef4c042a5f63af8[m
+Merge: bfb4817 cbb702e
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Mon Apr 18 17:04:20 2016 +0800
+
+    Merge pull request #48 from KOMSAY128AB-6L/retrieve_log_volunteers
+    
+    Update student.js
+
+[33mcommit cbb702e813d48cda8690564b5eeb224455913034[m
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Mon Apr 18 17:03:32 2016 +0800
+
+    Update seed.sql
+    
+    change some typo issues
+
+[33mcommit ca2daf4bd6c93b532315565bd593cd18813687d2[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Mon Apr 18 16:51:02 2016 +0800
+
+    edited seed.sql
+
+[33mcommit bfb481764b9aa5347a0dcc7dba1b0be1706b1422[m
+Author: emmanuelconstantino19 <emmanuelconstantino19@gmail.com>
+Date:   Mon Apr 18 16:46:50 2016 +0800
+
+    Update view_classes route
+
+[33mcommit 2a307252f615b1e5713eb58f22a789b31701d576[m
+Author: emmanuelconstantino19 <emmanuelconstantino19@gmail.com>
+Date:   Mon Apr 18 16:44:59 2016 +0800
+
+    Update view_classes
+
+[33mcommit 21de66583a462369991630c0be72801f0b64d3f4[m
+Author: emmanuelconstantino19 <emmanuelconstantino19@gmail.com>
+Date:   Mon Apr 18 16:25:52 2016 +0800
+
+    added route for view classes
+
+[33mcommit fd5ab1507c3b49229ca6a633b1dbd1134382cb0e[m
+Author: emmanuelconstantino19 <emmanuelconstantino19@gmail.com>
+Date:   Mon Apr 18 16:24:49 2016 +0800
+
+    added view classes
+
+[33mcommit be7055b548448b06cd2162fa301a6f1de8227440[m
+Author: camilleshainne <camilleshainne@gmail.com>
+Date:   Mon Apr 18 15:21:36 2016 +0800
+
+    Added transaction history
+
+[33mcommit 34d198a060fb977d6a7bfc32ffc0093db2c3641e[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Mon Apr 18 15:08:11 2016 +0800
+
+    updated schema.sql and seed.sql
+
+[33mcommit e7d6fce257ccd24989335a761ac133e7955f8be4[m
+Merge: b20d8b3 2abb8cd
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Mon Apr 18 15:03:05 2016 +0800
+
+    updated student.js
+
+[33mcommit b20d8b303e1ef8237d42b41b7764bd98e0a5f674[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Mon Apr 18 14:51:54 2016 +0800
+
+    updated student.js
+
+[33mcommit 2abb8cdb29e048b105747d02b1ffed69c8533864[m
+Author: najaafar <nurfitrajaafar@gmail.com>
+Date:   Mon Apr 18 00:21:38 2016 +0800
+
+    Update student.js
+
+[33mcommit 91672eb9664252131a2aff91e716f3ba1585657a[m
+Merge: 77896d0 c90d487
+Author: Tin <annekristinemontoya@gmail.com>
+Date:   Thu Apr 14 14:16:30 2016 +0800
+
+    Merge pull request #47 from KOMSAY128AB-6L/retrieve_log_volunteers
+    
+    Added retrieve_log_of_volunteers
+
+[33mcommit c90d487a481ffee2624ba9d5cb46233a2c6258cf[m
+Author: mnjaverina <mnjaverina@gmail.com>
+Date:   Thu Apr 14 14:05:57 2016 +0800
+
+    Added retrieve_log_of_volunteers
+
+[33mcommit 77896d013683f230ea7175df338f8ac9f4a4840f[m
+Author: emmanuelconstantino19 <emmanuelconstantino19@gmail.com>
+Date:   Thu Apr 14 13:51:50 2016 +0800
+
+    Update user.js logout
+
+[33mcommit c2956782bbb48c1d7551aa622b053f26717a73ae[m
+Merge: 75a6877 c53c8f4
+Author: jgjadaoag <jgjadaoag@users.noreply.github.com>
+Date:   Thu Apr 14 13:27:11 2016 +0800
+
+    Merge pull request #42 from KOMSAY128AB-6L/sessionFix
+    
+    Session fix
+
+[33mcommit c53c8f42240cc0caf03c70888
