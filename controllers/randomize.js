@@ -58,7 +58,7 @@ exports.randomize_classes = (req, res, next) => {
             return next(err);
         }
         
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' randomized students.');
 
         return res.item(random.randomize(result, data.settings))
                 .send();
@@ -78,7 +78,8 @@ exports.get_num_volunteers = (req, res, next) => {
     ); 
 
     function start () {
-    	logger.logg(req.session.user.teacher_id, last_query);
+    
+    	logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' accessed number of volunteers.');
     	
         res.item(data.num_of_volunteers).send();
     }
