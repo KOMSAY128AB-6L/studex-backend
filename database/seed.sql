@@ -1,5 +1,7 @@
 USE studex;
 
+DELETE FROM history;
+DELETE FROM student_tag;
 DELETE FROM volunteer_student;
 DELETE FROM volunteer;
 DELETE FROM student;
@@ -10,6 +12,11 @@ ALTER TABLE teacher AUTO_INCREMENT = 1;
 ALTER TABLE student AUTO_INCREMENT = 1;
 ALTER TABLE class AUTO_INCREMENT = 1;
 ALTER TABLE volunteer AUTO_INCREMENT = 1;
+ALTER TABLE volunteer_student AUTO_INCREMENT = 1;
+ALTER TABLE history AUTO_INCREMENT = 1;
+ALTER TABLE student_tag AUTO_INCREMENT = 1;
+
+
 
 
 -- TEACHER SEED
