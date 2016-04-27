@@ -1,5 +1,7 @@
 USE studex;
 
+DELETE FROM history;
+DELETE FROM student_tag;
 DELETE FROM volunteer_student;
 DELETE FROM volunteer;
 DELETE FROM student;
