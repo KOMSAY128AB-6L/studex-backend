@@ -290,6 +290,12 @@ exports.confirm_reset_password = (req, res, next) => {
 
 exports.change_password = (req, res, next) => {
 
+    const data = util.get_data(
+      {
+            password: ''
+      },
+          req.body
+    );
     function start () {
         if (data instanceof Error) {
 
@@ -300,7 +306,7 @@ exports.change_password = (req, res, next) => {
 
             .query(
               'UPDATE teacher WHERE teacher_id = (?)  SET password = (?);',
-              [req.session.user.teacher_id,req.params.id],
+              [req.session.user.teacher_id,req.data.password],
               send_response
             )
             .end();
@@ -313,9 +319,8 @@ exports.change_password = (req, res, next) => {
             return next(err);
         }
 
-        return res.status(200)
-                .item({message: 'Password changed'})
-                .send();
+        .item({message: 'Password changed'})
+        .send();
     }
 
 
