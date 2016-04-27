@@ -215,7 +215,8 @@ exports.retrieve_all_student = (req, res, next) => {
     function start () {
         mysql.use('master')
             .query(
-                'SELECT * FROM student;',
+                'SELECT * FROM student where class_id = ?;',
+                req.params.id,
                 send_response
             )
             .end();
