@@ -74,7 +74,8 @@ exports.update_student = (req, res, next) => {
             first_name: '',
             middle_initial: '',
             last_name: '',
-            picture: ''
+            picture: '',
+            chance: ''
         },
         req.body
     ); 
@@ -117,17 +118,32 @@ exports.delete_student = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'DELETE FROM student_class WHERE student_id = ?;',
+                'DELETE FROM student_tag WHERE student_id = ?;',
                 [req.params.id],
-                delete_student_data
+                delete_student_volunteer
             )
             .end();
        
     }
+    function delete_student_volunteer (err, result){
+        if (err) {
+            winston.error('Error in deleting student in tags', last_query);
+            return next(err);
+        }
+
+         mysql.use('master')
+            .query(
+                'DELETE FROM volunteer_student WHERE student_id = ?;',
+                [req.params.id],
+                delete_student_data
+            )
+            .end();
+
+    }
 
     function delete_student_data (err, result){
         if (err) {
-            winston.error('Error in deleting student in class', last_query);
+            winston.error('Error in deleting student in volunteers', last_query);
             return next(err);
         }
 
