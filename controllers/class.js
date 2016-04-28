@@ -131,12 +131,12 @@ exports.update_class = (req, res, next) => {
 			className:'',
 			section:''
 		},
-	req.body
+		req.body
 	);
 	function start () {
 		if (data instanceof Error) {
-            return res.warn(400, {message: data.message});
-        }
+			return res.warn(400, {message: data.message});
+	        }
 
 		mysql.use('master')
 			.query(
@@ -156,9 +156,9 @@ exports.update_class = (req, res, next) => {
 
 		if (result.affectedRows === 0) {
 			return res.status(404)
-                .error({code: 'CLASS404', message: 'Class not found'})
-                .send();
-        }
+				.error({code: 'CLASS404', message: 'Class not found'})
+				.send();
+	}
 
 		res.item({message:'Class successfully updated'})
 		.send();
