@@ -1,5 +1,6 @@
 'use strict';
 
+const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
 
@@ -19,7 +20,9 @@ exports.get_teachers = (req, res, next) => {
             winston.error('Error in getting teachers', last_query);
             return next(err);
         }
-
+        
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed all teachers\' details.');
+		
         res.item(result)
             .send();
     }
@@ -31,6 +34,7 @@ exports.get_teacher = (req, res, next) => {
 
     function start () {
         res.send(req.session.user);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed account details.');
     }
 
     start();
@@ -58,6 +62,8 @@ exports.post_teacher = (req, res, next) => {
             return next(err);
         }
         
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added ' + req.body.first_name + ' ' + req.body.last_name + ' to Teacher List.');
+        
         res.item(result[0])
             .send();
     }
@@ -71,7 +77,7 @@ exports.update_teacher = (req, res, next) => {
 		mysql.use('master')
 			.query(
 				'UPDATE teacher SET ? WHERE teacher_id=?',
-				[req.body, req.params.id],
+				[req.body, req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -88,7 +94,9 @@ exports.update_teacher = (req, res, next) => {
 			return res.status(404)
 				.error({code: 'teacher404', message: 'teacher not found'})
 				.send();
-		}        
+		}
+		
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' updated account details.');
 		
 		res.item(result[0])
 			.send();
@@ -103,7 +111,7 @@ exports.delete_teacher = (req, res, next) => {
 		mysql.use('master')
 			.query(
 				'DELETE from teacher WHERE teacher_id=?;',
-				[req.params.id],
+				[req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -121,10 +129,43 @@ exports.delete_teacher = (req, res, next) => {
 				.error({code: 'teacher404', message: 'teacher not found'})
 				.send();
 		}
+		
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' deleted ' + req.body.first_name + ' ' + req.body.last_name + '\'s account.');
 	
 		res.item(result[0])
 			.send();
 	}
 	
+	start();
+};
+
+exports.get_transaction_history = (req, res, next) => {
+	
+	function start () {
+		mysql.use('master')
+			.query(
+				'SELECT * FROM history WHERE teacher_id = ?;',
+				[req.session.user.teacher_id],
+				send_response
+			)
+			.end();
+	}
+	
+	function send_response (err, result, args, last_query){
+		if(err){
+			winston.error('Error in retrieving transaction log', last_query);
+			return next(err);
+		}
+
+		if(!result.length){
+			return res.status(404)
+					.error({code: 'TEACHER404', message: 'Teacher Transaction Log not found'})
+					.send();
+		}
+
+		res.item(result)
+            .send();   
+	}
+
 	start();
 };
