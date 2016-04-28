@@ -22,8 +22,8 @@ exports.view_class = (req, res, next) => {
 	function start () {
 	mysql.use('master')
 			.query(
-			'SELECT last_name, first_name, middle_initial, picture FROM student  WHERE class_id = ?',
-			[req.params.id],
+			'SELECT s.last_name, s.first_name, s.middle_initial, s.picture FROM student s, class c  WHERE c.class_id = ? AND s.class_id=c.class_id AND c.teacher_id=?',
+			[req.params.id,req.session.user.teacher_id],
 			send_response
 		)
 		.end();
@@ -41,7 +41,7 @@ exports.view_class = (req, res, next) => {
 		
 		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed students from class #' + req.params.id + '.');
 		
-		res.item(result[0])
+		res.item(result)
 		.send();
 	}
 	start();
@@ -91,8 +91,8 @@ exports.update_class = (req, res, next) => {
 
 		mysql.use('master')
 			.query(
-				'UPDATE class SET class_name = ?, section = ? WHERE class_id = ?;',
-				[data.className, data.section, data.id],
+				'UPDATE class SET class_name = ?, section = ? WHERE class_id = ? AND teacher_id=?;',
+				[data.className, data.section, data.id, req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -125,8 +125,8 @@ exports.delete_class = (req, res, next) => {
     	
         mysql.use('master')
             .query(
-                'DELETE FROM class WHERE class_id = ?',
-                [req.params.id],
+                'DELETE FROM class WHERE class_id = ? AND teacher_id=?',
+                [req.params.id, req.session.user.teacher_id],
                 send_response
             )
             .end();
@@ -288,7 +288,7 @@ exports.create_class = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT class_id FROM class WHERE class_name = ? and section = ?;',
+                'SELECT class_id FROM class WHERE class_name = ? AND section = ?;',
                 [data.class_name, data.section],
                 check_duplicate
             )
