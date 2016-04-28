@@ -154,26 +154,68 @@ exports.delete_class = (req, res, next) => {
 
 exports.write_to_csv = (req, res, next) => {
 
-	function start(){
+	let values = [];
+
+	function start () {
+		sh.exec('mkdir -p uploads/csv/', create_csv_directory);
+	}
+
+	function create_csv_directory (err) {
+
+		if (err) {
+			winston.error('Error in creating csv directory');
+		return next(err);
+		}
+
+	sh.exec('mkdir -p uploads/csv/', query);
+
+	}
+
+	function query(){
 		mysql.use('master')
 			.query(
-				'SELECT * FROM student',
+				'SELECT * FROM class ORDER BY class_id',
 				[],
-				write_to_csv
+				query2
 			)
 			.end();
 	}
-	
-	function write_to_csv(err, result, args, last_query){
+
+	function query2(err, result, args, last_query){		
+
+		var i=0;
 		
-		let values = [];
+		if(err){
+			winston.error('Selection query of classes failed', last_query);
+			return next(err);
+		}		
+
+		result.forEach(function (element) {
+			mysql.use('master')
+			.args(result[i])
+			.query(
+				'SELECT * FROM student WHERE class_id = ?',
+				[element.class_id],
+				write_to_csv_student
+			)
+			.end();
+			i++;
+		});
+	
+	}
+
+	function write_to_csv_student(err, result, args, last_query){
 		
 		if(err){
 			winston.error('Selection query of students failed', last_query);
 			return next(err);
-		}
-		
-		
+		}		
+
+		values.push([
+			args[0].class_name,
+			args[0].section,
+		]);
+
 		result.forEach(function (element) {
 			values.push([
 				element.email,
@@ -183,20 +225,20 @@ exports.write_to_csv = (req, res, next) => {
 				element.picture,
 			]);
 		});
-		
-		// TODO - make filenames more descriptive
+
 		csv_writer
-			.writeToPath("uploads/csv/students.csv", values, {headers: true})
-			.on("finish", send_response);
+		.writeToPath("uploads/csv/students.csv", values, {headers: true})
+		.on("finish", send_response);				
 	}
 	
-	function send_response(err, result, args){
+	function send_response(err, result, args, last_query){
+
 	 	if(err){
 	 		winston.error('Could not write to CSV');
 	 		return next(err);
 	 	}
 	 	
-	 	logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added students list to CSV.');
+	 	logger.logg(req.session.user.teacher_id, last_query);	 
 	 	res.send();
 	 }
 	
@@ -208,8 +250,7 @@ exports.create_class = (req, res, next) => {
 	const data = util.get_data(
         {
             class_name: '',
-            section: '',
-            teacher_id: ''
+            section: ''
         },
         req.body
     ); 
@@ -240,7 +281,7 @@ exports.create_class = (req, res, next) => {
         mysql.use('master')
         	.query(
         		'INSERT INTO class (class_name, section, teacher_id) VALUES (?,?,?);',
-        		[data.class_name,data.section,data.teacher_id],
+        		[data.class_name,data.section,req.session.user.teacher_id],
         		send_response
         	)
         	.end();
