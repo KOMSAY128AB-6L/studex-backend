@@ -357,28 +357,42 @@ exports.login_user = (req, res, next) => {
 };
 
 exports.change_password = (req, res, next) => {
-
     const data = util.get_data(
       {
-            password: ''
+          old_password: '',
+          new_password: ''
       },
           req.body
     );
+
     function start () {
         if (data instanceof Error) {
-
             return res.warn(400, {message: data.message});
         }
 
         mysql.use('master')
+             .query(
+               'SELECT teacher_id FROM teacher WHERE password = PASSWORD(CONCAT(MD5(?), ?)) AND teacher_id = ?',
+               [data.old_password, config.SALT, req.session.user.teacher_id],
+               check_password
+             )
+             .end();
+    }
 
-            .query(
-              'UPDATE teacher WHERE teacher_id = (?)  SET password = (?);',
-              [req.session.user.teacher_id,req.data.password],
-              send_response
-            )
-            .end();
+    function check_password(err, result, args, last_query) {
+        if (result.length === 0) {
+            res.status(400)
+               .item({message: 'Password does not match current password'})
+               .send();
+        }
 
+        mysql.use('master')
+             .query(
+               'UPDATE teacher SET password = PASSWORD(CONCAT(MD5(?), ?)) WHERE teacher_id = ?',
+               [data.new_password, config.SALT, req.session.user.teacher_id],
+               send_response
+             )
+             .end();
     }
 
     function send_response (err, result, args, last_query) {
@@ -387,8 +401,8 @@ exports.change_password = (req, res, next) => {
             return next(err);
         }
 
-        .item({message: 'Password changed'})
-        .send();
+        res.item({message: 'Password changed'})
+           .send();
     }
 
 

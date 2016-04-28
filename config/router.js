@@ -15,7 +15,7 @@ module.exports = (router) => {
     router.post('/logout',                          __.user.logout_user);
     router.post('/reset',                           __.user.reset_password);
     router.post('/confirm_reset',                   __.user.confirm_reset_password);
-    router.post('/change_password',                   __.user.change_password);
+    router.post('/change_password',                 $, __.user.change_password);
 
     //For sample purposes only
     router.post('/randomize/classes',               $, __.randomize.randomize_classes);
@@ -23,7 +23,7 @@ module.exports = (router) => {
 
     /*Routes for Student CRUD*/
     router.post('/student/:id',                     $, __.student.create_student);
-    router.post('/search/:id',                     $, __.student.retrieve_student);
+    router.post('/search/:id',                      $, __.student.retrieve_student);
     router.get ('/student/:id',                     $, __.student.retrieve_all_student);
     router.get ('/student_logs/',                   $, __.student.retrieve_log_of_volunteers);
     router.put ('/student/:id',                     $, __.student.update_student);
