@@ -5,6 +5,24 @@ const util   = require(__dirname + '/../helpers/util');
 const logger = require('../helpers/logger');
 const mysql   = require('anytv-node-mysql');
 const winston = require('winston');
+const sh        = require('shelljs');
+const multer    = require('multer');
+const fs        = require('fs');
+const storage   = multer.diskStorage({
+    destination: (req, file, cb) => {
+       let destFolder =__dirname + '/../uploads/students/pictures';
+
+       if (!fs.existsSync(destFolder)) {
+           fs.mkdirSync(destFolder);
+       }
+
+       cb(null, destFolder);
+    },
+    filename: (req, file, cb) => {
+       cb(null,file.originalname);
+    }
+});
+const upload    = multer({storage : storage}).single('pic');
 
 
 exports.create_student = (req, res, next) => {
@@ -305,6 +323,25 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
         res.item(result)
             .send();
     }
+
+    start();
+};
+
+exports.upload_picture = (req, res, next) => {
+
+   function start () {
+       upload(req, res, send_response);
+   }
+
+   function send_response (err) {
+
+       if (err) {
+           winston.error('Error in uploading picture');
+           return next(err);
+       }
+
+       res.item(req.file.path).send();
+   }
 
     start();
 };

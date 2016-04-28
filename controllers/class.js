@@ -196,25 +196,52 @@ exports.delete_class = (req, res, next) => {
 
 exports.write_to_csv = (req, res, next) => {
 
+	let values = [];
+
 	function start(){
 		mysql.use('master')
 			.query(
-				'SELECT * FROM student',
+				'SELECT * FROM class ORDER BY class_id',
 				[],
-				write_to_csv
+				start_query
 			)
 			.end();
 	}
 
-	function write_to_csv(err, result, args, last_query){
+    function start_query(err, result, args, last_query){
 
-		let values = [];
+		var i=0;
+
+		if(err){
+			winston.error('Selection query of classes failed', last_query);
+			return next(err);
+		}
+
+		result.forEach(function (element) {
+			mysql.use('master')
+			.args(result[i])
+			.query(
+				'SELECT * FROM student WHERE class_id = ?',
+				[element.class_id],
+				write_to_csv_student
+			)
+			.end();
+			i++;
+		});
+
+	}
+
+	function write_to_csv_student(err, result, args, last_query){
 
 		if(err){
 			winston.error('Selection query of students failed', last_query);
 			return next(err);
 		}
 
+		values.push([
+			args[0].class_name,
+			args[0].section,
+		]);
 
 		result.forEach(function (element) {
 			values.push([
@@ -226,10 +253,9 @@ exports.write_to_csv = (req, res, next) => {
 			]);
 		});
 
-		// TODO - make filenames more descriptive
 		csv_writer
-			.writeToPath("uploads/csv/students.csv", values, {headers: true})
-			.on("finish", send_response);
+		.writeToPath("uploads/csv/students.csv", values, {headers: true})
+		.on("finish", send_response);
 	}
 
 	function send_response(err, result, args){
@@ -239,6 +265,7 @@ exports.write_to_csv = (req, res, next) => {
 	 	}
 
 	 	logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added students list to CSV.');
+
 	 	res.send();
 	 }
 
@@ -250,8 +277,7 @@ exports.create_class = (req, res, next) => {
 	const data = util.get_data(
         {
             class_name: '',
-            section: '',
-            teacher_id: ''
+            section: ''
         },
         req.body
     );
@@ -282,7 +308,7 @@ exports.create_class = (req, res, next) => {
         mysql.use('master')
         	.query(
         		'INSERT INTO class (class_name, section, teacher_id) VALUES (?,?,?);',
-        		[data.class_name,data.section,data.teacher_id],
+        		[data.class_name,data.section,req.session.user.teacher_id],
         		send_response
         	)
         	.end();

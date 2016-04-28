@@ -27,13 +27,15 @@ module.exports = (router) => {
     router.get ('/student_logs/',                   $, __.student.retrieve_log_of_volunteers);
     router.put ('/student/:id',                     $, __.student.update_student);
     router.del ('/student/:id',                     $, __.student.delete_student);
+    router.post('/student/:id/upload',              $, __.student.upload_picture);
     router.get ('/volunteer/:id',                   $, __.student.get_times_student_volunteered);
 
-    router.get ('/teachers',                        $, __.teacher.get_teachers);
     router.get ('/teacher',                         $, __.teacher.get_teacher);
+    router.get ('/teachers',                        $, __.teacher.get_teachers);
     router.post('/teacher',                         $, __.teacher.post_teacher);
-    router.put ('/teacher',                         $, __.teacher.update_teacher);
-    router.del ('/teacher',                         $, __.teacher.delete_teacher);
+    router.put ('/teacher/:id',                     $, __.teacher.update_teacher);
+    router.del ('/teacher/:id',                     $, __.teacher.delete_teacher);
+    router.post('/teacher/:id/upload',              $, __.teacher.upload_picture);
     router.get ('/history',			                $, __.teacher.get_transaction_history);
 
 	// Routes for class read and write CSV
@@ -41,12 +43,14 @@ module.exports = (router) => {
     router.post('/class/csv',                       $, __.class.insert_csv_classlist);
 
     // Routes for class
-    router.get('/classes',			                $, __.class.view_classes);
-    router.get('/class/:id',                        $, __.class.view_class);
+    router.get ('/class/csv',                       $, __.class.write_to_csv);
+    router.get ('/classes',			                $, __.class.view_classes);
+    router.get ('/class/:id',                       $, __.class.view_class);
     router.post('/class',                           $, __.class.create_class);
-    router.put('/class',                            $, __.class.update_class);
-    router.delete('/class/:id',                     $, __.class.delete_class);
+    router.put ('/class',                           $, __.class.update_class);
+    router.del ('/class/:id',                       $, __.class.delete_class);
 
+    router.post('/randomize/get_num',               $, __.randomize.get_num_volunteers);
 
     router.all('*', (req, res) => {
         res.status(404)
