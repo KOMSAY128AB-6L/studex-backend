@@ -15,6 +15,7 @@ module.exports = (router) => {
     router.post('/logout',                          __.user.logout_user);
     router.post('/reset',                           __.user.reset_password);
     router.post('/confirm_reset',                   __.user.confirm_reset_password);
+    router.post('/change_password',                 $, __.user.change_password);
 
     //For sample purposes only
     router.post('/randomize/classes',               $, __.randomize.randomize_classes);
