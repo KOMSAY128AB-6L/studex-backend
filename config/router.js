@@ -26,19 +26,20 @@ module.exports = (router) => {
     router.get ('/student/:id',                     $, __.student.retrieve_all_student);
     router.get ('/student_logs/',                   $, __.student.retrieve_log_of_volunteers);
     router.put ('/student/:id',                     $, __.student.update_student);
-    router.delete('/student/:id',                   $, __.student.delete_student);
+    router.del ('/student/:id',                   $, __.student.delete_student);
     router.post('/student/:id/upload',              $, __.student.upload_picture);
-    router.get('/volunteer/:id',                    $, __.student.get_times_student_volunteered);
+    router.get ('/volunteer/:id',                    $, __.student.get_times_student_volunteered);
 
-    router.get ('/teachers',                        $, __.teacher.get_teachers);
-    router.get ('/teacher',                         $, __.teacher.get_teacher);
+    router.get ('/teachers',                         $, __.teacher.get_teachers);
+    router.get ('/teacher',                          $, __.teacher.get_teacher);
     router.post('/teacher',                         $, __.teacher.post_teacher);
-    router.put ('/teacher',                         $, __.teacher.update_teacher);
-    router.del ('/teacher',                         $, __.teacher.delete_teacher);
+    router.put ('/teacher/:id',                      $, __.teacher.update_teacher);
+    router.del ('/teacher/:id',                   $, __.teacher.delete_teacher);
+    router.post('/teacher/:id/upload',              $, __.teacher.upload_picture);
     router.get ('/history',			                $, __.teacher.get_transaction_history);
 
 	// Routes for class read and write CSV
-    router.get('/class/csv',                        $, __.class.write_to_csv);
+    router.get ('/class/csv',                        $, __.class.write_to_csv);
     router.post('/class/csv',                       $, __.class.insert_csv_classlist);
 
     // Routes for class
