@@ -40,6 +40,11 @@ exports.randomize_students = (req, res, next) => {
         }
 
         let student_ids = [];
+        let tag = '';
+
+        if (data.tags && data.tags.length > 0) {
+            tag = ' AND student_id IN (SELECT student_id FROM student_tag WHERE tag IN ?)';
+        }
 
         data.student_list.forEach((student) => 
             student_ids.push(student.student_id)
@@ -52,8 +57,8 @@ exports.randomize_students = (req, res, next) => {
                          volunteer_student vs ON s.student_id=vs.student_id 
                          WHERE s.student_id IN (SELECT s.student_id FROM 
                          student s, class c WHERE s.class_id = c.class_id AND 
-                         c.teacher_id = ?) AND s.student_id IN ?`, 
-                         [req.session.user.teacher_id, [student_ids]],
+                         c.teacher_id = ?) AND s.student_id IN ?${tag}`, 
+                         [req.session.user.teacher_id, [student_ids], data.tags],
                          assign_result
                  )
                  .end();
