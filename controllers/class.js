@@ -248,7 +248,7 @@ exports.write_to_csv = (req, res, next) => {
 			return next(err);
 		}
 
-		result.forEach(function (element) {
+		result.forEach((element) => {
 			mysql.use('master')
 			.args(result[i])
 			.query(
