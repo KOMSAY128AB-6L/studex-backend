@@ -213,10 +213,14 @@ exports.create_class = (req, res, next) => {
         req.body
     ); 
 
+	console.log(data.class_name);
+	console.log(data.section);
+
     function start () {
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
         }
+
 
         mysql.use('master')
             .query(
