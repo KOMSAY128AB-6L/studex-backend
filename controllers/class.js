@@ -152,6 +152,32 @@ exports.delete_class = (req, res, next) => {
     start();
 };
 
+exports.no_repetition = (req, res, next) => {
+	function start () {
+	mysql.use('master')
+			.query(
+			'SELECT s.* from student s LEFT JOIN (SELECT vs.* FROM volunteer_student vs, volunteer v WHERE v.teacher_id = ? AND v.class_id = ? AND DATE(v.volunteer_date) = CURDATE()) as selection ON s.student_id = selection.student_id WHERE selection.student_id IS NULL AND s.class_id = ?',
+			[req.session.user.teacher_id, req.params.id, req.params.id],
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in filtering student list', last_query);
+			return next(err);
+		}
+		if (!result.length) {
+			return res.status(404)
+			.error({code: 'CLASS404', message: 'Classes not found'})
+			.send();
+		}
+		res.item(result)
+		.send();
+	}
+	start();
+};
+
 exports.write_to_csv = (req, res, next) => {
 
 	let values = [];

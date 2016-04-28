@@ -48,6 +48,7 @@ module.exports = (router) => {
     router.post('/class',                           $, __.class.create_class);
     router.put ('/class',                           $, __.class.update_class);
     router.del ('/class/:id',                       $, __.class.delete_class);
+    router.get('/repetition/:id',		    		$, __.class.no_repetition);
 
     router.post('/randomize/get_num',               $, __.randomize.get_num_volunteers);
 
