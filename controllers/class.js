@@ -336,17 +336,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 	let path;
 
 	function start () {
-		upload(req, res, overwrite_permission);
-	}
-
-	function overwrite_permission (err) {
-		if (err) {
-			winston.error('Error in uploading csv file');
-			return next(err);
-		}
-
-		path = req.file.path;
-		sh.exec('sudo chmod 755 helpers/classlist.js', generate_query);
+		upload(req, res, generate_query);
 	}
 
 	function generate_query (err) {
@@ -355,6 +345,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 			return next(err);
 		}
 
+		path = req.file.path;
 		sh.exec('node helpers/classlist.js ' + path + ' > database/classlist-' + timestamp + '.sql', filter_query);
 	}
 
