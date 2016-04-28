@@ -19,7 +19,12 @@ const storage      =   multer.diskStorage( {
 		cb(null, destFolder);
     },
     filename: (req, file, cb) => {
-        file.originalname = 'classlist-' + date.get_today() + '.csv';
+        file.originalname = 'classlist-' + date.get_today();
+        if(sh.exec('test -f ' + 'uploads/csv/classlist-' + date.get_today()).code == 0) {
+            file.originalname += sh.ls().length;
+        }
+        file.originalname += '.csv';
+
         cb(null,file.originalname);
     }
 });
@@ -373,7 +378,7 @@ exports.insert_csv_classlist = (req, res, next) => {
             return next(err);
         }
 
-		sh.exec('rm ' + path, send_response);
+		// sh.exec('rm ' + path, send_response);
 	}
 
 	function send_response (err) {
