@@ -36,7 +36,7 @@ exports.create_student = (req, res, next) => {
             picture: ''
         },
         req.body
-    ); 
+    );
 
     function start () {
         if (data instanceof Error) {
@@ -50,7 +50,7 @@ exports.create_student = (req, res, next) => {
                 check_duplicate
             )
             .end();
-       
+
     }
 
     function check_duplicate (err, result) {
@@ -73,7 +73,7 @@ exports.create_student = (req, res, next) => {
             winston.error('Error in creating student', last_query);
             return next(err);
         }
-        
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added student #' + data.student_number + '.');
 
         return res.status(200)
@@ -96,7 +96,7 @@ exports.update_student = (req, res, next) => {
             chance: ''
         },
         req.body
-    ); 
+    );
 
 
     function start () {
@@ -122,7 +122,7 @@ exports.update_student = (req, res, next) => {
         if (err) {
             return next(err);
         }
-        
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' updated student #' + data.student_number + '.');
 
         res.send({message: 'Student successfully updated'});
@@ -141,7 +141,7 @@ exports.delete_student = (req, res, next) => {
                 delete_student_volunteer
             )
             .end();
-       
+
     }
     function delete_student_volunteer (err, result){
         if (err) {
@@ -180,7 +180,7 @@ exports.delete_student = (req, res, next) => {
             winston.error('Error in deleting student', last_query);
             return next(err);
         }
-        
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' deleted student #' + req.params.id + '.');
 
         res.item(result[0])
@@ -196,7 +196,7 @@ exports.retrieve_student = (req, res, next) => {
             last_name: ''
         },
         req.body
-    ); 
+    );
     function start () {
         mysql.use('master')
             .query(
@@ -218,7 +218,7 @@ exports.retrieve_student = (req, res, next) => {
                 .error({code: 'STUDENT404', message: 'Student not found'})
                 .send();
         }
-        
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed student #' + req.params.id + '\'s details.');
 
         res.item(result)
@@ -245,7 +245,7 @@ exports.retrieve_all_student = (req, res, next) => {
             winston.error('Error in selecting students', last_query);
             return next(err);
         }
-        
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed all students\' details.');
 
         res.item(result)
@@ -271,7 +271,7 @@ exports.get_times_student_volunteered = (req, res, next) => {
 					.error({code: 'STUDENT404', message: 'student not found'})
 					.send();
 				}
-				getVolunteerTimes(); 
+				getVolunteerTimes();
 			}
 		)
 		.end();
@@ -286,9 +286,9 @@ exports.get_times_student_volunteered = (req, res, next) => {
 		.end();
 	}
 	function send_response (err, result, args, last_query) {
-		
+
 		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed the number of times student #' + req.params.id + ' has volunteered.');
-	
+
 		res.item(result[0])
 		.send();
 	}
@@ -317,7 +317,7 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
             winston.error('Error in retrieving log of volunteers', last_query);
             return next(err);
         }
-        
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed log of volunteers.');
 
         res.item(result)
@@ -328,28 +328,8 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
 };
 
 exports.upload_picture = (req, res, next) => {
-    
-    function start () {
-       sh.exec('mkdir -p uploads/students/', create_pictures_directory);
-   }
 
-   function create_pictures_directory (err) {
-
-       if (err) {
-           winston.error('Error in creating students directory');
-           return next(err);
-       }
-
-       sh.exec('mkdir -p uploads/students/pictures/', upload_picture);
-   }
-
-   function upload_picture (err) {
-
-       if (err) {
-           winston.error('Error in creating pictures directory');
-           return next(err);
-       }
-
+   function start () {
        upload(req, res, send_response);
    }
 
@@ -362,6 +342,6 @@ exports.upload_picture = (req, res, next) => {
 
        res.item(req.file.path).send();
    }
-    
+
     start();
 };
