@@ -39,7 +39,7 @@ exports.view_class = (req, res, next) => {
 			.send();
 		}
 		
-		logger.logg(req.session.user.teacher_id, last_query);
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed students from class #' + req.params.id + '.');
 		
 		res.item(result[0])
 		.send();
@@ -67,6 +67,9 @@ exports.view_classes = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Classes not found'})
 			.send();
 		}
+		
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed his classes.');
+		
 		res.item(result)
 		.send();
 	}
@@ -107,7 +110,7 @@ exports.update_class = (req, res, next) => {
 				.send();
 			}
 			
-			logger.logg(req.session.user.teacher_id, last_query);
+			logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' updated ' + data.className + '\'s class details.');
 
 			res.item({message:'Class successfully updated'})
 			.send();
@@ -138,9 +141,9 @@ exports.delete_class = (req, res, next) => {
             return res.status(404)
                 .error({code: 'CLASS404', message: 'Class not found'})
                 .send();
-        }
+        }        
         
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' deleted class #' + req.params.id + '.');
 
         res.item({message:'Class successfully deleted'})
             .send();
@@ -151,26 +154,68 @@ exports.delete_class = (req, res, next) => {
 
 exports.write_to_csv = (req, res, next) => {
 
-	function start(){
+	let values = [];
+
+	function start () {
+		sh.exec('mkdir -p uploads/csv/', create_csv_directory);
+	}
+
+	function create_csv_directory (err) {
+
+		if (err) {
+			winston.error('Error in creating csv directory');
+		return next(err);
+		}
+
+	sh.exec('mkdir -p uploads/csv/', query);
+
+	}
+
+	function query(){
 		mysql.use('master')
 			.query(
-				'SELECT * FROM student',
+				'SELECT * FROM class ORDER BY class_id',
 				[],
-				write_to_csv
+				query2
 			)
 			.end();
 	}
-	
-	function write_to_csv(err, result, args, last_query){
+
+	function query2(err, result, args, last_query){		
+
+		var i=0;
 		
-		let values = [];
+		if(err){
+			winston.error('Selection query of classes failed', last_query);
+			return next(err);
+		}		
+
+		result.forEach(function (element) {
+			mysql.use('master')
+			.args(result[i])
+			.query(
+				'SELECT * FROM student WHERE class_id = ?',
+				[element.class_id],
+				write_to_csv_student
+			)
+			.end();
+			i++;
+		});
+	
+	}
+
+	function write_to_csv_student(err, result, args, last_query){
 		
 		if(err){
 			winston.error('Selection query of students failed', last_query);
 			return next(err);
-		}
-		
-		
+		}		
+
+		values.push([
+			args[0].class_name,
+			args[0].section,
+		]);
+
 		result.forEach(function (element) {
 			values.push([
 				element.email,
@@ -180,21 +225,20 @@ exports.write_to_csv = (req, res, next) => {
 				element.picture,
 			]);
 		});
-		
-		// TODO - make filenames more descriptive
+
 		csv_writer
-			.writeToPath("uploads/csv/students.csv", values, {headers: true})
-			.on("finish", send_response);
+		.writeToPath("uploads/csv/students.csv", values, {headers: true})
+		.on("finish", send_response);				
 	}
 	
-	function send_response(err, result, args){
+	function send_response(err, result, args, last_query){
+
 	 	if(err){
 	 		winston.error('Could not write to CSV');
 	 		return next(err);
 	 	}
 	 	
-	 	logger.logg(req.session.user.teacher_id, last_query);
-	 	
+	 	logger.logg(req.session.user.teacher_id, last_query);	 
 	 	res.send();
 	 }
 	
@@ -249,6 +293,8 @@ exports.create_class = (req, res, next) => {
             winston.error('Error in creating class', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' created ' + data.class_name + ' class.');
 
         return res.status(200)
                 .item({message: 'Class successfully created'})
@@ -289,8 +335,7 @@ exports.insert_csv_classlist = (req, res, next) => {
             return next(err);
         }
         
-        logger.logg(req.session.user.teacher_id, last_query);
-
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' inserted students list from CSV.');
         res.send();
     }
 

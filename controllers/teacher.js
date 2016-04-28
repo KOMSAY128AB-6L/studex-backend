@@ -52,6 +52,7 @@ exports.get_teacher = (req, res, next) => {
 
     function start () {
         res.send(req.session.user);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed account details.');
     }
 
     start();
@@ -79,7 +80,7 @@ exports.post_teacher = (req, res, next) => {
             return next(err);
         }
 
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added ' + req.body.first_name + ' ' + req.body.last_name + ' to Teacher List.');
 
         res.item(result[0])
             .send();
@@ -94,7 +95,7 @@ exports.update_teacher = (req, res, next) => {
 		mysql.use('master')
 			.query(
 				'UPDATE teacher SET ? WHERE teacher_id=?',
-				[req.body, req.params.id],
+				[req.body, req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -128,7 +129,7 @@ exports.delete_teacher = (req, res, next) => {
 		mysql.use('master')
 			.query(
 				'DELETE from teacher WHERE teacher_id=?;',
-				[req.params.id],
+				[req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -159,26 +160,6 @@ exports.delete_teacher = (req, res, next) => {
 exports.upload_picture = (req, res, next) => {
 
 	function start () {
-		sh.exec('mkdir -p uploads/teachers/', create_pictures_directory);
-	}
-
-	function create_pictures_directory (err) {
-
-		if (err) {
-			winston.error('Error in creating teachers directory');
-			return next(err);
-		}
-
-		sh.exec('mkdir -p uploads/teachers/pictures/', upload_picture);
-	}
-
-	function upload_picture (err) {
-
-		if (err) {
-			winston.error('Error in creating pictures directory');
-			return next(err);
-		}
-
 		upload(req, res, send_response);
 	}
 
