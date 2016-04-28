@@ -1,12 +1,36 @@
 'use strict';
 
 
+function randomize_sure(studentList, numberOfVolunteers, fullWeight) {
+    let volunteer;
 
+    let lastIndex;
+    for (lastIndex = 0; lastIndex < studentList.length && studentList[lastIndex].weight === fullWeight; lastIndex++) 
+        ;
+
+    let sureStudent = studentList.splice(0, lastIndex);
+    let sureVolunteerCount = (numberOfVolunteers > sureStudent.length)? sureStudent.length: numberOfVolunteers;
+
+    volunteer = randomize_distinct(sureStudent, sureVolunteerCount);
+
+    return volunteer;
+}
+
+//Assumes studentList is ordered by chance
 function randomize_with_chance(studentList, numberOfVolunteers, fullWeight) {
-    if (typeof fullWeight === 'undefined') {
-        fullWeight = 0;
-        studentList.forEach((student) => fullWeight += student.weight);
+    let volunteer = [];
+    
+    if (typeof fullWeight !== 'undefined') {
+        volunteer = randomize_sure(studentList, numberOfVolunteers, fullWeight);
+        if (volunteer.length === numberOfVolunteers) {
+            return volunteer;
+        }
+        numberOfVolunteers -= volunteer.length;
     }
+
+    fullWeight = 0;
+    studentList.forEach((student) => fullWeight += student.weight);
+
     let selectedWeights = [];
 
     while (numberOfVolunteers-- > 0) {
@@ -16,7 +40,6 @@ function randomize_with_chance(studentList, numberOfVolunteers, fullWeight) {
     selectedWeights.sort();
 
     let accumulatedWeight = 0;
-    let volunteer = [];
     let currentWeightIndex = 0;
 
     for(let iii = 0; iii < studentList.length;) {
@@ -36,11 +59,18 @@ function randomize_with_chance(studentList, numberOfVolunteers, fullWeight) {
 }
 
 function randomize_distinct_with_chance(studentList, numberOfVolunteers, fullWeight) {
-    if (typeof fullWeight === 'undefined') {
-        fullWeight = 0;
-        studentList.forEach((student) => fullWeight += student.weight);
-    }
     let volunteer = [];
+
+    if (typeof fullWeight !== 'undefined') {
+        volunteer = randomize_sure(studentList, numberOfVolunteers, fullWeight);
+        if (volunteer.length === numberOfVolunteers) {
+            return volunteer;
+        }
+        numberOfVolunteers -= volunteer.length;
+    }
+
+    fullWeight = 0;
+    studentList.forEach((student) => fullWeight += student.weight);
 
     let accumulatedWeight;
     let selectedWeight;

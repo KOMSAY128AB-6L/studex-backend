@@ -54,7 +54,7 @@ exports.randomize_students = (req, res, next) => {
                          student s, class c WHERE s.class_id = c.class_id AND 
                          c.teacher_id = ?) AND s.student_id IN ?`, 
                          [req.session.user.teacher_id, [student_ids]],
-                         chance_by_count
+                         assign_result
                  )
                  .end();
         } else if (data.settings.byChance) {
@@ -64,45 +64,28 @@ exports.randomize_students = (req, res, next) => {
                          WHERE s.class_id = c.class_id AND 
                          c.teacher_id = ?) AND student_id IN ? ORDER BY chance DESC`, 
                          [req.session.user.teacher_id, [student_ids]],
-                         chance_by_count
+                         assign_result
                  )
                  .end();
         } else {
             mysql.use('master')
-                 .query(`SELECT s.student_id FROM student s, class c WHERE
+                 .query(`SELECT s.* FROM student s, class c WHERE
                          s.class_id = c.class_id AND c.teacher_id = ? AND
                          s.student_id IN ?`, 
                          [req.session.user.teacher_id, [student_ids]],
-                         filter_non_students
+                         assign_result
                  )
                  .end();
         }
     }
 
-    function chance_by_count(err, result, args, last_query) {
+    function assign_result(err, result, args, last_query) {
         if(err) {
             winston.error('Error in selecting number volunteers of student', last_query);
             return next(err);
         }
 
         data.student_list = result;
-
-        if (data.settings.unique && data.settings.numberOfVolunteers > data.student_list.length) {
-            return res.item({message: 'Number of volunteers requested is greater than the number of students'}).send();
-        }
-
-        mysql.use('master')
-             .query('INSERT INTO volunteer(teacher_id) VALUES(?)', req.session.user.teacher_id, insert_volunteers)
-             .end();
-    }
-
-    function filter_non_students(err, result, args, last_query) {
-        if(err) {
-            winston.error('Error in selecting students of teacher', last_query);
-            return next(err);
-        }
-
-        data.student_list = data.student_list.filter((student) => result.indexOf(student.student_id) === -1);
 
         if (data.settings.unique && data.settings.numberOfVolunteers > data.student_list.length) {
             return res.item({message: 'Number of volunteers requested is greater than the number of students'}).send();
