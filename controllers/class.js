@@ -202,7 +202,6 @@ exports.write_to_csv = (req, res, next) => {
 		mysql.use('master')
 			.query(
 				'SELECT * FROM class ORDER BY class_id',
-				[],
 				start_query
 			)
 			.end();
@@ -271,7 +270,6 @@ exports.write_to_csv = (req, res, next) => {
 
 	start();
 };
-
 
 exports.create_class = (req, res, next) => {
 	const data = util.get_data(
@@ -346,21 +344,12 @@ exports.insert_csv_classlist = (req, res, next) => {
 		}
 
 		path = req.file.path;
-		sh.exec('node helpers/classlist.js ' + path + ' > database/classlist-' + timestamp + '.sql', filter_query);
-	}
-
-    function filter_query (err) {
-        if (err) {
-			winston.error('Error in parsing CSV file and converting it to into SQL format');
-			return next(err);
-		}
-
-		sh.exec('sudo mysql -uroot < database/classlist-' + timestamp + '.sql', execute_query);
+		sh.exec('node helpers/classlist.js ' + path + ' > database/classlist-' + timestamp + '.sql', execute_query);
 	}
 
 	function execute_query (err) {
 		if (err) {
-			winston.error('Error in filtering query');
+			winston.error('Error in parsing CSV file and converting it to into SQL format');
 			return next(err);
 		}
 
