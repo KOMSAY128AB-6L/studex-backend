@@ -274,7 +274,7 @@ exports.write_to_csv = (req, res, next) => {
 			args[0].section,
 		]);
 
-		result.forEach(function (element) {
+		result.forEach((element) => {
 			values.push([
 				element.email,
 				element.first_name,
