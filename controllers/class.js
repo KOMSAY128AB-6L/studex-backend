@@ -20,7 +20,7 @@ const storage      =   multer.diskStorage( {
     },
     filename: (req, file, cb) => {
         file.originalname = 'classlist-' + date.get_today();
-        if(sh.exec('test -f ' + 'uploads/csv/classlist-' + date.get_today()).code == 0) {
+        if(sh.exec('test -f ' + 'uploads/csv/classlist-' + date.get_today()).code === 0) {
             file.originalname += sh.ls().length;
         }
         file.originalname += '.csv';
