@@ -250,8 +250,7 @@ exports.create_class = (req, res, next) => {
 	const data = util.get_data(
         {
             class_name: '',
-            section: '',
-            teacher_id: ''
+            section: ''
         },
         req.body
     ); 
@@ -282,7 +281,7 @@ exports.create_class = (req, res, next) => {
         mysql.use('master')
         	.query(
         		'INSERT INTO class (class_name, section, teacher_id) VALUES (?,?,?);',
-        		[data.class_name,data.section,data.teacher_id],
+        		[data.class_name,data.section,req.session.user.teacher_id],
         		send_response
         	)
         	.end();
