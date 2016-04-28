@@ -15,6 +15,7 @@ module.exports = (router) => {
     router.post('/logout',                          __.user.logout_user);
     router.post('/reset',                           __.user.reset_password);
     router.post('/confirm_reset',                   __.user.confirm_reset_password);
+    router.post('/change_password',                 $, __.user.change_password);
 
     //For sample purposes only
     router.post('/randomize/classes',               $, __.randomize.randomize_classes);
@@ -33,8 +34,8 @@ module.exports = (router) => {
     router.get ('/teacher',                         $, __.teacher.get_teacher);
     router.get ('/teachers',                        $, __.teacher.get_teachers);
     router.post('/teacher',                         $, __.teacher.post_teacher);
-    router.put ('/teacher/:id',                     $, __.teacher.update_teacher);
-    router.del ('/teacher/:id',                     $, __.teacher.delete_teacher);
+    router.put ('/teacher',                      $, __.teacher.update_teacher);
+    router.del ('/teacher/:id',                   $, __.teacher.delete_teacher);
     router.post('/teacher/:id/upload',              $, __.teacher.upload_picture);
     router.get ('/history',			                $, __.teacher.get_transaction_history);
 
@@ -49,6 +50,7 @@ module.exports = (router) => {
     router.post('/class',                           $, __.class.create_class);
     router.put ('/class',                           $, __.class.update_class);
     router.del ('/class/:id',                       $, __.class.delete_class);
+    router.get('/repetition/:id',		    		$, __.class.no_repetition);
 
     router.post('/randomize/get_num',               $, __.randomize.get_num_volunteers);
 
