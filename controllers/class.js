@@ -19,7 +19,8 @@ const storage      =   multer.diskStorage( {
 		cb(null, destFolder);
     },
     filename: (req, file, cb) => {
-		cb(null,file.originalname);
+        file.originalname = 'classlist-' + date.get_today() + '.csv';
+        cb(null,file.originalname);
     }
 });
 const upload = multer({storage : storage}).single('csv');

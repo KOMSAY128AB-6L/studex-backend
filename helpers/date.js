@@ -9,7 +9,7 @@ function get_today () {
     var yyyy = today.getFullYear();
     var ss = today.getSeconds();
     var hh = today.getHours();
-    var mm = today.getMinutes();
+    var mi = today.getMinutes();
 
     if(dd<10) {
         dd='0'+dd
@@ -19,7 +19,7 @@ function get_today () {
         mm='0'+mm
     }
 
-    today = mm+'-'+dd+'-'+yyyy+'-'+hh+''+mm+''+ss;
+    today = mm+'-'+dd+'-'+yyyy+'-'+hh+''+mi+''+ss;
     return today;
 }
 
