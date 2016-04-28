@@ -56,7 +56,7 @@ exports.view_class = (req, res, next) => {
 			.send();
 		}
 
-		logger.logg(req.session.user.teacher_id, last_query);
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed students from class #' + req.params.id + '.');
 
 		res.item(result[0])
 		.send();
@@ -110,6 +110,9 @@ exports.view_classes = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Classes not found'})
 			.send();
 		}
+
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed his classes.');
+
 		res.item(result)
 		.send();
 	}
@@ -182,7 +185,7 @@ exports.delete_class = (req, res, next) => {
                 .send();
         }
 
-        logger.logg(req.session.user.teacher_id, last_query);
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' deleted class #' + req.params.id + '.');
 
         res.item({message:'Class successfully deleted'})
             .send();
@@ -235,8 +238,7 @@ exports.write_to_csv = (req, res, next) => {
 	 		return next(err);
 	 	}
 
-	 	logger.logg(req.session.user.teacher_id, last_query);
-
+	 	logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added students list to CSV.');
 	 	res.send();
 	 }
 
@@ -291,6 +293,8 @@ exports.create_class = (req, res, next) => {
             winston.error('Error in creating class', last_query);
             return next(err);
         }
+
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' created ' + data.class_name + ' class.');
 
         return res.status(200)
                 .item({message: 'Class successfully created'})
@@ -371,8 +375,7 @@ exports.insert_csv_classlist = (req, res, next) => {
             return next(err);
         }
 
-        logger.logg(req.session.user.teacher_id, last_query);
-
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' inserted students list from CSV.');
         res.send({message: "Classlist inserted"});
     }
 
