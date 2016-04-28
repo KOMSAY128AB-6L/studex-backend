@@ -22,12 +22,13 @@ module.exports = (router) => {
 
     /*Routes for Student CRUD*/
     router.post('/student/:id',                     $, __.student.create_student);
-    router.post('/search/:id',                     $, __.student.retrieve_student);
+    router.post('/search/:id',                      $, __.student.retrieve_student);
     router.get ('/student/:id',                     $, __.student.retrieve_all_student);
     router.get ('/student_logs/',                   $, __.student.retrieve_log_of_volunteers);
     router.put ('/student/:id',                     $, __.student.update_student);
-    router.del ('/student/:id',                     $, __.student.delete_student);
-    router.get ('/volunteer/:id',                   $, __.student.get_times_student_volunteered);
+    router.delete('/student/:id',                   $, __.student.delete_student);
+    router.post('/student/:id/upload',              $, __.student.upload_picture);
+    router.get('/volunteer/:id',                    $, __.student.get_times_student_volunteered);
 
     router.get ('/teachers',                        $, __.teacher.get_teachers);
     router.get ('/teacher',                         $, __.teacher.get_teacher);
