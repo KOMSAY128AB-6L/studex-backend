@@ -22,7 +22,7 @@ module.exports = (router) => {
 
     /*Routes for Student CRUD*/
     router.post('/student/:id',                     $, __.student.create_student);
-    router.post('/search/:id',                     $, __.student.retrieve_student);
+    router.post('/search/:id',                      $, __.student.retrieve_student);
     router.get ('/student/:id',                     $, __.student.retrieve_all_student);
     router.get ('/student_logs/',                   $, __.student.retrieve_log_of_volunteers);
     router.put ('/student/:id',                     $, __.student.update_student);
