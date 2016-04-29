@@ -21,6 +21,7 @@ exports.randomize_students = (req, res, next) => {
                     _byCount: false,
                     _byChance: false,
                     _unique: false,
+                    _andAllTags: false,
                     numberOfVolunteers: 0
                 }
             },
@@ -43,7 +44,11 @@ exports.randomize_students = (req, res, next) => {
         let tag = '';
 
         if (data.tags && data.tags.length > 0) {
-            tag = ` AND (SELECT COUNT(*) FROM student_tag st WHERE s.student_id=st.student_id AND tag IN ? ) = ${data.tags.length}`;
+            if (data.settings.andAllTags) {
+                tag = ` AND (SELECT COUNT(*) FROM student_tag st WHERE s.student_id=st.student_id AND tag IN ? ) = ${data.tags.length}`;
+            } else {
+                tag = ` AND (SELECT COUNT(*) FROM student_tag st WHERE s.student_id=st.student_id AND tag IN ? ) >= 1`;
+            }
         }
 
         data.student_list.forEach((student) => 
