@@ -55,9 +55,11 @@ CREATE TABLE IF NOT EXISTS student (
 
 CREATE TABLE IF NOT EXISTS volunteer (
 	volunteer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	student_id INT,
 	teacher_id INT,
 	class_id BIGINT,
 	volunteer_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY(student_id) REFERENCES student(student_id),
 	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id),
 	FOREIGN KEY(class_id) REFERENCES class(class_id)
 );
