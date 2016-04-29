@@ -110,7 +110,7 @@ function randomize_normal(studentList, numberOfVolunteers) {
 
 
 const freshWeight = 50; //default weight
-const minWeight = 0;
+const minWeight = 1;
 /**
  * All in one randomize function
  * @param1 the list of students to be randomized
