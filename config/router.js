@@ -30,7 +30,8 @@ module.exports = (router) => {
     router.del ('/student/:id',                   $, __.student.delete_student);
     router.post('/student/:id/upload',              $, __.student.upload_picture);
     router.get ('/volunteer/:id',                    $, __.student.get_times_student_volunteered);
-
+    router.post('/student/tag/:id',                 $, __.student.insert_student_tag);
+    
     router.get ('/teachers',                         $, __.teacher.get_teachers);
     router.get ('/teacher',                          $, __.teacher.get_teacher);
     router.post('/teacher',                         $, __.teacher.post_teacher);
