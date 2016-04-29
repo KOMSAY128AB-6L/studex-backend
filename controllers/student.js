@@ -390,7 +390,7 @@ exports.insert_student_tag = (req, res, next) => {
             return next(err);
         }
 
-        //logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added student tag #' + data.student_id + '.');
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added student tag #' + data.student_id + '.');
 
         return res.status(200)
                 .item({message: 'Student tag successfully inserted'})
