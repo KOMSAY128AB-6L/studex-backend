@@ -1,11 +1,34 @@
 'use strict';
 
-const mysql   = require('anytv-node-mysql');
-const logger = require('../helpers/logger');
-const winston = require('winston');
-const csv_writer = require('fast-csv');
-const util  	= require(__dirname + '/../helpers/util');
-const sh      	= require('shelljs');
+const util  	   = require(__dirname + '/../helpers/util');
+const date  	   = require(__dirname + '/../helpers/date');
+const logger       = require('../helpers/logger');
+const csv_writer   = require('fast-csv');
+const mysql   	   = require('anytv-node-mysql');
+const winston 	   = require('winston');
+const sh       	   = require('shelljs');
+const multer       = require('multer');
+const fs		   = require('fs');
+const storage      =   multer.diskStorage( {
+    destination: (req, file, cb) => {
+		let destFolder =__dirname + '/../uploads/csv';
+		if (!fs.existsSync(destFolder)) {
+			fs.mkdirSync(destFolder);
+		}
+
+		cb(null, destFolder);
+    },
+    filename: (req, file, cb) => {
+        file.originalname = 'classlist-' + date.get_today();
+        if(sh.exec('test -f ' + 'uploads/csv/classlist-' + date.get_today()).code === 0) {
+            file.originalname += sh.ls().length;
+        }
+        file.originalname += '.csv';
+
+        cb(null,file.originalname);
+    }
+});
+const upload = multer({storage : storage}).single('csv');
 
 /**
  * @api {get} /user/:id Get user information
@@ -38,14 +61,14 @@ exports.view_class = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Class not found'})
 			.send();
 		}
-		
+
 		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed students from class #' + req.params.id + '.');
-		
+
 		res.item(result)
-		.send();
+    		.send();
 	}
 	start();
-}; 
+};
 
 exports.view_classes = (req, res, next) => {
 	function start () {
@@ -67,9 +90,35 @@ exports.view_classes = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Classes not found'})
 			.send();
 		}
-		
+		res.item(result)
+		.send();
+	}
+	start();
+};
+
+exports.view_classes = (req, res, next) => {
+	function start () {
+	mysql.use('master')
+			.query(
+			'SELECT * FROM class WHERE teacher_id=?',
+			[req.session.user.teacher_id],
+			send_response
+		)
+		.end();
+	}
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in viewing classes', last_query);
+			return next(err);
+		}
+		if (!result.length) {
+			return res.status(404)
+			.error({code: 'CLASS404', message: 'Classes not found'})
+			.send();
+		}
+
 		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed his classes.');
-		
+
 		res.item(result)
 		.send();
 	}
@@ -82,12 +131,12 @@ exports.update_class = (req, res, next) => {
 			className:'',
 			section:''
 		},
-	req.body
+		req.body
 	);
 	function start () {
 		if (data instanceof Error) {
-            return res.warn(400, {message: data.message});
-        }
+			return res.warn(400, {message: data.message});
+	        }
 
 		mysql.use('master')
 			.query(
@@ -98,31 +147,30 @@ exports.update_class = (req, res, next) => {
 			.end();
 
 	}
-		function send_response (err, result, args, last_query) {
-			if (err) {
-				winston.error('Error in updating class', last_query);
-				return next(err);
-			}
 
-			if (result.affectedRows === 0) {
-				return res.status(404)
-		 		   .error({code: 'CLASS404', message: 'Class not found'})
-				.send();
-			}
-			
-			logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' updated ' + data.className + '\'s class details.');
-
-			res.item({message:'Class successfully updated'})
-			.send();
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in updating class', last_query);
+			return next(err);
 		}
 
-start();
+		if (result.affectedRows === 0) {
+			return res.status(404)
+				.error({code: 'CLASS404', message: 'Class not found'})
+				.send();
+	}
+
+		res.item({message:'Class successfully updated'})
+		.send();
+	}
+
+	start();
 };
 
 exports.delete_class = (req, res, next) => {
 
     function start () {
-    	
+
         mysql.use('master')
             .query(
                 'DELETE FROM class WHERE class_id = ? AND teacher_id=?',
@@ -141,8 +189,8 @@ exports.delete_class = (req, res, next) => {
             return res.status(404)
                 .error({code: 'CLASS404', message: 'Class not found'})
                 .send();
-        }        
-        
+        }
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' deleted class #' + req.params.id + '.');
 
         res.item({message:'Class successfully deleted'})
@@ -182,41 +230,25 @@ exports.write_to_csv = (req, res, next) => {
 
 	let values = [];
 
-	function start () {
-		sh.exec('mkdir -p uploads/csv/', create_csv_directory);
-	}
-
-	function create_csv_directory (err) {
-
-		if (err) {
-			winston.error('Error in creating csv directory');
-		return next(err);
-		}
-
-	sh.exec('mkdir -p uploads/csv/', query);
-
-	}
-
-	function query(){
+	function start(){
 		mysql.use('master')
 			.query(
 				'SELECT * FROM class ORDER BY class_id',
-				[],
-				query2
+				start_query
 			)
 			.end();
 	}
 
-	function query2(err, result, args, last_query){		
+    function start_query(err, result, args, last_query){
 
 		var i=0;
-		
+
 		if(err){
 			winston.error('Selection query of classes failed', last_query);
 			return next(err);
-		}		
+		}
 
-		result.forEach(function (element) {
+		result.forEach((element) => {
 			mysql.use('master')
 			.args(result[i])
 			.query(
@@ -227,22 +259,22 @@ exports.write_to_csv = (req, res, next) => {
 			.end();
 			i++;
 		});
-	
+
 	}
 
 	function write_to_csv_student(err, result, args, last_query){
-		
+
 		if(err){
 			winston.error('Selection query of students failed', last_query);
 			return next(err);
-		}		
+		}
 
 		values.push([
 			args[0].class_name,
 			args[0].section,
 		]);
 
-		result.forEach(function (element) {
+		result.forEach((element) => {
 			values.push([
 				element.email,
 				element.first_name,
@@ -254,23 +286,22 @@ exports.write_to_csv = (req, res, next) => {
 
 		csv_writer
 		.writeToPath("uploads/csv/students.csv", values, {headers: true})
-		.on("finish", send_response);				
+		.on("finish", send_response);
 	}
-	
-	function send_response(err, result, args, last_query){
 
+	function send_response(err, result, args){
 	 	if(err){
 	 		winston.error('Could not write to CSV');
 	 		return next(err);
 	 	}
-	 	
-	 	logger.logg(req.session.user.teacher_id, last_query);	 
+
+	 	logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added students list to CSV.');
+
 	 	res.send();
 	 }
-	
+
 	start();
 };
-
 
 exports.create_class = (req, res, next) => {
 	const data = util.get_data(
@@ -279,7 +310,7 @@ exports.create_class = (req, res, next) => {
             section: ''
         },
         req.body
-    ); 
+    );
 
     function start () {
         if (data instanceof Error) {
@@ -293,7 +324,7 @@ exports.create_class = (req, res, next) => {
                 check_duplicate
             )
             .end();
-       
+
     }
 
     function check_duplicate (err, result) {
@@ -318,7 +349,7 @@ exports.create_class = (req, res, next) => {
             winston.error('Error in creating class', last_query);
             return next(err);
         }
-        
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' created ' + data.class_name + ' class.');
 
         return res.status(200)
@@ -331,37 +362,59 @@ exports.create_class = (req, res, next) => {
 
 exports.insert_csv_classlist = (req, res, next) => {
 
-    function start () {
-		
-		let class_query;
-		
-		sh.cd('controllers');
-		sh.config.silent = true;
-		sh.exec('sudo chmod 755 ../helpers/classlist.js');
-		sh.config.silent = false;
-		sh.exec('node ../helpers/classlist.js ../uploads/csv/classlist.csv > ../database/classlist.sql', function (err) {
+    const timestamp = date.get_today();
+	let path;
 
-			if (err) {
-				winston.error('Error in inserting classlist from CSV');
-				return next(err);
-			}
+	function start () {
+		upload(req, res, generate_query);
+	}
 
-		});
-		class_query = sh.exec('cat ../database/classlist.sql').output;
-		
-		// TODO - convert to formal query
-		res.send();
+	function generate_query (err) {
+		if (err) {
+			winston.error('Error in setting permissions of helper function');
+			return next(err);
+		}
 
-    }
-	
-	function send_response (err, result, args, last_query) {
-        if (err) {
-            winston.error('Error in inserting classlist from CSV');
+		path = req.file.path;
+		sh.exec('node helpers/classlist.js ' + path + ' > database/classlist-' + timestamp + '.sql', execute_query);
+	}
+
+	function execute_query (err) {
+		if (err) {
+			winston.error('Error in parsing CSV file and converting it to into SQL format');
+			return next(err);
+		}
+
+		sh.exec('sudo mysql -uroot < database/classlist-' + timestamp + '.sql', clean_sql);
+	}
+
+	function clean_sql (err) {
+		if (err) {
+			winston.error('Error in inserting classlist from CSV');
+			sh.rm('database/classlist-' + timestamp + '.sql', path);
+			return next(err);
+        }
+
+		sh.exec('rm database/classlist-' + timestamp + '.sql', clean_csv);
+	}
+
+	function clean_csv (err) {
+		if (err) {
+			winston.error('Error in removing sql file');
             return next(err);
         }
-        
+
+		sh.exec('rm ' + path, send_response);
+	}
+
+	function send_response (err) {
+        if (err) {
+            winston.error('Error in removing csv file');
+            return next(err);
+        }
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' inserted students list from CSV.');
-        res.send();
+        res.send({message: "Classlist inserted"});
     }
 
     start();
