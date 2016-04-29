@@ -43,7 +43,7 @@ exports.randomize_students = (req, res, next) => {
         let tag = '';
 
         if (data.tags && data.tags.length > 0) {
-            tag = ' AND student_id IN (SELECT student_id FROM student_tag WHERE tag IN ?)';
+            tag = ` AND (SELECT COUNT(*) FROM student_tag st WHERE s.student_id=st.student_id AND tag IN ? ) = ${data.tags.length}`;
         }
 
         data.student_list.forEach((student) => 
@@ -58,17 +58,17 @@ exports.randomize_students = (req, res, next) => {
                          WHERE s.student_id IN (SELECT s.student_id FROM 
                          student s, class c WHERE s.class_id = c.class_id AND 
                          c.teacher_id = ?) AND s.student_id IN ?${tag}`, 
-                         [req.session.user.teacher_id, [student_ids], data.tags],
+                         [req.session.user.teacher_id, [student_ids], [data.tags]],
                          assign_result
                  )
                  .end();
         } else if (data.settings.byChance) {
             mysql.use('master')
-                 .query(`SELECT DISTINCT * FROM student WHERE student_id IN 
+                 .query(`SELECT DISTINCT * FROM student s WHERE student_id IN 
                          (SELECT s.student_id FROM student s, class c 
                          WHERE s.class_id = c.class_id AND 
-                         c.teacher_id = ?) AND student_id IN ? ORDER BY chance DESC`, 
-                         [req.session.user.teacher_id, [student_ids]],
+                         c.teacher_id = ?) AND student_id IN ?${tag} ORDER BY chance DESC`, 
+                         [req.session.user.teacher_id, [student_ids], [data.tags]],
                          assign_result
                  )
                  .end();
@@ -76,8 +76,8 @@ exports.randomize_students = (req, res, next) => {
             mysql.use('master')
                  .query(`SELECT s.* FROM student s, class c WHERE
                          s.class_id = c.class_id AND c.teacher_id = ? AND
-                         s.student_id IN ?`, 
-                         [req.session.user.teacher_id, [student_ids]],
+                         s.student_id IN ?${tag}`, 
+                         [req.session.user.teacher_id, [student_ids], [data.tags]],
                          assign_result
                  )
                  .end();
