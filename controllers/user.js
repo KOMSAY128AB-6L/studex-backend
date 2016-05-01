@@ -334,7 +334,7 @@ exports.login_user = (req, res, next) => {
         }
 
         if(!result.length) {
-            res.status(400).item({code: 'USER200', message: 'User Email or Password is incorrect.'})
+            res.status(400).error({code: 'USER200', message: 'User Email or Password is incorrect.'})
                 .send();
         }
 
