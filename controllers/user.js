@@ -94,7 +94,10 @@ exports.reset_password = (req, res, next) => {
     );
     
     let user = {
+        teacher_id: '',
         first_name: '',
+        middle_initial: '',
+        last_name: '',
         random_string: ''
     };
 
@@ -107,7 +110,7 @@ exports.reset_password = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT email, first_name FROM teacher WHERE email = ? LIMIT 1;',
+                'SELECT email, teacher_id, first_name, middle_initial, last_name FROM teacher WHERE email = ? LIMIT 1;',
                 [data.email],
                 find_user
              )
@@ -179,7 +182,7 @@ exports.reset_password = (req, res, next) => {
                 return next(error);
             }
             
-            logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' requested to change password.');
+            logger.logg(user.teacher_id, user.first_name + ' ' + user.middle_initial + ' ' + user.last_name + ' requested to change password.');
 
             res.status(200)
                 .item({message: 'Message sent'})
