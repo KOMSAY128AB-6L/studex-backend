@@ -396,8 +396,8 @@ exports.insert_student_tag = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT * FROM student_tag WHERE student_id = ?;',
-                [req.params.id],
+                'SELECT * FROM student_tag WHERE student_id = ? AND tag = ?;',
+                [req.params.id,data.tag],
                 check_duplicate
             )
             .end();
@@ -405,11 +405,30 @@ exports.insert_student_tag = (req, res, next) => {
     }
 
     function check_duplicate (err, result) {
-
+    
         if(result.length){
-            return res.item({message:'Student tag already exists.'}).send();
+        	return res.status(409)
+                .error({code: 'STUDENT_TAG409', message: 'CONFLICT:Student tag already exists'})
+                .send();
         }
-
+        
+		mysql.use('master')
+            .query(
+                'SELECT s.* FROM student s, class c WHERE s.student_id = ? AND s.class_id = c.class_id AND c.teacher_id=?;',
+                [req.params.id,req.session.user.teacher_id],
+                check_if_student
+            )
+            .end();
+        
+    }
+    
+    function check_if_student(err, result){
+    	if(!result.length){
+        	return res.status(404)
+                .error({code: 'STUDENT404', message: 'Student not found'})
+                .send();
+        }
+        console.log(result);
         mysql.use('master')
             .query(
                 'INSERT INTO student_tag(student_id, tag) VALUES (?,?);',
