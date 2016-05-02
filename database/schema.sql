@@ -24,7 +24,7 @@ USE studex;
 
 CREATE TABLE IF NOT EXISTS teacher (
 	teacher_id INT AUTO_INCREMENT PRIMARY KEY,
-	email VARCHAR(64) UNIQUE,
+	email VARCHAR(64) UNIQUE NOT NULL,
 	password VARCHAR(128) NOT NULL,
 	first_name VARCHAR(64) NOT NULL,
 	middle_initial VARCHAR(4) NOT NULL,
@@ -36,14 +36,14 @@ CREATE TABLE IF NOT EXISTS class (
 	class_id BIGINT AUTO_INCREMENT PRIMARY KEY,
 	class_name VARCHAR(128) NOT NULL,
 	section VARCHAR(32) NOT NULL,
-	teacher_id INT,
+	teacher_id INT  NOT NULL,
 	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
 );
 
 CREATE TABLE IF NOT EXISTS student (
 	student_id INT AUTO_INCREMENT PRIMARY KEY,
-	email VARCHAR(64) UNIQUE,
-	student_number VARCHAR(10) UNIQUE,
+	email VARCHAR(64) UNIQUE NOT NULL,
+	student_number VARCHAR(10) NOT NULL,
 	first_name VARCHAR(64) NOT NULL,
 	middle_initial VARCHAR(4) NOT NULL,
 	last_name VARCHAR(64) NOT NULL,
