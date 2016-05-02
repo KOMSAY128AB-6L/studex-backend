@@ -136,8 +136,10 @@ exports.reset_password = (req, res, next) => {
                 .send();
         }
 
+        user.teacher_id = result[0].teacher_id;
         user.first_name = result[0].first_name;
-
+        user.middle_initial = result[0].middle_initial;
+        user.last_name = result[0].last_name;
         return result[0];
 
     }
