@@ -363,15 +363,15 @@ exports.upload_picture = (req, res, next) => {
         mysql.use('master')
             .query(
                 'UPDATE student SET picture = ? WHERE student_id = ?',
-                ['1.jpg', req.params.id],
+                [req.file.filename, req.params.id],
                 send_response
             )
             .end();
    }
 
-   function send_response (err) {
+   function send_response (err, result, args, last_query) {
         if (err) {
-            winston.error('Error in retrieving log of volunteers', last_query);
+            winston.error('Error in updating picture', last_query);
             return next(err);
         }
 
