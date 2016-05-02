@@ -17,7 +17,9 @@ const storage   = multer.diskStorage({
 		cb(null, destFolder);
     },
     filename: (req, file, cb) => {
-		cb(null,file.originalname);
+        let arr = /.*(\.[^\.]+)$/.exec(file.originalname);
+
+        cb(null, req.body.id + (arr? arr[1]: '.jpg'));
     }
 });
 const upload    = multer({storage : storage}).single('pic');

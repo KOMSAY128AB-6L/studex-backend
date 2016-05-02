@@ -10,16 +10,21 @@ const multer    = require('multer');
 const fs        = require('fs');
 const storage   = multer.diskStorage({
     destination: (req, file, cb) => {
-       let destFolder =__dirname + '/../uploads/students/pictures';
+        let destFolder =__dirname + '/../uploads/students/pictures';
 
-       if (!fs.existsSync(destFolder)) {
-           fs.mkdirSync(destFolder);
-       }
+        if (!fs.existsSync(destFolder)) {
+            fs.mkdirSync(destFolder);
+        }
 
-       cb(null, destFolder);
+        cb(null, destFolder);
     },
     filename: (req, file, cb) => {
-       cb(null,file.originalname);
+        let arr = /.*(\.[^\.]+)$/.exec(file.originalname);
+
+        if (!req.body.id) {
+            return cb(new Error('Missing student id'));
+        };
+        cb(null, req.body.id + (arr? arr[1]: '.jpg'));
     }
 });
 const upload    = multer({storage : storage}).single('pic');
