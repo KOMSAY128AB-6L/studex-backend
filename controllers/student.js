@@ -21,6 +21,9 @@ const storage   = multer.diskStorage({
     filename: (req, file, cb) => {
         let arr = /.*(\.[^\.]+)$/.exec(file.originalname);
 
+        if (!req.body.id) {
+            return cb(new Error('Missing student id'));
+        };
         cb(null, req.body.id + (arr? arr[1]: '.jpg'));
     }
 });
