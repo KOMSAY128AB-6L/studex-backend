@@ -322,6 +322,9 @@ exports.confirm_reset_password = (req, res, next) => {
 
 
 exports.logout_user = (req,res,next) => {
+
+    logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' logged out to StudEx.');
+            
 	function start () {
 		req.session.destroy();
 	}
