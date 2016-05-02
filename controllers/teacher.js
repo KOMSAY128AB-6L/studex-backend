@@ -19,7 +19,7 @@ const storage   = multer.diskStorage({
     filename: (req, file, cb) => {
         let arr = /.*(\.[^\.]+)$/.exec(file.originalname);
 
-        cb(null, req.body.id + (arr? arr[1]: '.jpg'));
+        cb(null, req.session.user.teacher_id + (arr? arr[1]: '.jpg'));
     }
 });
 const upload    = multer({storage : storage}).single('pic');
@@ -162,17 +162,31 @@ exports.delete_teacher = (req, res, next) => {
 exports.upload_picture = (req, res, next) => {
 
 	function start () {
-		upload(req, res, send_response);
+		upload(req, res, update_picture);
 	}
 
-	function send_response (err) {
+    function update_picture (err) {
+        if (err) {
+            winston.error('Error in uploading picture');
+            return next(err);
+        }
 
-		if (err) {
-			winston.error('Error in uploading picture');
-			return next(err);
-		}
+        mysql.use('master')
+            .query(
+                'UPDATE student SET picture = ? WHERE student_id = ?',
+                [req.file.filename, req.params.id],
+                send_response
+            )
+            .end();
+    }
 
-		res.item(req.file.path).send();
+    function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in updating picture', last_query);
+            return next(err);
+        }
+
+       res.item({message: 'Successfully updated picture'}).send();
 	}
 
 	start();
