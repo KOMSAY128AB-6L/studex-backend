@@ -39,6 +39,9 @@ module.exports = (router) => {
     router.post('/teacher/:id/upload',              $, __.teacher.upload_picture);
     router.get ('/history',			                $, __.teacher.get_transaction_history);
 
+	//teacher image
+	router.get('/teacher_picture',	 						$, __.teacher.get_picture);
+	
 	// Routes for class read and write CSV
     router.get('/class/csv',                        $, __.class.write_to_csv);
     router.post('/class/csv',                       $, __.class.insert_csv_classlist);
@@ -53,6 +56,7 @@ module.exports = (router) => {
     router.get('/repetition/:id',		    		$, __.class.no_repetition);
 
     router.post('/randomize/get_num',               $, __.randomize.get_num_volunteers);
+
 
     router.all('*', (req, res) => {
         res.status(404)

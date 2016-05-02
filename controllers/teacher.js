@@ -206,3 +206,47 @@ exports.get_transaction_history = (req, res, next) => {
 
 	start();
 };
+
+exports.get_picture = (req, res, next) => {
+	
+	function start() {
+		mysql.use('master') 
+			.query(
+				'SELECT picture FROM teacher WHERE teacher_id = ?;',
+				[req.session.user.teacher_id],
+				request_image
+			)
+			.end();	
+	}
+	
+	function request_image(err, result, args, last_query){
+		if(err){
+			winston.error('Error in retrieving image.');
+			return next(err);
+		}
+	
+		if(!result.length){
+			return res.status(404)
+				.error({code: 'TEACHER404', message: 'Teacher image not found'})
+				.send();
+		}
+		
+		var options = {
+			root: __dirname + '/../uploads/teachers/pictures'
+		};
+
+		var fileName = result[0].picture;
+		res.sendFile(fileName, options, function (err) {
+			if (err) {
+				console.log(err);
+				res.status(err.status).end();
+			}
+			else {
+				console.log('Sent:', fileName);
+			}
+		});
+
+	}
+
+	start();
+}

@@ -327,7 +327,7 @@ exports.login_user = (req, res, next) => {
             .end();
     }
 
-    function send_response(err, result) {
+    function send_response(err, result, last_query) {
         if (err) {
             winston.error('Error in selecting teacher', last_query);
             return next(err);
