@@ -380,3 +380,76 @@ exports.upload_picture = (req, res, next) => {
 
     start();
 };
+
+exports.insert_student_tag = (req, res, next) => {
+    const data = util.get_data(
+        {
+            tag: ''
+        },
+        req.body
+    );
+
+    function start () {
+        if (data instanceof Error) {
+            return res.warn(400, {message: data.message});
+        }
+
+        mysql.use('master')
+            .query(
+                'SELECT * FROM student_tag WHERE student_id = ? AND tag = ?;',
+                [req.params.id,data.tag],
+                check_duplicate
+            )
+            .end();
+
+    }
+
+    function check_duplicate (err, result) {
+    
+        if(result.length){
+        	return res.status(409)
+                .error({code: 'STUDENT_TAG409', message: 'CONFLICT:Student tag already exists'})
+                .send();
+        }
+        
+		mysql.use('master')
+            .query(
+                'SELECT s.* FROM student s, class c WHERE s.student_id = ? AND s.class_id = c.class_id AND c.teacher_id=?;',
+                [req.params.id,req.session.user.teacher_id],
+                check_if_student
+            )
+            .end();
+        
+    }
+    
+    function check_if_student(err, result){
+    	if(!result.length){
+        	return res.status(404)
+                .error({code: 'STUDENT404', message: 'Student not found'})
+                .send();
+        }
+        console.log(result);
+        mysql.use('master')
+            .query(
+                'INSERT INTO student_tag(student_id, tag) VALUES (?,?);',
+                [req.params.id, data.tag],
+                send_response
+            )
+            .end();
+    }
+
+    function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in inserting tag', last_query);
+            return next(err);
+        }
+
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added student tag #' + data.student_id + '.');
+
+        return res.status(200)
+                .item({message: 'Student tag successfully inserted'})
+                .send();
+    }
+
+    start();
+};
