@@ -9,6 +9,7 @@ const util        = require(__dirname + '/helpers/util');
 const mysql       = require('anytv-node-mysql');
 const body_parser = require('body-parser');
 const winston     = require('winston');
+const sh          = require('shelljs');
 const express     = require('express');
 const session     = require('express-session');
 const RedisStore  = require('connect-redis')(session);
@@ -59,6 +60,10 @@ function start () {
         secret: 'keryboard cat'
     }));
 
+    // configure directory
+    sh.exec('mkdir -p uploads/csv');
+    sh.exec('mkdir -p uploads/teachers/pictures');
+    sh.exec('mkdir -p uploads/students/pictures');
 
     winston.log('verbose', 'Binding custom middlewares');
     app.use(require('anytv-node-cors')(config.CORS));

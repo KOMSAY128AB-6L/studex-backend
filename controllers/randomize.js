@@ -21,6 +21,7 @@ exports.randomize_students = (req, res, next) => {
                     _byCount: false,
                     _byChance: false,
                     _unique: false,
+                    _andAllTags: false,
                     numberOfVolunteers: 0
                 }
             },
@@ -40,6 +41,15 @@ exports.randomize_students = (req, res, next) => {
         }
 
         let student_ids = [];
+        let tag = '';
+
+        if (data.tags && data.tags.length > 0) {
+            if (data.settings.andAllTags) {
+                tag = ` AND (SELECT COUNT(*) FROM student_tag st WHERE s.student_id=st.student_id AND tag IN ? ) = ${data.tags.length}`;
+            } else {
+                tag = ` AND (SELECT COUNT(*) FROM student_tag st WHERE s.student_id=st.student_id AND tag IN ? ) >= 1`;
+            }
+        }
 
         data.student_list.forEach((student) => 
             student_ids.push(student.student_id)
@@ -52,18 +62,18 @@ exports.randomize_students = (req, res, next) => {
                          volunteer_student vs ON s.student_id=vs.student_id 
                          WHERE s.student_id IN (SELECT s.student_id FROM 
                          student s, class c WHERE s.class_id = c.class_id AND 
-                         c.teacher_id = ?) AND s.student_id IN ?`, 
-                         [req.session.user.teacher_id, [student_ids]],
+                         c.teacher_id = ?) AND s.student_id IN ?${tag}`, 
+                         [req.session.user.teacher_id, [student_ids], [data.tags]],
                          assign_result
                  )
                  .end();
         } else if (data.settings.byChance) {
             mysql.use('master')
-                 .query(`SELECT DISTINCT * FROM student WHERE student_id IN 
+                 .query(`SELECT DISTINCT * FROM student s WHERE student_id IN 
                          (SELECT s.student_id FROM student s, class c 
                          WHERE s.class_id = c.class_id AND 
-                         c.teacher_id = ?) AND student_id IN ? ORDER BY chance DESC`, 
-                         [req.session.user.teacher_id, [student_ids]],
+                         c.teacher_id = ?) AND student_id IN ?${tag} ORDER BY chance DESC`, 
+                         [req.session.user.teacher_id, [student_ids], [data.tags]],
                          assign_result
                  )
                  .end();
@@ -71,8 +81,8 @@ exports.randomize_students = (req, res, next) => {
             mysql.use('master')
                  .query(`SELECT s.* FROM student s, class c WHERE
                          s.class_id = c.class_id AND c.teacher_id = ? AND
-                         s.student_id IN ?`, 
-                         [req.session.user.teacher_id, [student_ids]],
+                         s.student_id IN ?${tag}`, 
+                         [req.session.user.teacher_id, [student_ids], [data.tags]],
                          assign_result
                  )
                  .end();
