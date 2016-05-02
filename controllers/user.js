@@ -207,6 +207,13 @@ exports.confirm_reset_password = (req, res, next) => {
         req.body
     );
 
+    let user = {
+        teacher_id: '',
+        first_name: '',
+        middle_initial: '',
+        last_name: ''
+    };
+
     function start () {
 
         if (data instanceof Error) {
@@ -219,8 +226,32 @@ exports.confirm_reset_password = (req, res, next) => {
                 [data.email, data.random_string],
                 validate_user_request
             )
+            .query(
+                'SELECT email, teacher_id, first_name, middle_initial, last_name FROM teacher WHERE email = ? LIMIT 1;',
+                [data.email],
+                get_user_credentials
+             )
             .end();
 
+    }
+
+    function get_user_credentials (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in reset password link request', last_query);
+            return next(err);
+        }
+
+        if (!result.length) {
+            return res.status(404)
+                .error({code: 'USER404', message: 'User not found'})
+                .send();
+        }
+
+        user.teacher_id = result[0].teacher_id;
+        user.first_name = result[0].first_name;
+        user.middle_initial = result[0].middle_initial;
+        user.last_name = result[0].last_name;
+        return result[0];
     }
 
     function validate_user_request (err, result, args, last_query) {
@@ -270,7 +301,7 @@ exports.confirm_reset_password = (req, res, next) => {
             )
             .end();
             
-        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' successfully changed password.');
+        logger.logg(user.teacher_id, user.first_name + ' ' + user.middle_initial + ' ' + user.last_name + ' successfully changed password.');
 
         return res.status(200)
                 .item({message: 'Reset password request successfully claimed'})
