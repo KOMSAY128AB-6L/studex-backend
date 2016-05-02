@@ -94,7 +94,10 @@ exports.reset_password = (req, res, next) => {
     );
 
     let user = {
+        teacher_id: '',
         first_name: '',
+        middle_initial: '',
+        last_name: '',
         random_string: ''
     };
 
@@ -107,7 +110,7 @@ exports.reset_password = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT email, first_name FROM teacher WHERE email = ? LIMIT 1;',
+                'SELECT email, teacher_id, first_name, middle_initial, last_name FROM teacher WHERE email = ? LIMIT 1;',
                 [data.email],
                 find_user
              )
@@ -133,8 +136,10 @@ exports.reset_password = (req, res, next) => {
                 .send();
         }
 
+        user.teacher_id = result[0].teacher_id;
         user.first_name = result[0].first_name;
-
+        user.middle_initial = result[0].middle_initial;
+        user.last_name = result[0].last_name;
         return result[0];
 
     }
@@ -158,18 +163,18 @@ exports.reset_password = (req, res, next) => {
             from: '"Studex Support" <studex.staff@gmail.com>', // sender address
             to: data.email, // list of receivers
             subject: 'Studex Account Password Reset', // Subject line
-            text: 'Dear '+user.first_name+', \n\n\
-                    You have requested to have your password reset for your account at Studex. \n\
-                    Please click on the following link or copy and paste the link on your address bar and enter '+user.random_string+' to reset your password. \
-                    http://localhost:8000/confirm_reset \n\
-                    This key is valid only for 24 hours.\n\
-                    If you received this email in error, you can safely ignore this email.', // plaintext body
-            html: '<p>Dear '+user.first_name+',</p><p></p>\
-                    <p>You have requested to have your password reset for your account at Studex.</p><p></p>\
-                    <p>Please click on the following link or copy and paste the link on your address bar and enter <strong>'+user.random_string+'</strong> to reset your password. </p><p></p>\
-                    <p><a href="http://localhost:8000/confirm_reset">http://localhost:8000/confirm_reset</a></p><p></p>\
-                    <p>This key is valid only for 24 hours.</p><p></p>\
-                    <p>If you received this email in error, you can safely ignore this email.</p>' // html body
+            text: `Dear ${user.first_name}, \n\n
+                    You have requested to have your password reset for your account at Studex. \n
+                    Please click on the following link or copy and paste the link on your address bar and enter ${user.random_string} to reset your password.
+                    http://localhost:8000/confirm_reset \n
+                    This key is valid only for 24 hours.\n
+                    If you received this email in error, you can safely ignore this email.`, // plaintext body
+            html: `<p>Dear ${user.first_name},</p><p></p>
+                    <p>You have requested to have your password reset for your account at Studex.</p><p></p>
+                    <p>Please click on the following link or copy and paste the link on your address bar and enter <strong> ${user.random_string} </strong> to reset your password. </p><p></p>
+                    <p><a href="http://localhost:8000/confirm_reset">http://localhost:8000/confirm_reset</a></p><p></p>
+                    <p>This key is valid only for 24 hours.</p><p></p>
+                    <p>If you received this email in error, you can safely ignore this email.</p>` // html body
         };
 
         // send mail with defined transport object
@@ -178,8 +183,8 @@ exports.reset_password = (req, res, next) => {
                 winston.error('Error in sending email containing password reset key', error);
                 return next(error);
             }
-
-            logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' requested to change password.');
+            
+            logger.logg(user.teacher_id, user.first_name + ' ' + user.middle_initial + ' ' + user.last_name + ' requested to change password.');
 
             res.status(200)
                 .item({message: 'Message sent'})
@@ -202,6 +207,13 @@ exports.confirm_reset_password = (req, res, next) => {
         req.body
     );
 
+    let user = {
+        teacher_id: '',
+        first_name: '',
+        middle_initial: '',
+        last_name: ''
+    };
+
     function start () {
 
         if (data instanceof Error) {
@@ -214,8 +226,32 @@ exports.confirm_reset_password = (req, res, next) => {
                 [data.email, data.random_string],
                 validate_user_request
             )
+            .query(
+                'SELECT email, teacher_id, first_name, middle_initial, last_name FROM teacher WHERE email = ? LIMIT 1;',
+                [data.email],
+                get_user_credentials
+             )
             .end();
 
+    }
+
+    function get_user_credentials (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in reset password link request', last_query);
+            return next(err);
+        }
+
+        if (!result.length) {
+            return res.status(404)
+                .error({code: 'USER404', message: 'User not found'})
+                .send();
+        }
+
+        user.teacher_id = result[0].teacher_id;
+        user.first_name = result[0].first_name;
+        user.middle_initial = result[0].middle_initial;
+        user.last_name = result[0].last_name;
+        return result[0];
     }
 
     function validate_user_request (err, result, args, last_query) {
@@ -264,8 +300,8 @@ exports.confirm_reset_password = (req, res, next) => {
                 remove_request
             )
             .end();
-
-        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' successfully changed password.');
+            
+        logger.logg(user.teacher_id, user.first_name + ' ' + user.middle_initial + ' ' + user.last_name + ' successfully changed password.');
 
         return res.status(200)
                 .item({message: 'Reset password request successfully claimed'})
@@ -286,6 +322,9 @@ exports.confirm_reset_password = (req, res, next) => {
 
 
 exports.logout_user = (req,res,next) => {
+
+    logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' logged out to StudEx.');
+            
 	function start () {
 		req.session.destroy();
 	}
