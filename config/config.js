@@ -26,7 +26,7 @@ const config = {
     DB: {
         host: 'localhost',
         user: 'root',
-        password: 'mistletoe',
+        password: '',
         database: 'studex'
     },
 
