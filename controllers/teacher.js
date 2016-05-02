@@ -181,7 +181,7 @@ exports.get_transaction_history = (req, res, next) => {
 	function start () {
 		mysql.use('master')
 			.query(
-				'SELECT * FROM history WHERE teacher_id = ?;',
+				'SELECT * FROM history WHERE teacher_id = ? ORDER BY log_time DESC;',
 				[req.session.user.teacher_id],
 				send_response
 			)
