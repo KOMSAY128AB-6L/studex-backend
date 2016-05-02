@@ -37,7 +37,7 @@ exports.randomize_students = (req, res, next) => {
         }
 
         if (data.settings.numberOfVolunteers < 0) {
-            return res.item({message: 'Number of volunteers requested is less than 0'}).send();
+            return res.warn(400, {message: 'Number of volunteers requested is less than 0'});
         }
 
         let student_ids = [];
@@ -98,7 +98,7 @@ exports.randomize_students = (req, res, next) => {
         data.student_list = result;
 
         if (data.settings.unique && data.settings.numberOfVolunteers > data.student_list.length) {
-            return res.item({message: 'Number of volunteers requested is greater than the number of students'}).send();
+            return res.warn(400, {message: 'Number of volunteers requested is greater than the number of students'});
         }
 
         mysql.use('master')
