@@ -10,16 +10,18 @@ const multer    = require('multer');
 const fs        = require('fs');
 const storage   = multer.diskStorage({
     destination: (req, file, cb) => {
-       let destFolder =__dirname + '/../uploads/students/pictures';
+        let destFolder =__dirname + '/../uploads/students/pictures';
 
-       if (!fs.existsSync(destFolder)) {
-           fs.mkdirSync(destFolder);
-       }
+        if (!fs.existsSync(destFolder)) {
+            fs.mkdirSync(destFolder);
+        }
 
-       cb(null, destFolder);
+        cb(null, destFolder);
     },
     filename: (req, file, cb) => {
-       cb(null,file.originalname);
+        let arr = /.*(\.[^\.]+)$/.exec(file.originalname);
+
+        cb(null, req.params.id + (arr? arr[1]: '.jpg'));
     }
 });
 const upload    = multer({storage : storage}).single('pic');
@@ -305,7 +307,7 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
                     CONCAT(CONCAT(student.first_name, ", "), student.last_name) as "Volunteer", student.picture as Picture, \
                     volunteer_date FROM volunteer, teacher, class, volunteer_student, student WHERE teacher.teacher_id = ? and \
                     teacher.teacher_id = volunteer.teacher_id and class.class_id = volunteer.class_id\
-                    and student.student_id= volunteer_student.student_id;',
+                    and student.student_id= volunteer_student.student_id ORDER BY volunteer_date DESC;',
                     [req.session.user.teacher_id],
                     send_response
             )
@@ -330,17 +332,50 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
 exports.upload_picture = (req, res, next) => {
 
    function start () {
-       upload(req, res, send_response);
+        mysql.use('master')
+            .query(
+                'SELECT * FROM student s JOIN class c ON s.class_id = c.class_id WHERE c.teacher_id = ? AND s.student_id = ?',
+                [req.session.user.teacher_id, req.params.id],
+                verify_student
+            )
+            .end();
    }
 
-   function send_response (err) {
+   function verify_student (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in selecting students', last_query);
+            return next(err);
+        }
 
-       if (err) {
-           winston.error('Error in uploading picture');
-           return next(err);
-       }
+        if (result.length === 0) {
+            return res.warn(400, {message: 'Student id does not belong in your class'});
+        }
 
-       res.item(req.file.path).send();
+        upload(req, res, update_picture);
+   }
+
+   function update_picture (err) {
+        if (err) {
+            winston.error('Error in uploading picture');
+            return next(err);
+        }
+
+        mysql.use('master')
+            .query(
+                'UPDATE student SET picture = ? WHERE student_id = ?',
+                [req.file.filename, req.params.id],
+                send_response
+            )
+            .end();
+   }
+
+   function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in updating picture', last_query);
+            return next(err);
+        }
+
+       res.item({message: 'Successfully updated picture'}).send();
    }
 
     start();

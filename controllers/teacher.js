@@ -17,7 +17,9 @@ const storage   = multer.diskStorage({
 		cb(null, destFolder);
     },
     filename: (req, file, cb) => {
-		cb(null,file.originalname);
+        let arr = /.*(\.[^\.]+)$/.exec(file.originalname);
+
+        cb(null, req.session.user.teacher_id + (arr? arr[1]: '.jpg'));
     }
 });
 const upload    = multer({storage : storage}).single('pic');
@@ -160,17 +162,31 @@ exports.delete_teacher = (req, res, next) => {
 exports.upload_picture = (req, res, next) => {
 
 	function start () {
-		upload(req, res, send_response);
+		upload(req, res, update_picture);
 	}
 
-	function send_response (err) {
+    function update_picture (err) {
+        if (err) {
+            winston.error('Error in uploading picture');
+            return next(err);
+        }
 
-		if (err) {
-			winston.error('Error in uploading picture');
-			return next(err);
-		}
+        mysql.use('master')
+            .query(
+                'UPDATE student SET picture = ? WHERE student_id = ?',
+                [req.file.filename, req.params.id],
+                send_response
+            )
+            .end();
+    }
 
-		res.item(req.file.path).send();
+    function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in updating picture', last_query);
+            return next(err);
+        }
+
+       res.item({message: 'Successfully updated picture'}).send();
 	}
 
 	start();
@@ -181,7 +197,7 @@ exports.get_transaction_history = (req, res, next) => {
 	function start () {
 		mysql.use('master')
 			.query(
-				'SELECT * FROM history WHERE teacher_id = ?;',
+				'SELECT * FROM history WHERE teacher_id = ? ORDER BY log_time DESC;',
 				[req.session.user.teacher_id],
 				send_response
 			)
@@ -206,3 +222,47 @@ exports.get_transaction_history = (req, res, next) => {
 
 	start();
 };
+
+exports.get_picture = (req, res, next) => {
+	
+	function start() {
+		mysql.use('master') 
+			.query(
+				'SELECT picture FROM teacher WHERE teacher_id = ?;',
+				[req.session.user.teacher_id],
+				request_image
+			)
+			.end();	
+	}
+	
+	function request_image(err, result, args, last_query){
+		if(err){
+			winston.error('Error in retrieving image.');
+			return next(err);
+		}
+	
+		if(!result.length){
+			return res.status(404)
+				.error({code: 'TEACHER404', message: 'Teacher image not found'})
+				.send();
+		}
+		
+		var options = {
+			root: __dirname + '/../uploads/teachers/pictures'
+		};
+
+		var fileName = result[0].picture;
+		res.sendFile(fileName, options, function (err) {
+			if (err) {
+				console.log(err);
+				res.status(err.status).end();
+			}
+			else {
+				console.log('Sent:', fileName);
+			}
+		});
+
+	}
+
+	start();
+}
