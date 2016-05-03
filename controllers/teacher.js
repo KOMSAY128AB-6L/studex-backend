@@ -1,11 +1,13 @@
 'use strict';
 
+const config    = require(__dirname + '/../config/config');
 const mysql     = require('anytv-node-mysql');
 const winston   = require('winston');
 const logger = require('../helpers/logger');
 const sh        = require('shelljs');
 const multer    = require('multer');
 const fs        = require('fs');
+const path      = require('path');
 const storage   = multer.diskStorage({
     destination: (req, file, cb) => {
 		let destFolder =__dirname + '/../uploads/teachers/pictures';
@@ -173,8 +175,8 @@ exports.upload_picture = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'UPDATE student SET picture = ? WHERE student_id = ?',
-                [req.file.filename, req.params.id],
+                'UPDATE teacher SET picture = ? WHERE teacher_id = ?',
+                [req.file.filename, req.session.user.teacher_id],
                 send_response
             )
             .end();
@@ -247,20 +249,15 @@ exports.get_picture = (req, res, next) => {
 				.send();
 		}
 		
-		var options = {
-			root: __dirname + '/../uploads/teachers/pictures'
-		};
+        let filePath = path.join(config.TEACHER_PIC_PATH, result[0].picture);
+        let stat = fs.statSync(filePath);
 
-		var fileName = result[0].picture;
-		res.sendFile(fileName, options, function (err) {
-			if (err) {
-				console.log(err);
-				res.status(err.status).end();
-			}
-			else {
-				console.log('Sent:', fileName);
-			}
-		});
+        res.writeHead(200, {
+            'Content-Type': 'image',
+            'Content-Length': stat.size
+        });
+
+        fs.createReadStream(filePath).pipe(res);
 
 	}
 
