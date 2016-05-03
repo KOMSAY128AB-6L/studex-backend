@@ -1,14 +1,15 @@
 'use strict';
 
-const util  	   = require(__dirname + '/../helpers/util');
-const date  	   = require(__dirname + '/../helpers/date');
+const util  	     = require(__dirname + '/../helpers/util');
+const date  	     = require(__dirname + '/../helpers/date');
+const config       = require(__dirname + '/../config/config');
 const logger       = require('../helpers/logger');
 const csv_writer   = require('fast-csv');
 const mysql   	   = require('anytv-node-mysql');
 const winston 	   = require('winston');
 const sh       	   = require('shelljs');
 const multer       = require('multer');
-const fs		   = require('fs');
+const fs		       = require('fs');
 const storage      =   multer.diskStorage( {
     destination: (req, file, cb) => {
 		let destFolder =__dirname + '/../uploads/csv';
@@ -362,8 +363,8 @@ exports.create_class = (req, res, next) => {
 
 exports.insert_csv_classlist = (req, res, next) => {
 
-    const timestamp = date.get_today();
-	let path;
+  const timestamp = date.get_today();
+  let path, user, pass, credential;
 
 	function start () {
 		upload(req, res, generate_query);
@@ -385,7 +386,16 @@ exports.insert_csv_classlist = (req, res, next) => {
 			return next(err);
 		}
 
-		sh.exec('sudo mysql -uroot < database/classlist-' + timestamp + '.sql', clean_sql);
+    if (config.DB.user !== '') {
+      user = '-u' + config.DB.user;
+    }
+
+    if (config.DB.password !== '') {
+      pass = '-p' + config.DB.password;
+    }
+
+    credential = user + ' ' + pass;
+		sh.exec('sudo mysql ' + credential + ' < database/classlist-' + timestamp + '.sql', clean_sql);
 	}
 
 	function clean_sql (err) {
@@ -393,7 +403,7 @@ exports.insert_csv_classlist = (req, res, next) => {
 			winston.error('Error in inserting classlist from CSV');
 			sh.rm('database/classlist-' + timestamp + '.sql', path);
 			return next(err);
-        }
+    }
 
 		sh.exec('rm database/classlist-' + timestamp + '.sql', clean_csv);
 	}
@@ -401,21 +411,21 @@ exports.insert_csv_classlist = (req, res, next) => {
 	function clean_csv (err) {
 		if (err) {
 			winston.error('Error in removing sql file');
-            return next(err);
-        }
+      return next(err);
+    }
 
 		sh.exec('rm ' + path, send_response);
 	}
 
 	function send_response (err) {
-        if (err) {
-            winston.error('Error in removing csv file');
-            return next(err);
-        }
-
-        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' inserted students list from CSV.');
-        res.send({message: "Classlist inserted"});
+    if (err) {
+      winston.error('Error in removing csv file');
+      return next(err);
     }
 
-    start();
+    logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' inserted students list from CSV.');
+    res.send({message: "Classlist inserted"});
+  }
+
+  start();
 }
