@@ -29,19 +29,20 @@ module.exports = (router) => {
     router.put ('/student/:id',                     $, __.student.update_student);
     router.del ('/student/:id',                     $, __.student.delete_student);
     router.post('/student/:id/upload',              $, __.student.upload_picture);
-    router.get ('/volunteer/:id',                    $, __.student.get_times_student_volunteered);
+    router.get ('/volunteer/:id',                   $, __.student.get_times_student_volunteered);
     router.post('/student/tag/:id',                 $, __.student.insert_student_tag);
 
-    router.get ('/teachers',                         $, __.teacher.get_teachers);
-    router.get ('/teacher',                          $, __.teacher.get_teacher);
+    router.get ('/teachers',                        $, __.teacher.get_teachers);
+    router.get ('/teacher',                         $, __.teacher.get_teacher);
     router.post('/teacher',                         $, __.teacher.post_teacher);
-    router.put ('/teacher',                      $, __.teacher.update_teacher);
-    router.del ('/teacher/:id',                   $, __.teacher.delete_teacher);
-    router.post('/teacher/upload',              $, __.teacher.upload_picture);
+    router.put ('/teacher',                         $, __.teacher.update_teacher);
+    router.del ('/teacher/:id',                     $, __.teacher.delete_teacher);
+    router.post('/teacher/upload',                  $, __.teacher.upload_picture);
     router.get ('/history',			                $, __.teacher.get_transaction_history);
 
 	//teacher image
-	router.get('/teacher_picture',	 						$, __.teacher.get_picture);
+	router.get ('/teacher_picture',	                $, __.teacher.get_picture);
+    router.get ('/student/:id/picture',             $, __.student.get_picture);
 
 	// Routes for class read and write CSV
     router.get('/class/csv',                        $, __.class.write_to_csv);

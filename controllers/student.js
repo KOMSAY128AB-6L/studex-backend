@@ -1,13 +1,14 @@
 'use strict';
 
-const config  = require(__dirname + '/../config/config');
-const util   = require(__dirname + '/../helpers/util');
-const logger = require('../helpers/logger');
-const mysql   = require('anytv-node-mysql');
-const winston = require('winston');
+const config    = require(__dirname + '/../config/config');
+const util      = require(__dirname + '/../helpers/util');
+const logger    = require('../helpers/logger');
+const mysql     = require('anytv-node-mysql');
+const winston   = require('winston');
 const sh        = require('shelljs');
 const multer    = require('multer');
 const fs        = require('fs');
+const path      = require('path');
 const storage   = multer.diskStorage({
     destination: (req, file, cb) => {
         let destFolder =__dirname + '/../uploads/students/pictures';
@@ -453,3 +454,41 @@ exports.insert_student_tag = (req, res, next) => {
 
     start();
 };
+
+exports.get_picture = (req, res, next) => {
+	function start() {
+		mysql.use('master') 
+			.query(
+				'SELECT picture FROM student s, class c WHERE s.student_id = ? AND s.class_id = c.class_id AND c.teacher_id = ?',
+				[req.params.id, req.session.user.teacher_id],
+				request_image
+			)
+			.end();	
+	}
+	
+	function request_image(err, result, args, last_query){
+		if(err){
+			winston.error('Error in retrieving image.');
+			return next(err);
+		}
+	
+		if(!result.length){
+			return res.status(404)
+				.error({message: 'Student image not found'})
+				.send();
+		}
+
+        let filePath = path.join(config.STUDENT_PIC_PATH, result[0].picture);
+        let stat = fs.statSync(filePath);
+
+        res.writeHead(200, {
+            'Content-Type': 'image',
+            'Content-Length': stat.size
+        });
+
+        fs.createReadStream(filePath).pipe(res);
+
+	}
+
+	start();
+}
