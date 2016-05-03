@@ -33,6 +33,7 @@ const config = {
     SALT: 'q5cH9VoL',
 
     STUDENT_PIC_PATH: __dirname +  '/../uploads/students/pictures',
+    TEACHER_PIC_PATH: __dirname + '/../uploads/teachers/pictures',
 
     use: (env) => {
         _.assign(config, require(__dirname + '/env/' + env));

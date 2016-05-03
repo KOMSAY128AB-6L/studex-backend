@@ -41,7 +41,7 @@ module.exports = (router) => {
     router.get ('/history',			                $, __.teacher.get_transaction_history);
 
 	//teacher image
-	router.get ('/teacher_picture',	                $, __.teacher.get_picture);
+	router.get ('/teacher/picture',	                $, __.teacher.get_picture);
     router.get ('/student/:id/picture',             $, __.student.get_picture);
 
 	// Routes for class read and write CSV
