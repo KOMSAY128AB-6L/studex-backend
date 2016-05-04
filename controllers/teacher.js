@@ -127,36 +127,120 @@ exports.update_teacher = (req, res, next) => {
 
 exports.delete_teacher = (req, res, next) => {
 
-	function start () {
-		mysql.use('master')
-			.query(
-				'DELETE from teacher WHERE teacher_id=?;',
-				[req.session.user.teacher_id],
-				send_response
-			)
-			.end();
-	}
+  function start () {
+    mysql.use('master')
+      .query(
+        'DELETE FROM history WHERE teacher_id=?;',
+        [req.session.user.teacher_id],
+        remove_student
+      )
+      .end();
+  }
 
-	function send_response (err, result, args, last_query) {
+  function remove_student (err, result, args, last_query) {
+    if (err) {
+      winston.error('Error in deleting log', last_query);
+      return next(err);
+    }
 
-		if (err) {
-			winston.error('Error in deleting teacher', last_query);
-			return next(err);
-		}
+    if (!result.affectedRows) {
+      return res.status(404)
+        .error({code: 'log404', message: 'log not found'})
+        .send();
+    }
 
-		if (!result.affectedRows) {
-			return res.status(404)
-				.error({code: 'teacher404', message: 'teacher not found'})
-				.send();
-		}
+    mysql.use('master')
+      .query(
+        'DELETE FROM student WHERE class_id=(SELECT class_id FROM class WHERE teacher_id=? LIMIT 1);',
+        [req.session.user.teacher_id],
+        remove_teacher
+      )
+      .end();
+  }
 
-		logger.logg(req.session.user.teacher_id, last_query);
 
-		res.item(result[0])
-			.send();
-	}
+  function remove_teacher (err, result, args, last_query) {
+    if (err) {
+      winston.error('Error in deleting student', last_query);
+      return next(err);
+    }
 
-	start();
+    if (!result.affectedRows) {
+      return res.status(404)
+        .error({code: 'student404', message: 'student not found'})
+        .send();
+    }
+
+    mysql.use('master')
+      .query(
+        'DELETE FROM teacher WHERE teacher_id=?;',
+        [req.session.user.teacher_id],
+        remove_class
+      )
+      .end();
+  }
+
+  function remove_volunteer (err, result, args, last_query) {
+    if (err) {
+      winston.error('Error in deleting teacher', last_query);
+      return next(err);
+    }
+
+    if (!result.affectedRows) {
+      return res.status(404)
+      .error({code: 'teacher404', message: 'teacher not found'})
+      .send();
+    }
+
+    mysql.use('master')
+    .query(
+      'DELETE FROM volunteer WHERE teacher_id=?;',
+      [req.session.user.teacher_id],
+      remove_class
+    )
+    .end();
+  }
+
+  function remove_class (err, result, args, last_query) {
+    if (err) {
+      winston.error('Error in deleting volunteer', last_query);
+      return next(err);
+    }
+
+    if (!result.affectedRows) {
+      return res.status(404)
+      .error({code: 'volunteer404', message: 'volunteer not found'})
+      .send();
+    }
+
+    mysql.use('master')
+    .query(
+      'DELETE FROM class WHERE teacher_id=?;',
+      [req.session.user.teacher_id],
+      send_response
+    )
+    .end();
+  }
+
+  function send_response (err, result, args, last_query) {
+    if (err) {
+      winston.error('Error in deleting class', last_query);
+      return next(err);
+    }
+
+    if (!result.affectedRows) {
+      return res.status(404)
+        .error({code: 'class404', message: 'class not found'})
+        .send();
+    }
+
+    logger.logg(req.session.user.teacher_id, last_query);
+
+    res.item(result[0])
+      .send();
+  }
+
+  start();
 };
 
 exports.upload_picture = (req, res, next) => {
@@ -224,29 +308,29 @@ exports.get_transaction_history = (req, res, next) => {
 };
 
 exports.get_picture = (req, res, next) => {
-	
+
 	function start() {
-		mysql.use('master') 
+		mysql.use('master')
 			.query(
 				'SELECT picture FROM teacher WHERE teacher_id = ?;',
 				[req.session.user.teacher_id],
 				request_image
 			)
-			.end();	
+			.end();
 	}
-	
+
 	function request_image(err, result, args, last_query){
 		if(err){
 			winston.error('Error in retrieving image.');
 			return next(err);
 		}
-	
+
 		if(!result.length){
 			return res.status(404)
 				.error({code: 'TEACHER404', message: 'Teacher image not found'})
 				.send();
 		}
-		
+
 		var options = {
 			root: __dirname + '/../uploads/teachers/pictures'
 		};
