@@ -468,7 +468,7 @@ exports.get_picture = (req, res, next) => {
 	
 	function read_image(err, result, args, last_query){
 		if(err){
-			winston.error('Error in retrieving image.');
+			winston.error('Error in selecting student', last_query);
 			return next(err);
 		}
 	
@@ -484,7 +484,19 @@ exports.get_picture = (req, res, next) => {
 
     function give_image(err, stats) {
         if (err) {
-            return res.warn(404, {message: 'Image not found'});
+            return fs.stat(filePath, (err, stats) => {
+                if (err) {
+                    winston.error('Error in retrieving image');
+                    return next(err);
+                }
+
+                res.writeHead(200, {
+                    'Content-Type': 'image',
+                    'Content-Length': stats.size
+                });
+
+                fs.createReadStream(config.DEFAULT_PIC).pipe(res);
+            });
         }
 
         res.writeHead(200, {
