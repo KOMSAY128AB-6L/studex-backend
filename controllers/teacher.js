@@ -226,18 +226,19 @@ exports.get_transaction_history = (req, res, next) => {
 };
 
 exports.get_picture = (req, res, next) => {
+    let filePath;
 	
 	function start() {
 		mysql.use('master') 
 			.query(
 				'SELECT picture FROM teacher WHERE teacher_id = ?;',
 				[req.session.user.teacher_id],
-				request_image
+				read_image
 			)
 			.end();	
 	}
 	
-	function request_image(err, result, args, last_query){
+	function read_image(err, result, args, last_query){
 		if(err){
 			winston.error('Error in retrieving image.');
 			return next(err);
@@ -249,17 +250,22 @@ exports.get_picture = (req, res, next) => {
 				.send();
 		}
 		
-        let filePath = path.join(config.TEACHER_PIC_PATH, result[0].picture);
-        let stat = fs.statSync(filePath);
+        filePath = `${config.TEACHER_PIC_PATH}/${result[0].picture}`;
+        fs.stat(filePath, give_image);
+	}
+
+    function give_image(err, stats) {
+        if (err) {
+            return res.warn(404, {message: 'Image not found'});
+        }
 
         res.writeHead(200, {
             'Content-Type': 'image',
-            'Content-Length': stat.size
+            'Content-Length': stats.size
         });
 
         fs.createReadStream(filePath).pipe(res);
-
-	}
+    }
 
 	start();
 }

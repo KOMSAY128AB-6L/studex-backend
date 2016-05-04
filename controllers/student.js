@@ -478,7 +478,7 @@ exports.get_picture = (req, res, next) => {
 				.send();
 		}
 
-        filePath = config.STUDENT_PIC_PATH + result[0].picture;
+        filePath = `${config.STUDENT_PIC_PATH}/${result[0].picture}`;
         fs.stat(filePath, give_image);
 	}
 
@@ -489,7 +489,7 @@ exports.get_picture = (req, res, next) => {
 
         res.writeHead(200, {
             'Content-Type': 'image',
-            'Content-Length': stat.size
+            'Content-Length': stats.size
         });
 
         fs.createReadStream(filePath).pipe(res);
