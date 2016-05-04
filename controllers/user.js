@@ -145,15 +145,7 @@ exports.reset_password = (req, res, next) => {
     }
 
     function send_email (err, result, args, last_query) {
-        var smtpConfig = {
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // use SSL
-            auth: {
-                user: 'studex.staff@gmail.com',
-                pass: 'cmsc128ab6l'
-            }
-        };
+        var smtpConfig = config.SMTP;
 
         // create reusable transporter object using the default SMTP transport
         var transporter = nodemailer.createTransport(smtpConfig);

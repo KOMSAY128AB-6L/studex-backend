@@ -32,6 +32,16 @@ const config = {
 
     SALT: 'q5cH9VoL',
 
+    SMTP: {
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // use SSL
+            auth: {
+                user: 'studex.staff@gmail.com',
+                pass: 'cmsc128ab6l'
+            }
+        },
+
     use: (env) => {
         _.assign(config, require(__dirname + '/env/' + env));
         return config;
