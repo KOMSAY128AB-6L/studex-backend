@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS class (
 	section VARCHAR(32) NOT NULL,
 	teacher_id INT  NOT NULL,
 	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS student (
@@ -51,6 +53,8 @@ CREATE TABLE IF NOT EXISTS student (
 	class_id BIGINT,
     chance FLOAT DEFAULT .1 NOT NULL,
 	FOREIGN KEY(class_id) REFERENCES class(class_id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS volunteer (
@@ -59,17 +63,27 @@ CREATE TABLE IF NOT EXISTS volunteer (
 	teacher_id INT,
 	class_id BIGINT,
 	volunteer_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY(student_id) REFERENCES student(student_id),
-	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id),
+	FOREIGN KEY(student_id) REFERENCES student(student_id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
 	FOREIGN KEY(class_id) REFERENCES class(class_id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS volunteer_student (
 	vs_id BIGINT AUTO_INCREMENT PRIMARY KEY,
 	student_id INT,
 	volunteer_id BIGINT,
-	FOREIGN KEY(student_id) REFERENCES student(student_id),
+	FOREIGN KEY(student_id) REFERENCES student(student_id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
 	FOREIGN KEY(volunteer_id) REFERENCES volunteer(volunteer_id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 );
 
 
@@ -90,11 +104,15 @@ CREATE TABLE IF NOT EXISTS history (
 	log_time timestamp NOT NULL default CURRENT_TIMESTAMP,
 	teacher_id INT, log_text VARCHAR(255),
 	FOREIGN KEY(teacher_id) REFERENCES teacher(teacher_id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS student_tag (
     student_id INT,
     tag VARCHAR(16),
-    FOREIGN KEY(student_id) REFERENCES student(student_id),
+    FOREIGN KEY(student_id) REFERENCES student(student_id)
+			ON DELETE CASCADE
+			ON UPDATE CASCADE,
     PRIMARY KEY(student_id, tag)
 );
