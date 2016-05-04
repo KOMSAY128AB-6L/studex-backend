@@ -302,14 +302,14 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
     function start () {
         mysql.use('master')
             .query(
-                'SELECT CONCAT(CONCAT(teacher.first_name, ", "), teacher.last_name) as "Teacher",\
-                    CONCAT(CONCAT(class.class_name, "-"), class.section) as "Class",\
-                    CONCAT(CONCAT(student.first_name, ", "), student.last_name) as "Volunteer", student.picture as Picture, \
-                    volunteer_date FROM volunteer, teacher, class, volunteer_student, student WHERE teacher.teacher_id = ? and \
-                    teacher.teacher_id = volunteer.teacher_id and class.class_id = volunteer.class_id\
-                    and student.student_id= volunteer_student.student_id ORDER BY volunteer_date DESC;',
-                    [req.session.user.teacher_id],
-                    send_response
+                    `SELECT CONCAT(CONCAT(t.first_name, ", "), t.last_name) AS "Teacher",
+                     CONCAT(CONCAT(c.class_name, "-"), c.section) AS "Class",
+                     CONCAT(CONCAT(s.last_name, ", "), s.first_name) AS "Volunteer", s.picture AS Picture, 
+                     volunteer_date FROM volunteer v, teacher t, class c, volunteer_student vs, student s WHERE t.teacher_id = ? AND
+                     t.teacher_id = v.teacher_id and c.class_id = s.class_id AND v.volunteer_id = vs.volunteer_id
+                     AND s.student_id= vs.student_id ORDER BY volunteer_date DESC;`,
+                   [req.session.user.teacher_id],
+                   send_response
             )
             .end();
     }
