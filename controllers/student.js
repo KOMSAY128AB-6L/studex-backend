@@ -8,7 +8,6 @@ const winston   = require('winston');
 const sh        = require('shelljs');
 const multer    = require('multer');
 const fs        = require('fs');
-const path      = require('path');
 const storage   = multer.diskStorage({
     destination: (req, file, cb) => {
         let destFolder =__dirname + '/../uploads/students/pictures';
@@ -456,17 +455,18 @@ exports.insert_student_tag = (req, res, next) => {
 };
 
 exports.get_picture = (req, res, next) => {
+    let filePath;
 	function start() {
 		mysql.use('master') 
 			.query(
 				'SELECT picture FROM student s, class c WHERE s.student_id = ? AND s.class_id = c.class_id AND c.teacher_id = ?',
 				[req.params.id, req.session.user.teacher_id],
-				request_image
+				read_image
 			)
 			.end();	
 	}
 	
-	function request_image(err, result, args, last_query){
+	function read_image(err, result, args, last_query){
 		if(err){
 			winston.error('Error in retrieving image.');
 			return next(err);
@@ -474,12 +474,18 @@ exports.get_picture = (req, res, next) => {
 	
 		if(!result.length){
 			return res.status(404)
-				.error({message: 'Student image not found'})
+				.error({message: 'Student not found'})
 				.send();
 		}
 
-        let filePath = path.join(config.STUDENT_PIC_PATH, result[0].picture);
-        let stat = fs.statSync(filePath);
+        filePath = config.STUDENT_PIC_PATH + result[0].picture;
+        fs.stat(filePath, give_image);
+	}
+
+    function give_image(err, stats) {
+        if (err) {
+            return res.warn(404, {message: 'Image not found'});
+        }
 
         res.writeHead(200, {
             'Content-Type': 'image',
@@ -487,8 +493,7 @@ exports.get_picture = (req, res, next) => {
         });
 
         fs.createReadStream(filePath).pipe(res);
-
-	}
+    }
 
 	start();
 }
