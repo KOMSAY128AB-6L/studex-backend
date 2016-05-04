@@ -249,7 +249,7 @@ exports.retrieve_all_student = (req, res, next) => {
             return next(err);
         }
 
-        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed all students\' details.');
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed class #' + req.params.id + '\'s students\' details.');
 
         res.item(result)
             .send();
@@ -375,6 +375,8 @@ exports.upload_picture = (req, res, next) => {
             winston.error('Error in updating picture', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' uploaded a picture.');
 
        res.item({message: 'Successfully updated picture'}).send();
    }
@@ -487,6 +489,8 @@ exports.get_picture = (req, res, next) => {
         });
 
         fs.createReadStream(filePath).pipe(res);
+        
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed student #' + req.params.id + '\'s picture.');
 
 	}
 
