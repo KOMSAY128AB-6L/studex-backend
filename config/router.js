@@ -36,7 +36,7 @@ module.exports = (router) => {
     router.get ('/teacher',                         $, __.teacher.get_teacher);
     router.post('/teacher',                         $, __.teacher.post_teacher);
     router.put ('/teacher',                         $, __.teacher.update_teacher);
-    router.del ('/teacher/:id',                     $, __.teacher.delete_teacher);
+    router.del ('/teacher',                     $, __.teacher.delete_teacher);
     router.post('/teacher/upload',                  $, __.teacher.upload_picture);
     router.get ('/history',			                $, __.teacher.get_transaction_history);
 

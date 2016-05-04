@@ -132,92 +132,7 @@ exports.delete_teacher = (req, res, next) => {
   function start () {
     mysql.use('master')
       .query(
-        'DELETE FROM history WHERE teacher_id=?;',
-        [req.session.user.teacher_id],
-        remove_student
-      )
-      .end();
-  }
-
-  function remove_student (err, result, args, last_query) {
-    if (err) {
-      winston.error('Error in deleting log', last_query);
-      return next(err);
-    }
-
-    if (!result.affectedRows) {
-      return res.status(404)
-        .error({code: 'log404', message: 'log not found'})
-        .send();
-    }
-
-    mysql.use('master')
-      .query(
-        'DELETE FROM student WHERE class_id=(SELECT class_id FROM class WHERE teacher_id=? LIMIT 1);',
-        [req.session.user.teacher_id],
-        remove_teacher
-      )
-      .end();
-  }
-
-
-  function remove_teacher (err, result, args, last_query) {
-    if (err) {
-      winston.error('Error in deleting student', last_query);
-      return next(err);
-    }
-
-    if (!result.affectedRows) {
-      return res.status(404)
-        .error({code: 'student404', message: 'student not found'})
-        .send();
-    }
-
-    mysql.use('master')
-      .query(
         'DELETE FROM teacher WHERE teacher_id=?;',
-        [req.session.user.teacher_id],
-        remove_class
-      )
-      .end();
-  }
-
-  function remove_volunteer (err, result, args, last_query) {
-    if (err) {
-      winston.error('Error in deleting teacher', last_query);
-      return next(err);
-    }
-
-    if (!result.affectedRows) {
-      return res.status(404)
-      .error({code: 'teacher404', message: 'teacher not found'})
-      .send();
-    }
-
-    mysql.use('master')
-    .query(
-      'DELETE FROM volunteer WHERE teacher_id=?;',
-      [req.session.user.teacher_id],
-      remove_class
-    )
-    .end();
-  }
-
-  function remove_class (err, result, args, last_query) {
-    if (err) {
-      winston.error('Error in deleting volunteer', last_query);
-      return next(err);
-    }
-
-    if (!result.affectedRows) {
-      return res.status(404)
-      .error({code: 'volunteer404', message: 'volunteer not found'})
-      .send();
-    }
-
-    mysql.use('master')
-    .query(
-      'DELETE FROM class WHERE teacher_id=?;',
       [req.session.user.teacher_id],
       send_response
     )
@@ -226,13 +141,13 @@ exports.delete_teacher = (req, res, next) => {
 
   function send_response (err, result, args, last_query) {
     if (err) {
-      winston.error('Error in deleting class', last_query);
+      winston.error('Error in deleting teacher', last_query);
       return next(err);
     }
 
     if (!result.affectedRows) {
       return res.status(404)
-        .error({code: 'class404', message: 'class not found'})
+        .error({code: 'teacher404', message: 'teacher not found'})
         .send();
     }
 
