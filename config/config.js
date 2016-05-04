@@ -35,6 +35,8 @@ const config = {
     STUDENT_PIC_PATH: __dirname +  '/../uploads/students/pictures',
     TEACHER_PIC_PATH: __dirname + '/../uploads/teachers/pictures',
 
+    RESET_LINK: 'http://localhost:8000/confirm_reset',
+
     SMTP: {
             host: 'smtp.gmail.com',
             port: 465,
