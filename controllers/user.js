@@ -145,34 +145,26 @@ exports.reset_password = (req, res, next) => {
     }
 
     function send_email (err, result, args, last_query) {
-        var smtpConfig = {
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // use SSL
-            auth: {
-                user: 'studex.staff@gmail.com',
-                pass: 'cmsc128ab6l'
-            }
-        };
+        let smtpConfig = config.SMTP;
 
         // create reusable transporter object using the default SMTP transport
-        var transporter = nodemailer.createTransport(smtpConfig);
+        let transporter = nodemailer.createTransport(smtpConfig);
 
         // setup e-mail data with unicode symbols
-        var mailOptions = {
+        let mailOptions = {
             from: '"Studex Support" <studex.staff@gmail.com>', // sender address
             to: data.email, // list of receivers
             subject: 'Studex Account Password Reset', // Subject line
             text: `Dear ${user.first_name}, \n\n
                     You have requested to have your password reset for your account at Studex. \n
                     Please click on the following link or copy and paste the link on your address bar and enter ${user.random_string} to reset your password.
-                    http://localhost:8000/confirm_reset \n
+                    ${config.RESET_LINK} \n
                     This key is valid only for 24 hours.\n
                     If you received this email in error, you can safely ignore this email.`, // plaintext body
             html: `<p>Dear ${user.first_name},</p><p></p>
                     <p>You have requested to have your password reset for your account at Studex.</p><p></p>
                     <p>Please click on the following link or copy and paste the link on your address bar and enter <strong> ${user.random_string} </strong> to reset your password. </p><p></p>
-                    <p><a href="http://localhost:8000/confirm_reset">http://localhost:8000/confirm_reset</a></p><p></p>
+                    <p><a href="${config.RESET_LINK}">${config.RESET_LINK}</a></p><p></p>
                     <p>This key is valid only for 24 hours.</p><p></p>
                     <p>If you received this email in error, you can safely ignore this email.</p>` // html body
         };
