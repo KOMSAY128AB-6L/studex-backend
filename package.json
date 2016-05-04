@@ -25,6 +25,7 @@
     "morgan": "^1.6.1",
     "multer": "^1.1.0",
     "nodemailer": "^2.3.0",
+    "path": "^0.12.7",
     "shelljs": "^0.6.0",
     "winston": "^2.1.0"
   },

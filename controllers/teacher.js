@@ -1,11 +1,13 @@
 'use strict';
 
+const config    = require(__dirname + '/../config/config');
 const mysql     = require('anytv-node-mysql');
 const winston   = require('winston');
 const logger = require('../helpers/logger');
 const sh        = require('shelljs');
 const multer    = require('multer');
 const fs        = require('fs');
+const path      = require('path');
 const storage   = multer.diskStorage({
     destination: (req, file, cb) => {
 		let destFolder =__dirname + '/../uploads/teachers/pictures';
@@ -19,7 +21,7 @@ const storage   = multer.diskStorage({
     filename: (req, file, cb) => {
         let arr = /.*(\.[^\.]+)$/.exec(file.originalname);
 
-        cb(null, req.body.id + (arr? arr[1]: '.jpg'));
+        cb(null, req.session.user.teacher_id + (arr? arr[1]: '.jpg'));
     }
 });
 const upload    = multer({storage : storage}).single('pic');
@@ -162,17 +164,31 @@ exports.delete_teacher = (req, res, next) => {
 exports.upload_picture = (req, res, next) => {
 
 	function start () {
-		upload(req, res, send_response);
+		upload(req, res, update_picture);
 	}
 
-	function send_response (err) {
+    function update_picture (err) {
+        if (err) {
+            winston.error('Error in uploading picture');
+            return next(err);
+        }
 
-		if (err) {
-			winston.error('Error in uploading picture');
-			return next(err);
-		}
+        mysql.use('master')
+            .query(
+                'UPDATE teacher SET picture = ? WHERE teacher_id = ?',
+                [req.file.filename, req.session.user.teacher_id],
+                send_response
+            )
+            .end();
+    }
 
-		res.item(req.file.path).send();
+    function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in updating picture', last_query);
+            return next(err);
+        }
+
+       res.item({message: 'Successfully updated picture'}).send();
 	}
 
 	start();
@@ -233,20 +249,15 @@ exports.get_picture = (req, res, next) => {
 				.send();
 		}
 		
-		var options = {
-			root: __dirname + '/../uploads/teachers/pictures'
-		};
+        let filePath = path.join(config.TEACHER_PIC_PATH, result[0].picture);
+        let stat = fs.statSync(filePath);
 
-		var fileName = result[0].picture;
-		res.sendFile(fileName, options, function (err) {
-			if (err) {
-				console.log(err);
-				res.status(err.status).end();
-			}
-			else {
-				console.log('Sent:', fileName);
-			}
-		});
+        res.writeHead(200, {
+            'Content-Type': 'image',
+            'Content-Length': stat.size
+        });
+
+        fs.createReadStream(filePath).pipe(res);
 
 	}
 
