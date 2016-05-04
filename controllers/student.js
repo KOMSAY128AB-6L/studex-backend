@@ -484,19 +484,7 @@ exports.get_picture = (req, res, next) => {
 
     function give_image(err, stats) {
         if (err) {
-            return fs.stat(filePath, (err, stats) => {
-                if (err) {
-                    winston.error('Error in retrieving image');
-                    return next(err);
-                }
-
-                res.writeHead(200, {
-                    'Content-Type': 'image',
-                    'Content-Length': stats.size
-                });
-
-                fs.createReadStream(config.DEFAULT_PIC).pipe(res);
-            });
+            return res.redirect(config.DEFAULT_PIC_LINK);
         }
 
         res.writeHead(200, {

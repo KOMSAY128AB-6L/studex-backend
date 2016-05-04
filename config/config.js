@@ -35,6 +35,7 @@ const config = {
     STUDENT_PIC_PATH: __dirname +  '/../uploads/students/pictures',
     TEACHER_PIC_PATH: __dirname + '/../uploads/teachers/pictures',
     DEFAULT_PIC: `${__dirname}/../assets/images/default-avatar.png`,
+    DEFAULT_PIC_LINK: 'http://localhost:8000/assets/images/default-avatar.png',
 
     use: (env) => {
         _.assign(config, require(__dirname + '/env/' + env));
