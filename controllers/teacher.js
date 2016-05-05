@@ -227,20 +227,21 @@ exports.get_transaction_history = (req, res, next) => {
 };
 
 exports.get_picture = (req, res, next) => {
-
+    let filePath;
+	
 	function start() {
 		mysql.use('master')
 			.query(
 				'SELECT picture FROM teacher WHERE teacher_id = ?;',
 				[req.session.user.teacher_id],
-				request_image
+				read_image
 			)
 			.end();
 	}
-
-	function request_image(err, result, args, last_query){
+	
+	function read_image(err, result, args, last_query){
 		if(err){
-			winston.error('Error in retrieving image.');
+			winston.error('Error in selecting teacher', last_query);
 			return next(err);
 		}
 
@@ -249,16 +250,22 @@ exports.get_picture = (req, res, next) => {
 				.error({code: 'TEACHER404', message: 'Teacher image not found'})
 				.send();
 		}
+		
+        filePath = `${config.TEACHER_PIC_PATH}/${result[0].picture}`;
+        fs.stat(filePath, give_image);
+	}
 
-    let filePath = path.join(config.TEACHER_PIC_PATH, result[0].picture);
-    let stat = fs.statSync(filePath);
+    function give_image(err, stats) {
+        if (err) {
+            return res.redirect(config.DEFAULT_PIC_LINK);
+        }
 
-    res.writeHead(200, {
-        'Content-Type': 'image',
-        'Content-Length': stat.size
-    });
+        res.writeHead(200, {
+            'Content-Type': 'image',
+            'Content-Length': stats.size
+        });
 
-    fs.createReadStream(filePath).pipe(res);
+        fs.createReadStream(filePath).pipe(res);
 
     logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed his account picture.');
 

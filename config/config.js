@@ -34,6 +34,7 @@ const config = {
 
     STUDENT_PIC_PATH: __dirname +  '/../uploads/students/pictures',
     TEACHER_PIC_PATH: __dirname + '/../uploads/teachers/pictures',
+    DEFAULT_PIC_LINK: 'http://localhost:8000/assets/images/default-avatar.png',
 
     RESET_LINK: 'http://localhost:8000/confirm_reset',
 
