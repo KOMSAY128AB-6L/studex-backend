@@ -45,7 +45,7 @@ exports.view_class = (req, res, next) => {
 	function start () {
 	mysql.use('master')
 			.query(
-			'SELECT s.last_name, s.first_name, s.middle_initial, s.picture FROM student s, class c  WHERE c.class_id = ? AND s.class_id=c.class_id AND c.teacher_id=?',
+			'SELECT s.* FROM student s, class c  WHERE c.class_id = ? AND s.class_id=c.class_id AND c.teacher_id=?',
 			[req.params.id,req.session.user.teacher_id],
 			send_response
 		)
