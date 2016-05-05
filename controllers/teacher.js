@@ -43,7 +43,7 @@ exports.get_teachers = (req, res, next) => {
             return next(err);
         }
 
-		logger.logg(req.session.user.teacher_id, last_query);
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed all teachers.');
 
         res.item(result)
             .send();
@@ -118,7 +118,7 @@ exports.update_teacher = (req, res, next) => {
 				.send();
 		}
 
-		logger.logg(req.session.user.teacher_id, last_query);
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' updated his account details.');
 
 		res.item(result[0])
 			.send();
@@ -151,7 +151,7 @@ exports.delete_teacher = (req, res, next) => {
         .send();
     }
 
-    logger.logg(req.session.user.teacher_id, last_query);
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' deleted his account.');
 
     res.item(result[0])
       .send();
@@ -186,6 +186,8 @@ exports.upload_picture = (req, res, next) => {
             winston.error('Error in updating picture', last_query);
             return next(err);
         }
+
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' uploaded an account picture.');
 
        res.item({message: 'Successfully updated picture'}).send();
 	}
@@ -257,6 +259,9 @@ exports.get_picture = (req, res, next) => {
     });
 
     fs.createReadStream(filePath).pipe(res);
+
+    logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed his account picture.');
+
 	}
 
 	start();

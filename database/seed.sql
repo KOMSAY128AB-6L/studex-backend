@@ -118,8 +118,8 @@ INSERT INTO student(email, student_number, first_name, middle_initial,last_name,
 
 
 -- VOLUNTEER seed
-INSERT INTO volunteer(teacher_id, class_id, volunteer_date) VALUES("4", "4", curdate());
-INSERT INTO volunteer(teacher_id, class_id, volunteer_date) VALUES("1", "1", curdate());
+INSERT INTO volunteer(teacher_id, volunteer_date) VALUES("4", curdate());
+INSERT INTO volunteer(teacher_id, volunteer_date) VALUES("1", curdate());
 
 -- Add Student to Volunteers
 INSERT INTO volunteer_student(student_id, volunteer_id) VALUES("19", "1");
