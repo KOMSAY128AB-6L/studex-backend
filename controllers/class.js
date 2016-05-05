@@ -45,7 +45,7 @@ exports.view_class = (req, res, next) => {
 	function start () {
 	mysql.use('master')
 			.query(
-			'SELECT s.last_name, s.first_name, s.middle_initial, s.picture FROM student s, class c  WHERE c.class_id = ? AND s.class_id=c.class_id AND c.teacher_id=?',
+			'SELECT s.* FROM student s, class c  WHERE c.class_id = ? AND s.class_id=c.class_id AND c.teacher_id=?',
 			[req.params.id,req.session.user.teacher_id],
 			send_response
 		)
@@ -90,6 +90,9 @@ exports.view_classes = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Classes not found'})
 			.send();
 		}
+		
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed his classes.');
+		
 		res.item(result)
 		.send();
 	}
@@ -160,6 +163,8 @@ exports.update_class = (req, res, next) => {
 				.send();
 	}
 
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed students from class #' + data.id + '.');
+
 		res.item({message:'Class successfully updated'})
 		.send();
 	}
@@ -220,6 +225,9 @@ exports.no_repetition = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Classes not found'})
 			.send();
 		}
+		
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' set randomizer to no repetition.');
+		
 		res.item(result)
 		.send();
 	}

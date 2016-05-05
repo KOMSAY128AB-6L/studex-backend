@@ -36,6 +36,18 @@ const config = {
     TEACHER_PIC_PATH: __dirname + '/../uploads/teachers/pictures',
     DEFAULT_PIC_LINK: 'http://localhost:8000/assets/images/default-avatar.png',
 
+    RESET_LINK: 'http://localhost:8000/confirm_reset',
+
+    SMTP: {
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // use SSL
+            auth: {
+                user: 'studex.staff@gmail.com',
+                pass: 'cmsc128ab6l'
+            }
+        },
+
     use: (env) => {
         _.assign(config, require(__dirname + '/env/' + env));
         return config;
