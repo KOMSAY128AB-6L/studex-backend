@@ -227,12 +227,8 @@ exports.get_transaction_history = (req, res, next) => {
 };
 
 exports.get_picture = (req, res, next) => {
-<<<<<<< HEAD
     let filePath;
 	
-=======
-
->>>>>>> master
 	function start() {
 		mysql.use('master')
 			.query(
@@ -242,13 +238,8 @@ exports.get_picture = (req, res, next) => {
 			)
 			.end();
 	}
-<<<<<<< HEAD
 	
 	function read_image(err, result, args, last_query){
-=======
-
-	function request_image(err, result, args, last_query){
->>>>>>> master
 		if(err){
 			winston.error('Error in selecting teacher', last_query);
 			return next(err);
