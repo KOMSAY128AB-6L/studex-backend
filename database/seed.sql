@@ -75,7 +75,7 @@ INSERT INTO student(email, student_number, first_name, middle_initial,last_name,
 		VALUES("ebconstantino@up.edu.ph","2013-86033","Emmanual Jr.","B","Constantino","mj.jpg", 6);
 
 INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture, class_id)\
-		VALUES("pmquizon@up.edu.ph","2013-94124","Pia Carmela","M","Quiz","pia.jpg", 6);
+		VALUES("pmquizon@up.edu.ph","2013-94124","Pia Carmela","M","Quizon","pia.jpg", 6);
 
 INSERT INTO student(email, student_number, first_name, middle_initial,last_name, picture, class_id)\
 		VALUES("jamanalo@up.edu.ph","2013-98325","Joshua David","A","Manalo","manalo.jpg", 6);
@@ -118,8 +118,8 @@ INSERT INTO student(email, student_number, first_name, middle_initial,last_name,
 
 
 -- VOLUNTEER seed
-INSERT INTO volunteer(teacher_id, class_id, volunteer_date) VALUES("1", "6", curdate());
-INSERT INTO volunteer(teacher_id, class_id, volunteer_date) VALUES("3", "2", curdate());
+INSERT INTO volunteer(teacher_id, volunteer_date) VALUES("1", curdate());
+INSERT INTO volunteer(teacher_id, volunteer_date) VALUES("3", curdate());
 
 -- Add Student to Volunteers
 INSERT INTO volunteer_student(student_id, volunteer_id) VALUES("1", "1");
