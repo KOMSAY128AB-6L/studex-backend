@@ -137,6 +137,8 @@ exports.randomize_students = (req, res, next) => {
             winston.error('Error in inserting volunteers', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' randomized students.');
 
         res.items(volunteers)
            .send();

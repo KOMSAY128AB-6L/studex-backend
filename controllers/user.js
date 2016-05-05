@@ -431,6 +431,8 @@ exports.change_password = (req, res, next) => {
             winston.error('Error in changing password', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' changed password.');
 
         res.item({message: 'Password changed'})
            .send();
