@@ -1,25 +1,27 @@
 'use strict';
 
-const config  = require(__dirname + '/../config/config');
-const util   = require(__dirname + '/../helpers/util');
-const logger = require('../helpers/logger');
-const mysql   = require('anytv-node-mysql');
-const winston = require('winston');
+const config    = require(__dirname + '/../config/config');
+const util      = require(__dirname + '/../helpers/util');
+const logger    = require('../helpers/logger');
+const mysql     = require('anytv-node-mysql');
+const winston   = require('winston');
 const sh        = require('shelljs');
 const multer    = require('multer');
 const fs        = require('fs');
 const storage   = multer.diskStorage({
     destination: (req, file, cb) => {
-       let destFolder =__dirname + '/../uploads/students/pictures';
+        let destFolder =__dirname + '/../uploads/students/pictures';
 
-       if (!fs.existsSync(destFolder)) {
-           fs.mkdirSync(destFolder);
-       }
+        if (!fs.existsSync(destFolder)) {
+            fs.mkdirSync(destFolder);
+        }
 
-       cb(null, destFolder);
+        cb(null, destFolder);
     },
     filename: (req, file, cb) => {
-       cb(null,file.originalname);
+        let arr = /.*(\.[^\.]+)$/.exec(file.originalname);
+
+        cb(null, req.params.id + (arr? arr[1]: '.jpg'));
     }
 });
 const upload    = multer({storage : storage}).single('pic');
@@ -252,7 +254,7 @@ exports.retrieve_all_student = (req, res, next) => {
             return next(err);
         }
 
-        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed all students\' details.');
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed class #' + req.params.id + '\'s students\' details.');
 
         res.item(result)
             .send();
@@ -336,18 +338,173 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
 exports.upload_picture = (req, res, next) => {
 
    function start () {
-       upload(req, res, send_response);
+        mysql.use('master')
+            .query(
+                'SELECT * FROM student s JOIN class c ON s.class_id = c.class_id WHERE c.teacher_id = ? AND s.student_id = ?',
+                [req.session.user.teacher_id, req.params.id],
+                verify_student
+            )
+            .end();
    }
 
-   function send_response (err) {
+   function verify_student (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in selecting students', last_query);
+            return next(err);
+        }
 
-       if (err) {
-           winston.error('Error in uploading picture');
-           return next(err);
-       }
+        if (result.length === 0) {
+            return res.warn(400, {message: 'Student id does not belong in your class'});
+        }
 
-       res.item(req.file.path).send();
+        upload(req, res, update_picture);
+   }
+
+   function update_picture (err) {
+        if (err) {
+            winston.error('Error in uploading picture');
+            return next(err);
+        }
+
+        mysql.use('master')
+            .query(
+                'UPDATE student SET picture = ? WHERE student_id = ?',
+                [req.file.filename, req.params.id],
+                send_response
+            )
+            .end();
+   }
+
+   function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in updating picture', last_query);
+            return next(err);
+        }
+        
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' uploaded a picture.');
+
+       res.item({message: 'Successfully updated picture'}).send();
    }
 
     start();
 };
+
+exports.insert_student_tag = (req, res, next) => {
+    const data = util.get_data(
+        {
+            tag: ''
+        },
+        req.body
+    );
+
+    function start () {
+        if (data instanceof Error) {
+            return res.warn(400, {message: data.message});
+        }
+
+        mysql.use('master')
+            .query(
+                'SELECT * FROM student_tag WHERE student_id = ? AND tag = ?;',
+                [req.params.id,data.tag],
+                check_duplicate
+            )
+            .end();
+
+    }
+
+    function check_duplicate (err, result) {
+    
+        if(result.length){
+        	return res.status(409)
+                .error({code: 'STUDENT_TAG409', message: 'CONFLICT:Student tag already exists'})
+                .send();
+        }
+        
+		mysql.use('master')
+            .query(
+                'SELECT s.* FROM student s, class c WHERE s.student_id = ? AND s.class_id = c.class_id AND c.teacher_id=?;',
+                [req.params.id,req.session.user.teacher_id],
+                check_if_student
+            )
+            .end();
+        
+    }
+    
+    function check_if_student(err, result){
+    	if(!result.length){
+        	return res.status(404)
+                .error({code: 'STUDENT404', message: 'Student not found'})
+                .send();
+        }
+        console.log(result);
+        mysql.use('master')
+            .query(
+                'INSERT INTO student_tag(student_id, tag) VALUES (?,?);',
+                [req.params.id, data.tag],
+                send_response
+            )
+            .end();
+    }
+
+    function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in inserting tag', last_query);
+            return next(err);
+        }
+
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added student tag #' + data.student_id + '.');
+
+        return res.status(200)
+                .item({message: 'Student tag successfully inserted'})
+                .send();
+    }
+
+    start();
+};
+
+exports.get_picture = (req, res, next) => {
+    let filePath;
+	function start() {
+		mysql.use('master') 
+			.query(
+				'SELECT picture FROM student s, class c WHERE s.student_id = ? AND s.class_id = c.class_id AND c.teacher_id = ?',
+				[req.params.id, req.session.user.teacher_id],
+				read_image
+			)
+			.end();	
+	}
+	
+	function read_image(err, result, args, last_query){
+		if(err){
+			winston.error('Error in selecting student', last_query);
+			return next(err);
+		}
+	
+		if(!result.length){
+			return res.status(404)
+				.error({message: 'Student not found'})
+				.send();
+		}
+
+        filePath = `${config.STUDENT_PIC_PATH}/${result[0].picture}`;
+        fs.stat(filePath, give_image);
+	}
+
+    function give_image(err, stats) {
+        if (err) {
+            return res.redirect(config.DEFAULT_PIC_LINK);
+        }
+
+        res.writeHead(200, {
+            'Content-Type': 'image',
+            'Content-Length': stats.size
+        });
+
+        fs.createReadStream(filePath).pipe(res);
+        
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed student #' + req.params.id + '\'s picture.');
+
+	}
+
+	start();
+}

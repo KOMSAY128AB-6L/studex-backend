@@ -37,7 +37,7 @@ exports.randomize_students = (req, res, next) => {
         }
 
         if (data.settings.numberOfVolunteers < 0) {
-            return res.item({message: 'Number of volunteers requested is less than 0'}).send();
+            return res.warn(400, {message: 'Number of volunteers requested is less than 0'});
         }
 
         let student_ids = [];
@@ -98,7 +98,7 @@ exports.randomize_students = (req, res, next) => {
         data.student_list = result;
 
         if (data.settings.unique && data.settings.numberOfVolunteers > data.student_list.length) {
-            return res.item({message: 'Number of volunteers requested is greater than the number of students'}).send();
+            return res.warn(400, {message: 'Number of volunteers requested is greater than the number of students'});
         }
 
         mysql.use('master')
@@ -137,6 +137,8 @@ exports.randomize_students = (req, res, next) => {
             winston.error('Error in inserting volunteers', last_query);
             return next(err);
         }
+        
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' randomized students.');
 
         res.items(volunteers)
            .send();

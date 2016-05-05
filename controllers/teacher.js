@@ -1,11 +1,13 @@
 'use strict';
 
+const config    = require(__dirname + '/../config/config');
 const mysql     = require('anytv-node-mysql');
 const winston   = require('winston');
 const logger = require('../helpers/logger');
 const sh        = require('shelljs');
 const multer    = require('multer');
 const fs        = require('fs');
+const path      = require('path');
 const storage   = multer.diskStorage({
     destination: (req, file, cb) => {
 		let destFolder =__dirname + '/../uploads/teachers/pictures';
@@ -17,7 +19,9 @@ const storage   = multer.diskStorage({
 		cb(null, destFolder);
     },
     filename: (req, file, cb) => {
-		cb(null,file.originalname);
+        let arr = /.*(\.[^\.]+)$/.exec(file.originalname);
+
+        cb(null, req.session.user.teacher_id + (arr? arr[1]: '.jpg'));
     }
 });
 const upload    = multer({storage : storage}).single('pic');
@@ -39,7 +43,7 @@ exports.get_teachers = (req, res, next) => {
             return next(err);
         }
 
-		logger.logg(req.session.user.teacher_id, last_query);
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed all teachers.');
 
         res.item(result)
             .send();
@@ -114,7 +118,7 @@ exports.update_teacher = (req, res, next) => {
 				.send();
 		}
 
-		logger.logg(req.session.user.teacher_id, last_query);
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' updated his account details.');
 
 		res.item(result[0])
 			.send();
@@ -125,52 +129,67 @@ exports.update_teacher = (req, res, next) => {
 
 exports.delete_teacher = (req, res, next) => {
 
-	function start () {
-		mysql.use('master')
-			.query(
-				'DELETE from teacher WHERE teacher_id=?;',
-				[req.session.user.teacher_id],
-				send_response
-			)
-			.end();
-	}
+  function start () {
+    mysql.use('master')
+      .query(
+        'DELETE FROM teacher WHERE teacher_id=?;',
+      [req.session.user.teacher_id],
+      send_response
+    )
+    .end();
+  }
 
-	function send_response (err, result, args, last_query) {
+  function send_response (err, result, args, last_query) {
+    if (err) {
+      winston.error('Error in deleting teacher', last_query);
+      return next(err);
+    }
 
-		if (err) {
-			winston.error('Error in deleting teacher', last_query);
-			return next(err);
-		}
+    if (!result.affectedRows) {
+      return res.status(404)
+        .error({code: 'teacher404', message: 'teacher not found'})
+        .send();
+    }
 
-		if (!result.affectedRows) {
-			return res.status(404)
-				.error({code: 'teacher404', message: 'teacher not found'})
-				.send();
-		}
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' deleted his account.');
 
-		logger.logg(req.session.user.teacher_id, last_query);
+    res.item(result[0])
+      .send();
+  }
 
-		res.item(result[0])
-			.send();
-	}
-
-	start();
+  start();
 };
 
 exports.upload_picture = (req, res, next) => {
 
 	function start () {
-		upload(req, res, send_response);
+		upload(req, res, update_picture);
 	}
 
-	function send_response (err) {
+    function update_picture (err) {
+        if (err) {
+            winston.error('Error in uploading picture');
+            return next(err);
+        }
 
-		if (err) {
-			winston.error('Error in uploading picture');
-			return next(err);
-		}
+        mysql.use('master')
+            .query(
+                'UPDATE teacher SET picture = ? WHERE teacher_id = ?',
+                [req.file.filename, req.session.user.teacher_id],
+                send_response
+            )
+            .end();
+    }
 
-		res.item(req.file.path).send();
+    function send_response (err, result, args, last_query) {
+        if (err) {
+            winston.error('Error in updating picture', last_query);
+            return next(err);
+        }
+
+        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' uploaded an account picture.');
+
+       res.item({message: 'Successfully updated picture'}).send();
 	}
 
 	start();
@@ -206,3 +225,51 @@ exports.get_transaction_history = (req, res, next) => {
 
 	start();
 };
+
+exports.get_picture = (req, res, next) => {
+    let filePath;
+	
+	function start() {
+		mysql.use('master')
+			.query(
+				'SELECT picture FROM teacher WHERE teacher_id = ?;',
+				[req.session.user.teacher_id],
+				read_image
+			)
+			.end();
+	}
+	
+	function read_image(err, result, args, last_query){
+		if(err){
+			winston.error('Error in selecting teacher', last_query);
+			return next(err);
+		}
+
+		if(!result.length){
+			return res.status(404)
+				.error({code: 'TEACHER404', message: 'Teacher image not found'})
+				.send();
+		}
+		
+        filePath = `${config.TEACHER_PIC_PATH}/${result[0].picture}`;
+        fs.stat(filePath, give_image);
+	}
+
+    function give_image(err, stats) {
+        if (err) {
+            return res.redirect(config.DEFAULT_PIC_LINK);
+        }
+
+        res.writeHead(200, {
+            'Content-Type': 'image',
+            'Content-Length': stats.size
+        });
+
+        fs.createReadStream(filePath).pipe(res);
+
+    logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed his account picture.');
+
+	}
+
+	start();
+}
