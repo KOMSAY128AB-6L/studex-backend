@@ -209,9 +209,12 @@ exports.no_repetition = (req, res, next) => {
 	function start () {
 	mysql.use('master')
 			.query(
-			'SELECT s.* from student s LEFT JOIN (SELECT vs.* FROM volunteer_student vs, volunteer v WHERE v.teacher_id = ? AND v.class_id = ? AND DATE(v.volunteer_date) = CURDATE()) as selection ON s.student_id = selection.student_id WHERE selection.student_id IS NULL AND s.class_id = ?',
-			[req.session.user.teacher_id, req.params.id, req.params.id],
-			send_response
+                    `SELECT DISTINCT s.* FROM student s JOIN class c ON s.class_id = c.class_id AND
+                    c.class_id = ? AND c.teacher_id = ? AND s.student_id NOT IN (SELECT DISTINCT s.student_id FROM student s 
+                    JOIN volunteer_student vs ON s.student_id = vs.student_id 
+                    JOIN volunteer v ON v.volunteer_id = vs.volunteer_id AND DATE(v.volunteer_date) = CURDATE())`
+                    [req.params.id, req.session.user.teacher_id],
+                    send_response
 		)
 		.end();
 	}
