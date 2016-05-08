@@ -199,10 +199,13 @@ exports.retrieve_student = (req, res, next) => {
         },
         req.body
     );
+
     function start () {
         mysql.use('master')
             .query(
-                'SELECT * FROM student WHERE last_name = ? and class_id = ?;',
+                'SELECT s.*, count(vs.student_id) as "times_volunteered" FROM student s \
+                    LEFT JOIN volunteer_student vs ON s.student_id=vs.student_id \
+                    WHERE s.last_name = ? and s.class_id = ?;',
                 [data.last_name, req.params.id],
                 send_response
             )
@@ -215,7 +218,7 @@ exports.retrieve_student = (req, res, next) => {
             return next(err);
         }
 
-        if (!result.length) {
+        if (!result.length || result[0].student_id==null) {
             return res.status(404)
                 .error({code: 'STUDENT404', message: 'Student not found'})
                 .send();
@@ -235,7 +238,10 @@ exports.retrieve_all_student = (req, res, next) => {
     function start () {
         mysql.use('master')
             .query(
-                'SELECT * FROM student where class_id = ?;',
+                'SELECT s.*, count(vs.student_id) as "times_volunteered"\
+                    FROM student s LEFT JOIN volunteer_student vs ON \
+                    vs.student_id=s.student_id WHERE s.class_id=? \
+                    GROUP BY s.student_id;',
                 req.params.id,
                 send_response
             )
