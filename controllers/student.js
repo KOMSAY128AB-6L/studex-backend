@@ -235,13 +235,10 @@ exports.retrieve_all_student = (req, res, next) => {
     function start () {
         mysql.use('master')
             .query(
-                'SELECT student.student_id, CONCAT(CONCAT(student.first_name, " ",\
-                    student.middle_initial, ". "), student.last_name) as "Name", \
-                    student.student_number, student.email, student.picture, \
-                    student.chance, count(volunteer_student.student_id) as "Number of Times Volunteered"\
-                    FROM student LEFT JOIN volunteer_student ON \
-                    volunteer_student.student_id=student.student_id WHERE class_id=? \
-                    GROUP BY student.student_id;',
+                'SELECT s.*, count(vs.student_id) as "Number of Times Volunteered"\
+                    FROM student s LEFT JOIN volunteer_student vs ON \
+                    vs.student_id=s.student_id WHERE s.class_id=? \
+                    GROUP BY s.student_id;',
                 req.params.id,
                 send_response
             )
