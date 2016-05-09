@@ -308,7 +308,7 @@ exports.retrieve_log_of_volunteers = (req, res, next) => {
     function start () {
         mysql.use('master')
             .query(
-                    `SELECT CONCAT(CONCAT(t.first_name, ", "), t.last_name) AS "Teacher",
+                    `SELECT CONCAT(CONCAT(t.last_name, ", "), t.first_name) AS "Teacher",
                      CONCAT(CONCAT(c.class_name, "-"), c.section) AS "Class",
                      CONCAT(CONCAT(s.last_name, ", "), s.first_name) AS "Volunteer", s.picture AS Picture, 
                      volunteer_date FROM volunteer v, teacher t, class c, volunteer_student vs, student s WHERE t.teacher_id = ? AND
