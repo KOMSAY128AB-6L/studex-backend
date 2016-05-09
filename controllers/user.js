@@ -75,8 +75,6 @@ exports.create_user = (req, res, next) => {
             return next(err);
         }
 
-        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' created user ' + data.first_name + ' ' + data.middle_initial + ' ' + data.last_name + '.');
-
         return res.status(200)
                 .item({code: 'USER200', message: 'User successfully created'})
                 .send();
