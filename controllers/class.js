@@ -2,12 +2,14 @@
 
 const util  	   = require(__dirname + '/../helpers/util');
 const date  	   = require(__dirname + '/../helpers/date');
+const config  	   = require(__dirname + '/../config/config');
 const logger       = require('../helpers/logger');
 const csv_writer   = require('fast-csv');
 const mysql   	   = require('anytv-node-mysql');
 const winston 	   = require('winston');
 const sh       	   = require('shelljs');
 const multer       = require('multer');
+const opener       = require('opener');
 const fs		   = require('fs');
 const storage      =   multer.diskStorage( {
     destination: (req, file, cb) => {
@@ -90,9 +92,9 @@ exports.view_classes = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Classes not found'})
 			.send();
 		}
-		
+
 		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed his classes.');
-		
+
 		res.item(result)
 		.send();
 	}
@@ -210,8 +212,8 @@ exports.no_repetition = (req, res, next) => {
 	mysql.use('master')
 			.query(
                     `SELECT DISTINCT s.* FROM student s JOIN class c ON s.class_id = c.class_id AND
-                    c.class_id = ? AND c.teacher_id = ? AND s.student_id NOT IN (SELECT DISTINCT s.student_id FROM student s 
-                    JOIN volunteer_student vs ON s.student_id = vs.student_id 
+                    c.class_id = ? AND c.teacher_id = ? AND s.student_id NOT IN (SELECT DISTINCT s.student_id FROM student s
+                    JOIN volunteer_student vs ON s.student_id = vs.student_id
                     JOIN volunteer v ON v.volunteer_id = vs.volunteer_id AND DATE(v.volunteer_date) = CURDATE())`
                     [req.params.id, req.session.user.teacher_id],
                     send_response
@@ -228,9 +230,9 @@ exports.no_repetition = (req, res, next) => {
 			.error({code: 'CLASS404', message: 'Classes not found'})
 			.send();
 		}
-		
+
 		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' set randomizer to no repetition.');
-		
+
 		res.item(result)
 		.send();
 	}
@@ -240,71 +242,71 @@ exports.no_repetition = (req, res, next) => {
 exports.write_to_csv = (req, res, next) => {
 
 	let values = [];
+  let filename = "classlist-" + date.get_today() + ".csv";
 
-	function start(){
+  function start(){
+
 		mysql.use('master')
-			.query(
-				'SELECT * FROM class ORDER BY class_id',
-				start_query
-			)
-			.end();
+  		.query(
+        'SELECT c.class_name, c.section, s.email, s.first_name, s.middle_initial, s.last_name, s.picture \
+          FROM class c, student s \
+          WHERE s.class_id = c.class_id;',
+  			generate_csv
+  		)
+  		.end();
 	}
 
-    function start_query(err, result, args, last_query){
+	function generate_csv(err, result, args, last_query){
 
-		var i=0;
-
-		if(err){
-			winston.error('Selection query of classes failed', last_query);
-			return next(err);
-		}
-
-		result.forEach((element) => {
-			mysql.use('master')
-			.args(result[i])
-			.query(
-				'SELECT * FROM student WHERE class_id = ?',
-				[element.class_id],
-				write_to_csv_student
-			)
-			.end();
-			i++;
-		});
-
-	}
-
-	function write_to_csv_student(err, result, args, last_query){
+    let currentClass = "";
+    let currentSection = "";
 
 		if(err){
 			winston.error('Selection query of students failed', last_query);
 			return next(err);
 		}
 
-		values.push([
-			args[0].class_name,
-			args[0].section,
-		]);
+    result.forEach((element) => {
+      if (!(element.class_name == currentClass && element.section == currentSection)) {
+        values.push([
+          element.class_name,
+          element.section,
+        ]);
 
-		result.forEach((element) => {
-			values.push([
-				element.email,
-				element.first_name,
-				element.middle_initial,
-				element.last_name,
-				element.picture,
-			]);
-		});
+        values.push([
+          element.email,
+          element.first_name,
+          element.middle_initial,
+          element.last_name,
+          element.picture
+        ]);
+
+        currentClass = element.class_name;
+        currentSection = element.section;
+      } else {
+        values.push([
+          element.email,
+          element.first_name,
+          element.middle_initial,
+          element.last_name,
+          element.picture
+        ]);
+      }
+    });
 
 		csv_writer
-		.writeToPath("uploads/csv/students.csv", values, {headers: true})
-		.on("finish", send_response);
+  		.writeToPath("uploads/csv/" + filename, values, {headers: true})
+  		.on("finish", send_response);
 	}
 
 	function send_response(err, result, args){
-	 	if(err){
-	 		winston.error('Could not write to CSV');
-	 		return next(err);
-	 	}
+    if(err){
+      winston.error('Could not write to CSV');
+      return next(err);
+    }
+
+    // TODO: Download file after importing to backend
+    // opener('http://' + config.UPLOAD_DIR + 'csv/' + filename);
 
 	 	logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' added students list to CSV.');
 
@@ -373,7 +375,7 @@ exports.create_class = (req, res, next) => {
 
 exports.insert_csv_classlist = (req, res, next) => {
 
-    const timestamp = date.get_today();
+  const timestamp = date.get_today();
 	let path;
 
 	function start () {
