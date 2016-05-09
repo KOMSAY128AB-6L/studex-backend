@@ -5,6 +5,7 @@ const start = () => {
 
     let lr;
     let class_name;
+    let section;
 
     if (process.argv.length < 3) {
 	   console.log('Usage: node ' + process.argv[1] + ' INPUT > ../database/FILE.sql');
@@ -42,7 +43,8 @@ const start = () => {
                     line_arr[i] += ',';
                 }
             }
-            class_name = line_arr[1];
+            class_name = line_arr[0];
+            section = line_arr[1];
             console.log(
                 ['\nCALL ADD_CLASS (', line_arr[0], line_arr[1], line_arr[2], ');'].join('')
             );
@@ -59,7 +61,8 @@ const start = () => {
             console.log(
                 ['INSERT INTO student (email, first_name, middle_initial, last_name, picture, class_id)',
                 ' VALUES (', line_arr[0], line_arr[1], line_arr[2],  line_arr[3],  line_arr[4],
-                ', (SELECT class_id FROM class WHERE class_name = ', class_name.split(',')[0], ' LIMIT 1))',
+                ', (SELECT class_id FROM class WHERE class_name = ', class_name.split(',')[0], ' AND',
+                ' section = ', section.split(',')[0] ,' LIMIT 1))',
                 ' ON DUPLICATE KEY UPDATE ',
                     'email = ', line_arr[0].split(',')[0],
                 ';'].join('')
