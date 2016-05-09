@@ -248,9 +248,10 @@ exports.write_to_csv = (req, res, next) => {
 
 		mysql.use('master')
   		.query(
-        'SELECT c.class_name, c.section, s.email, s.first_name, s.middle_initial, s.last_name, s.picture \
+        'SELECT c.class_id, c.class_name, c.section, s.email, s.first_name, s.middle_initial, s.last_name, s.picture \
           FROM class c, student s \
-          WHERE s.class_id = c.class_id;',
+          WHERE s.class_id = c.class_id AND c.teacher_id=?;',
+        [req.session.user.teacher_id],
   			generate_csv
   		)
   		.end();
@@ -258,8 +259,7 @@ exports.write_to_csv = (req, res, next) => {
 
 	function generate_csv(err, result, args, last_query){
 
-    let currentClass = "";
-    let currentSection = "";
+    let currentClassId = 0;
 
 		if(err){
 			winston.error('Selection query of students failed', last_query);
@@ -267,7 +267,7 @@ exports.write_to_csv = (req, res, next) => {
 		}
 
     result.forEach((element) => {
-      if (!(element.class_name == currentClass && element.section == currentSection)) {
+      if (element.class_id !== currentClassId) {
         values.push([
           element.class_name,
           element.section,
@@ -281,8 +281,7 @@ exports.write_to_csv = (req, res, next) => {
           element.picture
         ]);
 
-        currentClass = element.class_name;
-        currentSection = element.section;
+        currentClassId = element.class_id;
       } else {
         values.push([
           element.email,

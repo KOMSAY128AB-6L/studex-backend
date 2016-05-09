@@ -47,13 +47,13 @@ INSERT INTO class(class_name, section, teacher_id)\
 		VALUES("CMSC 128","AB-3L",3);
 
 INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-4L",4);
+		VALUES("CMSC 128","AB-4L",1);
 
 INSERT INTO class(class_name, section, teacher_id)\
 		VALUES("CMSC 128","AB-5L",2);
 
 INSERT INTO class(class_name, section, teacher_id)\
-		VALUES("CMSC 128","AB-4L",1);
+		VALUES("CMSC 128","AB-6L",3);
 
 INSERT INTO class(class_name, section, teacher_id)\
 		VALUES("CMSC 128","AB-7L",3);
