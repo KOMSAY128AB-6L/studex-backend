@@ -36,7 +36,7 @@ module.exports = (router) => {
     router.get ('/teacher',                         $, __.teacher.get_teacher);
     router.post('/teacher',                         $, __.teacher.post_teacher);
     router.put ('/teacher',                         $, __.teacher.update_teacher);
-    router.del ('/teacher',                     $, __.teacher.delete_teacher);
+    router.del ('/teacher',                         $, __.teacher.delete_teacher);
     router.post('/teacher/upload',                  $, __.teacher.upload_picture);
     router.get ('/history',			                $, __.teacher.get_transaction_history);
 
@@ -52,6 +52,7 @@ module.exports = (router) => {
     router.get ('/class/csv',                       $, __.class.write_to_csv);
     router.get ('/classes',			                $, __.class.view_classes);
     router.get ('/class/:id',                       $, __.class.view_class);
+    router.get ('/class_info/:id',                  $, __.class.get_class);
     router.post('/class',                           $, __.class.create_class);
     router.put ('/class',                           $, __.class.update_class);
     router.del ('/class/:id',                       $, __.class.delete_class);

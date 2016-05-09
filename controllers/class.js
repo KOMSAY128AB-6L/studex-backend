@@ -99,11 +99,11 @@ exports.view_classes = (req, res, next) => {
 	start();
 };
 
-exports.view_classes = (req, res, next) => {
+exports.get_class = (req, res, next) => {
 	function start () {
 	mysql.use('master')
 			.query(
-			'SELECT * FROM class WHERE teacher_id=?',
+			'SELECT * FROM class WHERE class_id=?',
 			[req.session.user.teacher_id],
 			send_response
 		)
@@ -111,18 +111,18 @@ exports.view_classes = (req, res, next) => {
 	}
 	function send_response (err, result, args, last_query) {
 		if (err) {
-			winston.error('Error in viewing classes', last_query);
+			winston.error('Error in viewing class', last_query);
 			return next(err);
 		}
 		if (!result.length) {
 			return res.status(404)
-			.error({code: 'CLASS404', message: 'Classes not found'})
+			.error({code: 'CLASS404', message: 'Class not found'})
 			.send();
 		}
 
 		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed his classes.');
 
-		res.item(result)
+		res.item(result[0])
 		.send();
 	}
 	start();
