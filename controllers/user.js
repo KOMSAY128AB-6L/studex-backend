@@ -173,7 +173,7 @@ exports.reset_password = (req, res, next) => {
                 winston.error('Error in sending email containing password reset key', error);
                 return next(error);
             }
-            
+
             logger.logg(user.teacher_id, user.first_name + ' ' + user.middle_initial + ' ' + user.last_name + ' requested to change password.');
 
             res.status(200)
@@ -290,7 +290,7 @@ exports.confirm_reset_password = (req, res, next) => {
                 remove_request
             )
             .end();
-            
+
         logger.logg(user.teacher_id, user.first_name + ' ' + user.middle_initial + ' ' + user.last_name + ' successfully changed password.');
 
         return res.status(200)
@@ -314,7 +314,7 @@ exports.confirm_reset_password = (req, res, next) => {
 exports.logout_user = (req,res,next) => {
 
     logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' logged out to StudEx.');
-            
+
 	function start () {
 		req.session.destroy();
 	}
@@ -410,8 +410,8 @@ exports.change_password = (req, res, next) => {
 
     function check_password(err, result, args, last_query) {
         if (result.length === 0) {
-            res.status(400)
-               .item({message: 'Password does not match current password'})
+            return res.status(400)
+               .error({code: 'PASSWORD400', message: 'Password does not match current password'})
                .send();
         }
 
@@ -429,7 +429,7 @@ exports.change_password = (req, res, next) => {
             winston.error('Error in changing password', last_query);
             return next(err);
         }
-        
+
         logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' changed password.');
 
         res.item({message: 'Password changed'})
