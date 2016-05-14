@@ -98,7 +98,7 @@ exports.update_teacher = (req, res, next) => {
 
   const data = util.get_data(
       {
-      	  email: '',
+          email: '',
           first_name: '',
           middle_initial: '',
           last_name: ''
