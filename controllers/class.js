@@ -331,8 +331,8 @@ exports.create_class = (req, res, next) => {
 
         mysql.use('master')
             .query(
-                'SELECT class_id FROM class WHERE class_name = ? AND section = ?;',
-                [data.class_name, data.section],
+                'SELECT class_id FROM class WHERE class_name = ? AND section = ? AND teacher_id = ?;',
+                [data.class_name, data.section, req.session.user.teacher_id],
                 check_duplicate
             )
             .end();
@@ -341,9 +341,14 @@ exports.create_class = (req, res, next) => {
 
     function check_duplicate (err, result) {
 
+      if (err) {
+          winston.error('Error in finding duplicate class');
+          return next(err);
+      }
+
         if(result.length){
             return res.status(409)
-                .error({code: 'CLASS409', message: 'CONFLICT:Class already exists'})
+                .error({code: 'CLASS409', message: 'CONFLICT: Class already exists', result})
                 .send();
         }
 
