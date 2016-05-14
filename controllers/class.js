@@ -147,13 +147,13 @@ exports.update_class = (req, res, next) => {
 			.query(
 				'SELECT * FROM class WHERE class_name=? AND section=? AND teacher_id=?;',
 				[data.class_name, data.section, req.session.user.teacher_id],
-				update_class
+				update_query
 			)
 			.end();
 
 	}
 
-  function update_class (err, result, args, last_query) {
+  function update_query (err, result, args, last_query) {
     if (err) {
 			winston.error('Error in selecting class', last_query);
 			return next(err);
