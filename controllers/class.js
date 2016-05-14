@@ -132,12 +132,12 @@ exports.view_classes = (req, res, next) => {
 
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
-	  	 	id:'',
-			className:'',
+			class_name:'',
 			section:''
 		},
 		req.body
 	);
+
 	function start () {
 		if (data instanceof Error) {
 			return res.warn(400, {message: data.message});
@@ -145,13 +145,34 @@ exports.update_class = (req, res, next) => {
 
 		mysql.use('master')
 			.query(
-				'UPDATE class SET class_name = ?, section = ? WHERE class_id = ? AND teacher_id=?;',
-				[data.className, data.section, data.id, req.session.user.teacher_id],
-				send_response
+				'SELECT * FROM class WHERE class_name=? AND section=? AND teacher_id=?;',
+				[data.class_name, data.section, req.session.user.teacher_id],
+				update_class
 			)
 			.end();
 
 	}
+
+  function update_class (err, result, args, last_query) {
+    if (err) {
+			winston.error('Error in selecting class', last_query);
+			return next(err);
+		}
+
+    if(result.length){
+      return res.status(409)
+        .error({code: 'CLASS409', message: 'CONFLICT: Class update will cause conflicts', result})
+        .send();
+    }
+
+    mysql.use('master')
+			.query(
+				'UPDATE class SET class_name=?, section=? WHERE teacher_id=?;',
+				[data.class_name, data.section, req.session.user.teacher_id],
+				send_response
+			)
+			.end();
+  }
 
 	function send_response (err, result, args, last_query) {
 		if (err) {
