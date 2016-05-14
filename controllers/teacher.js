@@ -1,6 +1,7 @@
 'use strict';
 
 const config    = require(__dirname + '/../config/config');
+const util  	   = require(__dirname + '/../helpers/util');
 const mysql     = require('anytv-node-mysql');
 const winston   = require('winston');
 const logger = require('../helpers/logger');
@@ -95,11 +96,20 @@ exports.post_teacher = (req, res, next) => {
 
 exports.update_teacher = (req, res, next) => {
 
+  const data = util.get_data(
+      {
+          first_name: '',
+          middle_initial: '',
+          last_name: ''
+      },
+      req.body
+  );
+
 	function start () {
 		mysql.use('master')
 			.query(
-				'UPDATE teacher SET ? WHERE teacher_id=?',
-				[req.body, req.session.user.teacher_id],
+				'UPDATE teacher SET first_name=?, middle_initial=?, last_name=? WHERE teacher_id=?',
+				[data.first_name, data.middle_initial, data.last_name, req.session.user.teacher_id],
 				send_response
 			)
 			.end();
@@ -228,7 +238,7 @@ exports.get_transaction_history = (req, res, next) => {
 
 exports.get_picture = (req, res, next) => {
     let filePath;
-	
+
 	function start() {
 		mysql.use('master')
 			.query(
@@ -238,7 +248,7 @@ exports.get_picture = (req, res, next) => {
 			)
 			.end();
 	}
-	
+
 	function read_image(err, result, args, last_query){
 		if(err){
 			winston.error('Error in selecting teacher', last_query);
@@ -250,7 +260,7 @@ exports.get_picture = (req, res, next) => {
 				.error({code: 'TEACHER404', message: 'Teacher image not found'})
 				.send();
 		}
-		
+
         filePath = `${config.TEACHER_PIC_PATH}/${result[0].picture}`;
         fs.stat(filePath, give_image);
 	}
