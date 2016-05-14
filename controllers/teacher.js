@@ -98,6 +98,7 @@ exports.update_teacher = (req, res, next) => {
 
   const data = util.get_data(
       {
+      	  email: '',
           first_name: '',
           middle_initial: '',
           last_name: ''
@@ -108,8 +109,8 @@ exports.update_teacher = (req, res, next) => {
 	function start () {
 		mysql.use('master')
 			.query(
-				'UPDATE teacher SET first_name=?, middle_initial=?, last_name=? WHERE teacher_id=?',
-				[data.first_name, data.middle_initial, data.last_name, req.session.user.teacher_id],
+				'UPDATE teacher SET email=?, first_name=?, middle_initial=?, last_name=? WHERE teacher_id=?',
+				[data.email, data.first_name, data.middle_initial, data.last_name, req.session.user.teacher_id],
 				send_response
 			)
 			.end();
