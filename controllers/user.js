@@ -32,10 +32,18 @@ exports.create_user = (req, res, next) => {
         req.body
     );
 
-
     function start () {
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
+        }
+
+      	validate_email(/[^\s@]+@[^\s@]+\.[^\s@]+/.test(data.email));
+    }
+
+    function validate_email (result) {
+        if (result === false) {
+            winston.error('Error in validating email');
+      			return next('Pattern did not match');
         }
 
         mysql.use('master')

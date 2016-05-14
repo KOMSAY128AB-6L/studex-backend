@@ -107,14 +107,24 @@ exports.update_teacher = (req, res, next) => {
   );
 
 	function start () {
-		mysql.use('master')
+		update_query(/[^\s@]+@[^\s@]+\.[^\s@]+/.test(data.email));
+	}
+
+  function update_query (result) {
+
+    if (result === false) {
+			winston.error('Error in validating email');
+			return next('Pattern did not match');
+		}
+
+    mysql.use('master')
 			.query(
 				'UPDATE teacher SET email=?, first_name=?, middle_initial=?, last_name=? WHERE teacher_id=?',
 				[data.email, data.first_name, data.middle_initial, data.last_name, req.session.user.teacher_id],
 				send_response
 			)
 			.end();
-	}
+  }
 
 	function send_response (err, result, args, last_query) {
 
