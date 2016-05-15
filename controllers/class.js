@@ -209,15 +209,12 @@ exports.delete_class = (req, res, next) => {
 
 exports.no_repetition = (req, res, next) => {
     function start () {
-		//parser errors when used directly
-        const query = `SELECT DISTINCT s.* FROM student s JOIN class c ON s.class_id = c.class_id AND
-                    c.class_id = ? AND c.teacher_id = ? AND s.student_id NOT IN (SELECT DISTINCT s.student_id FROM student s
-                    JOIN volunteer_student vs ON s.student_id = vs.student_id
-                    JOIN volunteer v ON v.volunteer_id = vs.volunteer_id AND DATE(v.volunteer_date) = CURDATE())`;
-
         mysql.use('master')
                 .query(
-                        query,
+                        `SELECT DISTINCT s.* FROM student s JOIN class c ON s.class_id = c.class_id AND
+						c.class_id = ? AND c.teacher_id = ? AND s.student_id NOT IN (SELECT DISTINCT s.student_id FROM student s
+						JOIN volunteer_student vs ON s.student_id = vs.student_id
+						JOIN volunteer v ON v.volunteer_id = vs.volunteer_id AND DATE(v.volunteer_date) = CURDATE())`,
                         [req.params.id, req.session.user.teacher_id],
                         send_response
             )
