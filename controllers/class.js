@@ -131,47 +131,69 @@ exports.view_classes = (req, res, next) => {
 };
 
 exports.update_class = (req, res, next) => {
-    const data = util.get_data({
-               id:'',
-            className:'',
-            section:''
-        },
-        req.body
-    );
-    function start () {
-        if (data instanceof Error) {
-            return res.warn(400, {message: data.message});
-            }
+	const data = util.get_data({
+			id:'',
+			class_name:'',
+			section:''
+		},
+		req.body
+	);
 
-        mysql.use('master')
-            .query(
-                'UPDATE class SET class_name = ?, section = ? WHERE class_id = ? AND teacher_id=?;',
-                [data.className, data.section, data.id, req.session.user.teacher_id],
-                send_response
-            )
-            .end();
+	function start () {
+		if (data instanceof Error) {
+			return res.warn(400, {message: data.message});
+	        }
 
-    }
+		mysql.use('master')
+			.query(
+				'SELECT * FROM class WHERE class_name=? AND section=? AND teacher_id=?;',
+				[data.class_name, data.section, req.session.user.teacher_id],
+				update_query
+			)
+			.end();
 
-    function send_response (err, result, args, last_query) {
-        if (err) {
-            winston.error('Error in updating class', last_query);
-            return next(err);
-        }
+	}
 
-        if (result.affectedRows === 0) {
-            return res.status(404)
-                .error({code: 'CLASS404', message: 'Class not found'})
-                .send();
-    }
+  function update_query (err, result, args, last_query) {
+    if (err) {
+			winston.error('Error in selecting class', last_query);
+			return next(err);
+		}
 
-        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed students from class #' + data.id + '.');
-
-        res.item({message:'Class successfully updated'})
+    if(result.length){
+      return res.status(409)
+        .error({code: 'CLASS409', message: 'CONFLICT: Class update will cause conflicts', result})
         .send();
     }
 
-    start();
+    mysql.use('master')
+			.query(
+				'UPDATE class SET class_name = ?, section = ? WHERE class_id = ? AND teacher_id=?;',
+				[data.class_name, data.section, data.id, req.session.user.teacher_id],
+				send_response
+			)
+			.end();
+  }
+
+	function send_response (err, result, args, last_query) {
+		if (err) {
+			winston.error('Error in updating class', last_query);
+			return next(err);
+		}
+
+		if (result.affectedRows === 0) {
+			return res.status(404)
+				.error({code: 'CLASS404', message: 'Class not found'})
+				.send();
+	}
+
+		logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed students from class #' + data.id + '.');
+
+		res.item({message:'Class successfully updated'})
+		.send();
+	}
+
+	start();
 };
 
 exports.delete_class = (req, res, next) => {
