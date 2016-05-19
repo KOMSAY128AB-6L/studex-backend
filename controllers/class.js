@@ -131,7 +131,6 @@ exports.view_classes = (req, res, next) => {
 };
 
 exports.update_class = (req, res, next) => {
-<<<<<<< HEAD
 	const data = util.get_data({
       id:'',
 			class_name:'',
@@ -195,49 +194,6 @@ exports.update_class = (req, res, next) => {
 	}
 
 	start();
-=======
-    const data = util.get_data({
-               id:'',
-            className:'',
-            section:''
-        },
-        req.body
-    );
-    function start () {
-        if (data instanceof Error) {
-            return res.warn(400, {message: data.message});
-            }
-
-        mysql.use('master')
-            .query(
-                'UPDATE class SET class_name = ?, section = ? WHERE class_id = ? AND teacher_id=?;',
-                [data.className, data.section, data.id, req.session.user.teacher_id],
-                send_response
-            )
-            .end();
-
-    }
-
-    function send_response (err, result, args, last_query) {
-        if (err) {
-            winston.error('Error in updating class', last_query);
-            return next(err);
-        }
-
-        if (result.affectedRows === 0) {
-            return res.status(404)
-                .error({code: 'CLASS404', message: 'Class not found'})
-                .send();
-    }
-
-        logger.logg(req.session.user.teacher_id, req.session.user.first_name + ' ' + req.session.user.middle_initial + ' ' + req.session.user.last_name + ' viewed students from class #' + data.id + '.');
-
-        res.item({message:'Class successfully updated'})
-        .send();
-    }
-
-    start();
->>>>>>> def227f7fa1faddd29c8178f098b41c637fe243f
 };
 
 exports.delete_class = (req, res, next) => {
