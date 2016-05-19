@@ -132,6 +132,7 @@ exports.view_classes = (req, res, next) => {
 
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
+      id:'',
 			class_name:'',
 			section:''
 		},
@@ -167,8 +168,8 @@ exports.update_class = (req, res, next) => {
 
     mysql.use('master')
 			.query(
-				'UPDATE class SET class_name=?, section=? WHERE teacher_id=?;',
-				[data.class_name, data.section, req.session.user.teacher_id],
+				'UPDATE class SET class_name = ?, section = ? WHERE class_id = ? AND teacher_id=?;',
+				[data.class_name, data.section, data.id, req.session.user.teacher_id],
 				send_response
 			)
 			.end();
