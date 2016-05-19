@@ -102,22 +102,35 @@ exports.update_student = (req, res, next) => {
 
 
     function start () {
-        let id;
 
         if (data instanceof Error) {
             return res.warn(400, {message: data.message});
         }
 
-        id = req.params.id;
-        delete req.params.id;
-
         mysql.use('master')
             .query(
+                'SELECT student_id FROM student WHERE email = ?;',
+                [data.email],
+                check_duplicate
+            )
+            .end();
+       
+    }
+    function check_duplicate (err, result) {
+        if(result.length){
+            if(result[0].student_id!=req.params.id){
+                return res.item({message:'Email already exists.'}).send();
+            }
+        }
+
+         mysql.use('master')
+            .query(
                 'UPDATE student SET ? WHERE student_id = ? LIMIT 1;',
-                [data, id],
+                [data, req.params.id],
                 send_response
             )
             .end();
+
     }
 
     function send_response (err, result) {
