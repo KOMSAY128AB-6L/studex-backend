@@ -132,7 +132,7 @@ exports.view_classes = (req, res, next) => {
 
 exports.update_class = (req, res, next) => {
 	const data = util.get_data({
-      id:'',
+			id:'',
 			class_name:'',
 			section:''
 		},
